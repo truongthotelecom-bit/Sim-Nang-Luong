@@ -1,0 +1,4127 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VUA SIM ĐẸP - HỆ THỐNG PHONG THỦY TỔNG LỰC</title>
+    <!-- Thêm font chữ hiện đại -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Thêm thư viện Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+
+        :root {
+            --primary: #d32f2f;
+            --primary-hover: #b71c1c;
+            --secondary: #fbc02d;
+            --bg: #f4f7f6;
+            --surface: #ffffff;
+            --text-main: #2d3748;
+            --text-muted: #718096;
+            --border: #e2e8f0;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 15px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            margin: 0;
+            padding-bottom: 50px;
+            color: var(--text-main);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* HEADER & SEARCH */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 12px 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+        }
+
+        .search-area {
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 0 15px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .search-input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        .search-input-wrapper input {
+            width: 100%;
+            padding: 14px 90px 14px 45px;
+            /* Tăng padding-right để chừa vi trí cho nút Tìm */
+            border: 2px solid var(--border);
+            border-radius: 30px;
+            font-size: 16px;
+            outline: none;
+            transition: 0.3s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .search-input-wrapper input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .btn-search-inline {
+            position: absolute;
+            right: 6px;
+            top: 6px;
+            bottom: 6px;
+            background: var(--text-main);
+            color: white;
+            border: none;
+            border-radius: 24px;
+            padding: 0 20px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-search-inline:hover {
+            background: #1a202c;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-filter-trigger {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+            font-size: 15px;
+        }
+
+        .btn-filter-trigger:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .filter-icon {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+        }
+
+        /* DANH SÁCH SIM (CARD-BASED LAYOUT) */
+        .container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        .sim-card-list {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* DÒNG 1: MẠNG - SỐ - GIÁ */
+        .card-row-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .card-main-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* DÒNG 2: MỆNH - CÁT TINH - QUẺ */
+        .card-row-bottom {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding-top: 12px;
+            border-top: 1px dashed var(--border);
+        }
+
+        .telco-badge {
+            font-weight: 800;
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #718096;
+        }
+
+        .telco-viettel {
+            color: #e53935;
+        }
+
+        .telco-mobi {
+            color: #1e88e5;
+        }
+
+        .telco-vina {
+            color: #43a047;
+        }
+
+        .sim-num {
+            font-size: 22px;
+            font-weight: 800;
+            color: #1a202c;
+            letter-spacing: 0.5px;
+        }
+
+        .price {
+            color: var(--primary);
+            font-weight: 800;
+            font-size: 18px;
+        }
+
+        /* CHIPS / BADGES */
+        .tag-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .tag-row b {
+            color: var(--text-main);
+            font-weight: 700;
+        }
+
+        .tag-menh {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .tag-menh:hover {
+            filter: brightness(0.9);
+            transform: translateY(-1.5px);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .menh-thuy {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .menh-hoa {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .menh-kim {
+            background: #fff8e1;
+            color: #f57f17;
+        }
+
+        .menh-moc {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .menh-tho {
+            background: #efebe9;
+            color: #4e342e;
+        }
+
+        .tag-cat-tinh {
+            color: #4a5568;
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        .tag-que {
+            color: #6b46c1;
+            font-weight: 700;
+            font-size: 13px;
+            padding: 2px 4px;
+            cursor: pointer;
+            transition: 0.2s;
+            border-radius: 4px;
+        }
+
+        .tag-que:hover {
+            background: #f3e8ff;
+            transform: translateY(-1.5px);
+        }
+
+
+
+        /* SIM SELECTION MODE STYLES */
+        .sim-status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 5px;
+            margin-bottom: 5px;
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .sim-status-bar b {
+            color: var(--primary);
+        }
+
+        .sim-card {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            padding: 16px 20px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            margin-bottom: 12px;
+            animation: cardFadeIn 0.5s ease-out backwards;
+        }
+
+        @keyframes cardFadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .sim-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary);
+        }
+
+        .sim-checkbox {
+            display: none;
+            width: 22px;
+            height: 22px;
+            cursor: pointer;
+            accent-color: var(--primary);
+            flex-shrink: 0;
+        }
+
+        .selection-mode .sim-checkbox {
+            display: block;
+        }
+
+        .sim-card-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        /* DÒNG 3: TỈ LỆ 3 CÁT TINH */
+        .card-row-ratio {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px 15px;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px dotted var(--border);
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        .card-row-ratio b {
+            color: var(--primary);
+        }
+
+        /* FLOATING ACTION BUTTON (FAB) */
+        .fab-select {
+            position: fixed;
+            right: 25px;
+            bottom: 30px;
+            width: 65px;
+            height: 65px;
+            background: var(--text-main);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            z-index: 1500;
+            transition: 0.3s;
+            border: 3px solid white;
+        }
+
+        .fab-select:hover {
+            transform: scale(1.1);
+            background: var(--primary);
+        }
+
+        .fab-select svg {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 2px;
+        }
+
+        .fab-select span {
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        /* SELECTION ACTION BAR (BOTTOM) */
+        .selection-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #1a202c;
+            color: white;
+            padding: 15px 25px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 1600;
+            transform: translateY(100%);
+            transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .selection-mode .selection-bar {
+            transform: translateY(0);
+        }
+
+        .selection-mode .fab-select {
+            bottom: 100px;
+            background: var(--primary);
+        }
+
+        .btn-settings-trigger {
+            background: #f1f5f9;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 10px;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+            flex-shrink: 0;
+        }
+
+        .btn-settings-trigger:hover {
+            background: #e2e8f0;
+        }
+
+        .btn-settings-trigger svg {
+            width: 22px;
+            height: 22px;
+        }
+
+
+
+        .sel-stats {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .sel-stats span {
+            color: #fbd38d;
+        }
+
+        .sel-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn-sel {
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            transition: 0.2s;
+        }
+
+        .btn-sel-outline {
+            background: transparent;
+            border: 1.5px solid rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+
+        .btn-sel-outline:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: white;
+        }
+
+        .btn-sel-primary {
+            background: white;
+            color: #1a202c;
+        }
+
+        .btn-sel-primary:hover {
+            background: #edf2f7;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 600px) {
+            .selection-bar {
+                flex-direction: column;
+                gap: 12px;
+                padding: 15px 20px;
+                border-radius: 24px 24px 0 0;
+            }
+
+            .sel-stats {
+                width: 100%;
+                text-align: center;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                padding-bottom: 10px;
+            }
+
+            .sel-actions-flex {
+                flex-direction: column;
+                width: 100%;
+                gap: 12px;
+            }
+
+            .sel-limit-group {
+                width: 100%;
+            }
+
+            .sel-btns {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .btn-sel {
+                flex: 1;
+                padding: 12px 5px;
+                font-size: 12px;
+            }
+        }
+
+        .sel-actions-flex {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .sel-limit-group {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .sel-limit-group input {
+            width: 60px;
+            background: transparent;
+            border: none;
+            color: white;
+            text-align: center;
+            font-weight: 700;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .btn-limit-apply {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 7px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        .sel-btns {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* SORT OPTION STYLES */
+        .sort-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .sort-btn {
+            flex: 1;
+            background: #f1f5f9;
+            border: 1px solid var(--border);
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: 0.2s;
+            text-align: center;
+        }
+
+        .sort-btn.active {
+            background: var(--text-main);
+            color: white;
+            border-color: var(--text-main);
+        }
+
+        /* ACTIVE FILTERS BOARD */
+        .active-filters-board {
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 12px 15px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .filter-chip {
+            background: #edf2f7;
+            color: #2d3748;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid #e2e8f0;
+            transition: 0.2s;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .filter-chip:hover {
+            background: #e2e8f0;
+            transform: translateY(-1px);
+        }
+
+        .filter-chip .remove-icon {
+            cursor: pointer;
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #cbd5e1;
+            border-radius: 50%;
+            color: white;
+            font-size: 10px;
+            transition: 0.2s;
+        }
+
+        .filter-chip .remove-icon:hover {
+            background: var(--primary);
+        }
+
+        .btn-reset-main {
+            background: #fff;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            padding: 0 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+
+        .btn-reset-main:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+
+        /* RESPONSIVE CARDS */
+        @media (max-width: 768px) {
+            .sim-card {
+                padding: 15px;
+            }
+
+            .card-row-top {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .card-main-info {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .price {
+                align-self: flex-end;
+                font-size: 20px;
+            }
+
+            .sim-num {
+                font-size: 24px;
+            }
+
+            .card-row-bottom {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .tag-row {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .search-area {
+                flex-direction: row;
+                gap: 6px;
+                padding: 0 10px;
+                align-items: center;
+            }
+
+            .btn-filter-trigger {
+                padding: 0;
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+                flex-shrink: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .btn-filter-trigger span {
+                display: none;
+            }
+
+            .btn-settings-trigger {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                flex-shrink: 0;
+                padding: 0;
+            }
+
+            .search-input-wrapper input {
+                padding: 10px 65px 10px 35px;
+                font-size: 13px;
+                border-radius: 20px;
+            }
+
+            .search-icon {
+                left: 10px;
+                width: 16px;
+            }
+
+            .btn-search-inline {
+                padding: 0 10px;
+                font-size: 11px;
+                right: 4px;
+                top: 4px;
+                bottom: 4px;
+                border-radius: 18px;
+            }
+
+            .header-quick-bar {
+                padding: 8px 10px;
+                gap: 8px;
+            }
+
+            .quick-select {
+                font-size: 11px;
+                padding: 6px 4px;
+                min-width: 80px;
+            }
+
+            .quick-net-chip {
+                padding: 6px 12px;
+                font-size: 11px;
+            }
+        }
+
+        /* QUICK FILTER BAR */
+        .header-quick-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 10px 15px;
+            overflow-x: auto;
+            white-space: nowrap;
+            scrollbar-width: none;
+            /* Firefox */
+        }
+
+        .header-quick-bar::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Chrome/Safari */
+
+        .quick-filter-label {
+            font-size: 10px;
+            font-weight: 800;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-right: -4px;
+        }
+
+        .quick-select {
+            background: #f1f5f9;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-main);
+            outline: none;
+            cursor: pointer;
+            min-width: 100px;
+        }
+
+        .quick-select:focus {
+            border-color: var(--primary);
+        }
+
+        .quick-net-scroll {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .quick-net-chip {
+            padding: 8px 16px;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: 0.2s;
+            white-space: nowrap;
+        }
+
+        .quick-net-chip:hover {
+            background: #f8fafc;
+        }
+
+        .quick-net-chip.active {
+            color: white;
+            transform: translateY(-2px) scale(1.05);
+            font-weight: 900; /* Tăng độ đậm phông chữ */
+            border-width: 2px;
+        }
+
+        /* MÀU ĐẶC TRƯNG THEO TỪNG MẠNG */
+        .quick-net-chip.active[data-net="Viettel"] {
+            background: #ee0033;
+            border-color: #ee0033;
+            box-shadow: 0 8px 20px rgba(238, 0, 51, 0.4);
+        }
+
+        .quick-net-chip.active[data-net="Mobi"] {
+            background: #004cff;
+            border-color: #004cff;
+            box-shadow: 0 8px 20px rgba(0, 76, 255, 0.4);
+        }
+
+        .quick-net-chip.active[data-net="Vina"] {
+            background: #00a1e4;
+            border-color: #00a1e4;
+            box-shadow: 0 8px 20px rgba(0, 161, 228, 0.4);
+        }
+
+        .quick-net-chip.active[data-net="Vietnamobile"] {
+            background: #ff6600;
+            border-color: #ff6600;
+            box-shadow: 0 8px 20px rgba(255, 102, 0, 0.4);
+        }
+
+        .quick-net-chip.active[data-net="Itel"] {
+            background: #e60012;
+            border-color: #e60012;
+            box-shadow: 0 8px 20px rgba(230, 0, 18, 0.4);
+        }
+
+        .quick-net-chip.active[data-net="Wintel"] {
+            background: #ed1c24;
+            border-color: #ed1c24;
+            box-shadow: 0 8px 20px rgba(237, 28, 36, 0.4);
+        }
+
+        /* MAIN LAYOUT WITH SIDEBAR */
+        .main-layout {
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+            margin-top: 25px;
+        }
+
+        .content-main {
+            flex: 1;
+            min-width: 0;
+        }
+
+        /* SIDEBARS */
+        .sidebar-left,
+        .sidebar-right {
+            width: 250px;
+            position: sticky;
+            top: 90px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            flex-shrink: 0;
+        }
+
+        /* ẨN SIDEBARS TRÊN MOBILE/TABLET */
+        @media (max-width: 1300px) {
+            .sidebar-right {
+                display: none;
+            }
+        }
+
+        @media (max-width: 1023px) {
+            .sidebar-left {
+                display: none;
+            }
+
+            .main-layout {
+                display: block;
+            }
+        }
+
+        .quick-filter-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 22px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border);
+        }
+
+        .quick-filter-card h4 {
+            margin: 0 0 15px 0;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--primary);
+            border-bottom: 1.5px solid var(--bg);
+            padding-bottom: 8px;
+        }
+
+        .sidebar-select-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .sidebar-select-group label {
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .sidebar-net-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .sidebar-net-grid .quick-net-chip {
+            padding: 10px 5px;
+            text-align: center;
+        }
+
+        /* ẨN SIDEBAR TRÊN MOBILE/TABLET */
+        @media (max-width: 1023px) {
+            .sidebar-left {
+                display: none;
+            }
+
+            .main-layout {
+                display: block;
+            }
+        }
+
+        /* POPUP MODAL (BỘ LỌC) */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: var(--surface);
+            width: 100%;
+            max-width: 700px;
+            max-height: 90vh;
+            border-radius: 24px 24px 0 0;
+            padding: 25px 25px 0 25px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            transform: translateY(100%);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+
+        @media (min-width: 769px) {
+            .modal {
+                align-items: center;
+            }
+
+            .modal-content {
+                border-radius: var(--radius-lg);
+                padding: 35px;
+                transform: scale(0.95);
+                max-height: 85vh;
+            }
+
+            .modal.active .modal-content {
+                transform: scale(1);
+            }
+        }
+
+        /* DETAIL POPUP SPECIFIC STYLES */
+        .detail-card {
+            background: #fff;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .detail-header {
+            background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+            color: #fff;
+            padding: 30px 25px;
+            text-align: center;
+            position: relative;
+        }
+
+        .detail-num {
+            font-size: 32px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .detail-price {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--secondary);
+        }
+
+        .detail-tags {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--text-main);
+            text-transform: uppercase;
+            margin: 25px 0 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        /* 8 CÁT TINH GRID */
+        .star-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        @media (max-width: 600px) {
+            .star-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .star-box {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+            transition: 0.3s;
+        }
+
+        .star-box label {
+            display: block;
+            font-size: 10px;
+            font-weight: 800;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+        }
+
+        .star-box span {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+
+        /* LOADING OVERLAY */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .loading-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ÂM DƯƠNG ANALYSIS */
+        .yy-analysis {
+            display: flex;
+            align-items: center;
+            background: #f1f5f9;
+            padding: 20px;
+            border-radius: 16px;
+            gap: 20px;
+        }
+
+        .yy-stat {
+            flex: 1;
+            text-align: center;
+        }
+
+        .yy-lbl {
+            font-size: 11px;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .yy-val {
+            font-size: 24px;
+            font-weight: 800;
+        }
+
+        /* CHART STYLES (NEW) */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        @media (max-width: 600px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .chart-box-wrapper {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .chart-box-wrapper h5 {
+            margin: 0 0 10px 0;
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .chart-container-canvas {
+            position: relative;
+            height: 180px;
+            width: 100%;
+        }
+
+        /* QUẺ DỊCH */
+        .que-detail-box {
+            background: #fffcf0;
+            border: 1px solid #ffecb3;
+            padding: 20px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .que-icon-placeholder {
+            width: 60px;
+            height: 60px;
+            background: #1a202c;
+            color: #fff;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 800;
+        }
+
+        .que-info-text b {
+            display: block;
+            font-size: 18px;
+            color: #854d0e;
+        }
+
+        .que-info-text p {
+            font-size: 13px;
+            color: #92400e;
+            margin: 4px 0 0 0;
+            line-height: 1.4;
+        }
+
+        .detail-footer-btns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 30px;
+            padding-bottom: 20px;
+        }
+
+        .btn-detail {
+            padding: 15px;
+            border-radius: 14px;
+            border: none;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-copy-full {
+            background: var(--text-main);
+            color: #fff;
+        }
+
+        .btn-zalo {
+            background: #0068ff;
+            color: #fff;
+        }
+
+        .btn-detail:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            color: var(--text-main);
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .close-modal {
+            background: #f1f5f9;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: 0.2s;
+        }
+
+        .close-modal:hover {
+            background: #e2e8f0;
+            color: var(--text-main);
+        }
+
+        .close-modal svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .modal-body {
+            overflow-y: auto;
+            padding-bottom: 20px;
+            padding-right: 5px;
+            flex: 1;
+        }
+
+        /* Modal Scrollbar */
+        .modal-body::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .modal-body::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .modal-body::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        /* FILTER COMPONENTS */
+        h3 {
+            color: var(--text-main);
+            font-size: 15px;
+            margin: 25px 0 12px 0;
+            font-weight: 700;
+        }
+
+        .filter-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .filter-row {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+        }
+
+        /* NÚT CHỌN DẠNG CHIP (PILL) */
+        .chip-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .chip-group-3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        @media (max-width: 600px) {
+            .chip-group-3 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .chip-label {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .chip-label input {
+            display: none;
+        }
+
+        .chip-text {
+            display: block;
+            width: 100%;
+            text-align: center;
+            padding: 12px 10px;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-muted);
+            transition: 0.2s ease;
+        }
+
+        .chip-label:hover .chip-text {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+
+        .chip-label input:checked+.chip-text {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 4px 10px rgba(211, 47, 47, 0.2);
+        }
+
+        /* TRÁNH SỐ & XÉT SỐ CUỐI */
+        .tech-box {
+            background: #fafafa;
+            padding: 20px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+        }
+
+        .exclude-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .num-btn {
+            border: 1px solid var(--border);
+            padding: 12px 0;
+            text-align: center;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            background: white;
+            font-size: 16px;
+            color: var(--text-main);
+            transition: 0.2s;
+        }
+
+        .num-btn:active {
+            transform: scale(0.95);
+        }
+
+        .num-btn.active {
+            background: var(--text-main);
+            color: white;
+            border-color: var(--text-main);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* STATUS LABEL */
+        .status-lbl {
+            font-size: 12px;
+            color: var(--primary);
+            font-weight: 500;
+            margin-top: 8px;
+            display: block;
+        }
+
+        /* INPUTS */
+        .input-text {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: #f8fafc;
+            outline: none;
+            font-size: 14px;
+            font-family: inherit;
+            transition: 0.2s;
+        }
+
+        .input-text:focus {
+            border-color: var(--text-main);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .modal-footer {
+            padding: 20px 0;
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            position: sticky;
+            bottom: 0px;
+            z-index: 10;
+        }
+
+        .btn-main {
+            width: 100%;
+            padding: 18px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 4px 15px rgba(211, 47, 47, 0.3);
+        }
+
+        .btn-main:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(211, 47, 47, 0.4);
+        }
+
+        .btn-main:active {
+            transform: translateY(0);
+        }
+
+        .que-scroll {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px;
+            background: #f8fafc;
+        }
+
+        .que-scroll::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .que-scroll::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        /* DÃY LOẠI TRỪ CHI TIẾT */
+        .exclude-detail {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-top: 15px;
+        }
+
+        /* GRID NHẬP ĐIỂM */
+        .points-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+        }
+
+        .point-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .point-item label {
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--text-main);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .point-inputs {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .point-inputs .input-text {
+            padding: 8px 4px;
+            text-align: center;
+            font-size: 13px;
+        }
+
+        .point-dash {
+            color: var(--text-muted);
+            font-weight: bold;
+            font-size: 10px;
+        }
+
+        @media (max-width: 600px) {
+            .points-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .hint-text {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        /* INPUT GIÁ TÙY CHỈNH */
+        .price-input-row {
+            display: grid;
+            grid-template-columns: 1fr 20px 1fr;
+            align-items: center;
+            gap: 5px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed var(--border);
+        }
+
+        .price-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .price-input-group span {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .price-dash {
+            margin-top: 20px;
+            color: var(--text-muted);
+            font-weight: bold;
+        }
+
+        /* TAG QUẺ DỊCH */
+        .tag-que {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-left: 8px;
+            vertical-align: middle;
+            text-transform: uppercase;
+        }
+        .tag-que.type-cat, .tag-que.type-daicat { background: #e8f5e9; color: #2e7d32; }
+        .tag-que.type-hung { background: #ffebee; color: #c62828; }
+        .tag-que.type-binhhoa { background: #f1f5f9; color: #475569; }
+        .tag-que.type-cathanh { background: #fff3e0; color: #ef6c00; }
+
+        /* HÌNH QUẺ DỊCH */
+        .que-visual {
+            display: flex !important;
+            flex-direction: column;
+            gap: 3px;
+            width: 42px;
+            height: 42px;
+            padding: 6px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border: 1px solid #f1f5f9;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* TOOLTIP HOVER */
+        .tag-tooltip {
+            position: fixed;
+            z-index: 10000;
+            background: #334155;
+            color: #f8fafc;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 13px;
+            max-width: 280px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            pointer-events: none;
+            display: none;
+            line-height: 1.5;
+            border: 1px solid #475569;
+        }
+        .tag-tooltip b { color: #facc15; display: block; margin-bottom: 4px; }
+        .tag-tooltip hr { border: 0; border-top: 1px solid #475569; margin: 8px 0; }
+        .tag-tooltip .label { font-weight: 600; color: #94a3b8; }
+        .tag-tooltip .value { color: #f1f5f9; }
+        .que-line {
+            height: 3px;
+            width: 100%;
+            border-radius: 2px;
+        }
+        .que-line.solid {
+            background: #1e293b;
+        }
+        .que-line.broken {
+            display: flex;
+            justify-content: space-between;
+            background: transparent !important;
+        }
+        .que-line.broken::before, .que-line.broken::after {
+            content: "";
+            height: 3px;
+            width: 42%;
+            background: #1e293b;
+            border-radius: 2px;
+        }
+        /* MODAL Ý NGHĨA TỔ HỢP */
+        #combinationModal {
+            display: none;
+            position: fixed;
+            z-index: 3000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+
+        #combinationModal.active {
+            display: flex;
+        }
+
+        .comb-content {
+            background: #fff;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 450px;
+            width: 90%;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            position: relative;
+            animation: modalIn 0.3s ease-out;
+        }
+
+        .comb-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .comb-desc {
+            font-size: 15px;
+            line-height: 1.6;
+            color: #475569;
+        }
+
+        .comb-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #f1f5f9;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #64748b;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="search-area">
+            <button class="btn-settings-trigger" onclick="toggleSettingsModal(true)" title="Cài đặt">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+            <div class="search-input-wrapper">
+                <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" id="mainSearch" placeholder="Tìm số (Vd: 090*191, *999)"
+                    onkeypress="handleSearchEnter(event)">
+                <button class="btn-search-inline" onclick="executeMainSearch()">Tìm</button>
+            </div>
+            <button class="btn-reset-main" onclick="resetFilters()" style="margin-right: 4px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                    <path d="M3 3v5h5"></path>
+                </svg>
+                <span class="hidden-mobile">BỎ LỌC</span>
+            </button>
+            <button class="btn-filter-trigger" onclick="toggleModal(true)">
+                <svg class="filter-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z" />
+                </svg>
+                <span>BỘ LỌC</span>
+            </button>
+        </div>
+
+        <!-- THANH LỌC NHANH TRONG HEADER (SẮP XẾP & MẠNG) -->
+        <div class="header-quick-bar">
+            <select class="quick-select" id="headerSort" onchange="setSort(this.value)">
+                <option value="default">Sắp xếp</option>
+                <option value="asc">Giá thấp ↑</option>
+                <option value="desc">Giá cao ↓</option>
+            </select>
+
+            <div class="quick-net-scroll">
+                <div class="quick-net-chip" data-net="Viettel" onclick="toggleQuickNet('Viettel')">Viettel</div>
+                <div class="quick-net-chip" data-net="Mobi" onclick="toggleQuickNet('Mobi')">Mobifone</div>
+                <div class="quick-net-chip" data-net="Vina" onclick="toggleQuickNet('Vina')">Vinaphone</div>
+                <div class="quick-net-chip" data-net="Vietnamobile" onclick="toggleQuickNet('Vietnamobile')">VNM</div>
+                <div class="quick-net-chip" data-net="Itel" onclick="toggleQuickNet('Itel')">Itel</div>
+                <div class="quick-net-chip" data-net="Wintel" onclick="toggleQuickNet('Wintel')">Wintel</div>
+            </div>
+        </div>
+    </header>
+
+    <div id="activeFiltersBoard" class="active-filters-board"></div>
+
+    <!-- TRẠNG THÁI TẢI DỮ LIỆU -->
+    <div class="main-layout container">
+        <!-- CỘT BÊN TRÁI (SIDEBAR - CHỈ HIỆN TRÊN MÁY TÍNH) -->
+
+
+        <!-- NỘI DUNG CHÍNH (DANH SÁCH SIM) -->
+        <main class="content-main">
+            <div class="sim-status-bar" style="margin-top: 0; border-radius: var(--radius-md);">
+                <span>Đang hiển thị: <b id="stCount">0</b> / <b id="stTotal">0</b> SIM</span>
+            </div>
+
+            <div class="sim-card-list" id="simBody">
+                <!-- JS chèn SIM vào đây -->
+            </div>
+
+            <div id="loadMoreTrigger" style="height: 50px; text-align: center; margin-bottom: 30px;"></div>
+        </main>
+
+        <!-- CỘT BÊN PHẢI (SIDEBAR - LỌC GIÁ) -->
+        <aside class="sidebar-right">
+            <div class="quick-filter-card">
+                <h4>Khoảng Giá Phổ Biến</h4>
+                <div class="sidebar-select-group">
+                    <label class="chip-label">
+                        <input type="checkbox" class="price-cb" value="Dưới 1tr" onchange="updateUI()">
+                        <span class="chip-text">Dưới 1 triệu</span>
+                    </label>
+                    <label class="chip-label">
+                        <input type="checkbox" class="price-cb" value="1-5tr" onchange="updateUI()">
+                        <span class="chip-text">1 - 5 triệu</span>
+                    </label>
+                    <label class="chip-label">
+                        <input type="checkbox" class="price-cb" value="5-10tr" onchange="updateUI()">
+                        <span class="chip-text">5 - 10 triệu</span>
+                    </label>
+                    <label class="chip-label">
+                        <input type="checkbox" class="price-cb" value="Khác" onchange="toggleCustomPrice(this)">
+                        <span class="chip-text">Khác</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="quick-filter-card" id="customPriceCard" style="display: none;">
+                <h4>Khoảng Giá Tùy Chỉnh</h4>
+                <div class="price-input-row" style="margin-top:0; border-top:none; padding-top:0;">
+                    <div class="price-input-group">
+                        <span>Tối thiểu</span>
+                        <input type="number" id="priceMin" class="input-text" placeholder="Min" onchange="updateUI()">
+                    </div>
+                    <div class="price-dash" style="margin-top:15px;">-</div>
+                    <div class="price-input-group">
+                        <span>Tối đa</span>
+                        <input type="number" id="priceMax" class="input-text" placeholder="Max" onchange="updateUI()">
+                    </div>
+                </div>
+                <p style="font-size: 10px; color: var(--text-muted); margin-top: 10px; font-style: italic;">
+                    (Nhập số tiền chính xác để lọc)
+                </p>
+            </div>
+
+            <div class="quick-filter-card" style="background: #fffef0; border-color: #fbd38d;">
+                <h4 style="color: #c05621; border-color: #feebc8;">Mẹo Tìm Kiếm</h4>
+                <p style="font-size: 11px; color: #744210; margin: 0; line-height: 1.6;">
+                    Bạn có thể kết hợp <b>Chọn mạng</b> ở trên, <b>Phục vị</b> bên trái và <b>Khoảng giá</b> bên phải để
+                    tìm được số SIM ưng ý nhất!
+                </p>
+            </div>
+        </aside>
+    </div>
+
+
+
+    <!-- NÚT CHỌN SIM (FAB) -->
+    <div class="fab-select" id="fabSelect" onclick="toggleSelectionMode()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M9 11l3 3L22 4"></path>
+            <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"></path>
+        </svg>
+        <span>Chọn SIM</span>
+    </div>
+
+    <!-- THANH MENU NỔI (SELECTION BAR) -->
+    <div class="selection-bar" id="selectionBar">
+        <div class="sel-stats">
+            Đã chọn: <span id="selCount">0</span> số
+        </div>
+        <div class="sel-actions-flex">
+            <div class="sel-limit-group">
+                <input type="number" id="inputLimit" value="100" min="1">
+                <button class="btn-limit-apply" onclick="selectTopN()">Chọn tối đa</button>
+            </div>
+            <div class="sel-btns">
+                <button class="btn-sel btn-sel-outline" onclick="selectAllFiltered(true)">Tất cả</button>
+                <button class="btn-sel btn-sel-outline" onclick="selectAllFiltered(false)">Bỏ chọn</button>
+                <button class="btn-sel btn-sel-primary" onclick="copySelected()">Copy</button>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <!-- MODAL TÙY CHỌN COPY -->
+    <div class="modal" id="copyModal">
+        <div class="modal-content" style="padding-bottom: 20px; text-align: center;">
+            <div class="modal-header">
+                <h2>Định Dạng Lấy Dữ Liệu</h2>
+                <button class="close-modal" onclick="toggleCopyModal(false)">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                        stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body" style="display: flex; flex-direction: column; gap: 12px; margin-top: 10px;">
+                <button class="btn-sel btn-sel-outline"
+                    style="padding: 14px; font-size: 15px; border-color: var(--primary); color: var(--primary);"
+                    onclick="executeCopy(1)">Chỉ Copy Số SIM</button>
+                <button class="btn-sel btn-sel-primary" style="padding: 14px; font-size: 15px; background: #2563eb;"
+                    onclick="executeCopy(2)">SỐ + GIÁ TIỀN</button>
+                <button class="btn-sel btn-sel-primary" style="padding: 14px; font-size: 15px; background: #059669;"
+                    onclick="executeCopy(3)">SỐ + GIÁ + MỆNH</button>
+                <button class="btn-sel btn-sel-primary" style="padding: 14px; font-size: 15px; background: #d97706;"
+                    onclick="executeCopy(4)">SỐ + GIÁ + MỆNH + ĐIỂM CÁT TINH</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL CÀI ĐẶT -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Cài đặt ứng dụng</h2>
+                <button class="close-modal" onclick="toggleSettingsModal(false)">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                        stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body" style="padding-bottom: 30px;">
+                <h3 style="font-size: 15px; margin-bottom: 15px; color: var(--primary);">Cấu Hình Hiển Thị Giá</h3>
+                <div class="chip-group" style="grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 25px;">
+                    <label class="chip-label"><input type="radio" name="priceFmtStyle" value="vnd" checked
+                            onchange="updateUI()"><span class="chip-text">1.500.000đ</span></label>
+                    <label class="chip-label"><input type="radio" name="priceFmtStyle" value="TrDot"
+                            onchange="updateUI()"><span class="chip-text">1.5Tr</span></label>
+                    <label class="chip-label"><input type="radio" name="priceFmtStyle" value="TrChar"
+                            onchange="updateUI()"><span class="chip-text">1Tr5</span></label>
+                    <label class="chip-label"><input type="radio" name="priceFmtStyle" value="Trieu"
+                            onchange="updateUI()"><span class="chip-text">1.5 Triệu</span></label>
+                    <label class="chip-label" style="grid-column: span 2;"><input type="radio" name="priceFmtStyle"
+                            value="K" onchange="updateUI()"><span class="chip-text">Dạng K (1500K)</span></label>
+                </div>
+
+                <h3
+                    style="font-size: 15px; margin-bottom: 15px; color: var(--primary); border-top: 1px solid var(--border); padding-top: 20px;">
+                    Dữ Liệu Hệ Thống</h3>
+                <button class="btn-main" onclick="loadDataFromAPI()" style="background: #1a202c; box-shadow: none;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        style="margin-right: 8px;">
+                        <path d="M23 4v6h-6"></path>
+                        <path d="M1 20v-6h6"></path>
+                        <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"></path>
+                    </svg>
+                    Làm mới dữ liệu từ Google Sheet
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL BỘ LỌC -->
+    <div class="modal" id="filterModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                    </svg>
+                    Bộ lọc chuyên sâu
+                </h2>
+                <button class="close-modal" onclick="toggleModal(false)">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                        stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <h3 style="margin-bottom: 12px;">Sắp Xếp Dữ Liệu</h3>
+                <div class="sort-group">
+                    <div class="sort-btn active" id="sort-default" onclick="setSort('default')">Mặc định</div>
+                    <div class="sort-btn" id="sort-asc" onclick="setSort('asc')">Giá tăng dần ↑</div>
+                    <div class="sort-btn" id="sort-desc" onclick="setSort('desc')">Giá giảm dần ↓</div>
+                </div>
+
+                <div class="filter-row">
+                    <!-- NHÀ MẠNG (Modal vẫn giữ bản đầy đủ để dự phòng) -->
+                    <div style="grid-column: span 2;">
+
+                        <h3>Nhà Mạng</h3>
+                        <div class="chip-group chip-group-3">
+                            <label class="chip-label"><input type="checkbox" class="net-cb" value="Viettel"
+                                    onchange="updateUI()"><span class="chip-text">Viettel</span></label>
+                            <label class="chip-label"><input type="checkbox" class="net-cb" value="Mobi"
+                                    onchange="updateUI()"><span class="chip-text">Mobifone</span></label>
+                            <label class="chip-label"><input type="checkbox" class="net-cb" value="Vina"
+                                    onchange="updateUI()"><span class="chip-text">Vinaphone</span></label>
+                            <label class="chip-label"><input type="checkbox" class="net-cb" value="Vietnamobile"
+                                    onchange="updateUI()"><span class="chip-text">Vietnamobile</span></label>
+                            <label class="chip-label"><input type="checkbox" class="net-cb" value="Gmobile"
+                                    onchange="updateUI()"><span class="chip-text">Gmobile</span></label>
+                            <label class="chip-label"><input type="checkbox" class="net-cb" value="Itel"
+                                    onchange="updateUI()"><span class="chip-text">Itel</span></label>
+                            <label class="chip-label"><input type="checkbox" class="net-cb" value="Wintel"
+                                    onchange="updateUI()"><span class="chip-text">Wintel</span></label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MỆNH -->
+                <h3>Ngũ Hành (Mệnh)</h3>
+                <div class="chip-group">
+                    <label class="chip-label"><input type="checkbox" class="menh-cb" value="Kim"
+                            onchange="updateUI()"><span class="chip-text">Kim</span></label>
+                    <label class="chip-label"><input type="checkbox" class="menh-cb" value="Mộc"
+                            onchange="updateUI()"><span class="chip-text">Mộc</span></label>
+                    <label class="chip-label"><input type="checkbox" class="menh-cb" value="Thủy"
+                            onchange="updateUI()"><span class="chip-text">Thủy</span></label>
+                    <label class="chip-label"><input type="checkbox" class="menh-cb" value="Hỏa"
+                            onchange="updateUI()"><span class="chip-text">Hỏa</span></label>
+                    <label class="chip-label"><input type="checkbox" class="menh-cb" value="Thổ"
+                            onchange="updateUI()"><span class="chip-text">Thổ</span></label>
+                </div>
+
+                <!-- ÂM DƯƠNG -->
+                <h3>Âm Dương Cân Bằng</h3>
+                <div class="chip-group chip-group-3">
+                    <label class="chip-label"><input type="checkbox" class="am-duong-cb" value="-1"
+                            onchange="updateUI()"><span class="chip-text">Âm thịnh (-1)</span></label>
+                    <label class="chip-label"><input type="checkbox" class="am-duong-cb" value="0"
+                            onchange="updateUI()"><span class="chip-text">Cân bằng (0)</span></label>
+                    <label class="chip-label"><input type="checkbox" class="am-duong-cb" value="1"
+                            onchange="updateUI()"><span class="chip-text">Dương thịnh (1)</span></label>
+                </div>
+
+                <!-- LỌC THEO ĐỊNH DẠNG (*) -->
+                <div style="margin-top: 25px; border-top: 1px dashed var(--border); padding-top: 20px;">
+                    <h3 style="margin-bottom: 15px;">Lọc Theo Định Dạng Dấu Sao (*)</h3>
+
+                    <div style="display: flex; flex-direction: column; gap: 15px;">
+                        <!-- Nhóm 1: Số SIM -->
+                        <div
+                            style="background: #f8fafc; padding: 15px; border-radius: 12px; border: 1px solid var(--border);">
+                            <div style="font-weight: 700; font-size: 14px; color: var(--primary); margin-bottom: 6px;">
+                                1. Tìm Cấu Trúc Số SIM</div>
+                            <div class="hint-text" style="margin-top: 0; margin-bottom: 12px;">Dùng dấu <b>*</b> để thay
+                                thế. Khách có thể nhập có số 0 hoặc không (vd: <b>098*</b> hoặc <b>98*</b> đều được).
+                            </div>
+                            <input type="text" id="searchSim" class="input-text" placeholder="vd: 098*, *999..."
+                                onkeyup="updateUI()" style="background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                        </div>
+
+                        <!-- Nhóm 2: Cát Tinh / Phục Vị -->
+                        <div
+                            style="background: #f8fafc; padding: 15px; border-radius: 12px; border: 1px solid var(--border);">
+                            <div style="font-weight: 700; font-size: 14px; color: var(--primary); margin-bottom: 6px;">
+                                2. Chuỗi Cát Tinh & Phục Vị Căn Bản</div>
+                            <div class="hint-text" style="margin-top: 0; margin-bottom: 12px;">Tìm theo hệ chữ cái. Ngăn
+                                cách nhiều điều kiện bằng dấu phẩy (vd: <b>TY*, *SK</b>).</div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                                <div>
+                                    <label
+                                        style="font-size: 11px; font-weight: bold; color: var(--text-main); display: block; margin-bottom: 6px;">Cát
+                                        Tinh (Chữ)</label>
+                                    <input type="text" id="searchStars" class="input-text" placeholder="vd: TY*, *SK..."
+                                        onkeyup="updateUI()"
+                                        style="background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                                </div>
+                                <div>
+                                    <label
+                                        style="font-size: 11px; font-weight: bold; color: var(--text-main); display: block; margin-bottom: 6px;">Chuỗi
+                                        Có Phục Vị (Chữ)</label>
+                                    <input type="text" id="searchPV" class="input-text" placeholder="vd: PV*, *SK..."
+                                        onkeyup="updateUI()"
+                                        style="background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Nhóm 3: Biến Tính / Biến Tiến -->
+                        <div
+                            style="background: #f8fafc; padding: 15px; border-radius: 12px; border: 1px solid var(--border);">
+                            <div style="font-weight: 700; font-size: 14px; color: var(--primary); margin-bottom: 6px;">
+                                3. Lọc Dãy Số Rút Gọn Đặc Biệt</div>
+                            <div class="hint-text" style="margin-top: 0; margin-bottom: 12px;">Nhập chuỗi rút gọn mong
+                                muốn hoặc né các số xấu (Hỗ trợ nhét sao *vd: *49*).</div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                                <div>
+                                    <label
+                                        style="font-size: 11px; font-weight: bold; color: var(--text-main); display: block; margin-bottom: 6px;">Dãy
+                                        Số Rút Gọn Biến Tính</label>
+                                    <input type="text" id="searchCTBT" class="input-text"
+                                        placeholder="Gồm (vd: 919*, *72)" onkeyup="updateUI()"
+                                        style="background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 8px;">
+                                    <input type="text" id="excludeCTBT" class="input-text"
+                                        placeholder="Né (vd: *49*, *53*)" onkeyup="updateUI()"
+                                        style="background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #ffcdd2;">
+                                </div>
+                                <div>
+                                    <label
+                                        style="font-size: 11px; font-weight: bold; color: var(--text-main); display: block; margin-bottom: 6px;">Dãy
+                                        Số Rút Gọn Giữ PV</label>
+                                    <input type="text" id="searchPVBT" class="input-text"
+                                        placeholder="Gồm (vd: 913*, *72)" onkeyup="updateUI()"
+                                        style="background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 8px;">
+                                    <input type="text" id="excludePVBT" class="input-text"
+                                        placeholder="Né (vd: *49*, *53*)" onkeyup="updateUI()"
+                                        style="background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #ffcdd2;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TRÁNH HUNG TINH (GIÁ TRỊ = 1) -->
+                <div style="margin-top: 25px; border-top: 1px dashed var(--border); padding-top: 20px;">
+                    <h3 style="margin-bottom: 12px;">Tránh Hung Tinh (Giá trị = 1)</h3>
+                    <div class="chip-group">
+                        <label class="chip-label">
+                            <input type="checkbox" class="hung-cb" value="HungTinh-5" onchange="updateUI()">
+                            <span class="chip-text">Có số 5</span>
+                        </label>
+                        <label class="chip-label">
+                            <input type="checkbox" class="hung-cb" value="HungTinh-PhucVi" onchange="updateUI()">
+                            <span class="chip-text">Kề Phục Vị</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- TRÁNH SỐ -->
+                <h3>Tránh Số (Chạm để loại trừ)</h3>
+                <div class="tech-box">
+                    <div class="exclude-grid" id="exGrid"></div>
+                    <div class="status-lbl" id="st-ex" style="margin-top: 0; margin-bottom: 15px;"></div>
+
+                    <div
+                        style="display:flex; align-items:center; justify-content:space-between; padding-top:15px; border-top:1px dashed var(--border);">
+                        <span style="font-size:14px; font-weight:600; color:var(--text-main);">Xét đuôi bao nhiêu
+                            số?</span>
+                        <input type="number" id="lastDig" value="6" class="input-text"
+                            style="width:80px; text-align:center; padding: 8px;">
+                    </div>
+
+                    <!-- Input né số linh hoạt -->
+                    <div class="exclude-detail">
+                        <span style="font-size:14px; font-weight:600; color:var(--text-main); white-space:nowrap;">Né
+                            cặp/dãy số:</span>
+                        <input type="text" id="excludeString" class="input-text" placeholder="Ví dụ: 49, 53, 00"
+                            style="padding: 8px;">
+                    </div>
+                </div>
+
+                <!-- CHỈ SỐ CÁT TINH / ĐIỂM -->
+                <h3>Lọc Điểm Cát Tinh (Min - Max)</h3>
+                <div class="points-grid">
+                    <div class="point-item">
+                        <label>TY</label>
+                        <div class="point-inputs" style="flex: 1;">
+                            <input type="number" class="input-text" placeholder="Min" onchange="updateUI()" style="height: 44px; font-size: 16px;">
+                            <span class="point-dash">-</span>
+                            <input type="number" class="input-text" placeholder="Max" onchange="updateUI()" style="height: 44px; font-size: 16px;">
+                        </div>
+                    </div>
+                    <div class="point-item">
+                        <label>SK</label>
+                        <div class="point-inputs" style="flex: 1;">
+                            <input type="number" class="input-text" placeholder="Min" onchange="updateUI()" style="height: 44px; font-size: 16px;">
+                            <span class="point-dash">-</span>
+                            <input type="number" class="input-text" placeholder="Max" onchange="updateUI()" style="height: 44px; font-size: 16px;">
+                        </div>
+                    </div>
+                    <div class="point-item">
+                        <label>DN</label>
+                        <div class="point-inputs" style="flex: 1;">
+                            <input type="number" class="input-text" placeholder="Min" onchange="updateUI()" style="height: 44px; font-size: 16px;">
+                            <span class="point-dash">-</span>
+                            <input type="number" class="input-text" placeholder="Max" onchange="updateUI()" style="height: 44px; font-size: 16px;">
+                        </div>
+                    </div>
+                    <div class="point-item">
+                        <label>PV</label>
+                        <div class="point-inputs" style="flex: 1;">
+                            <input type="number" class="input-text" placeholder="Min" onchange="updateUI()" style="height: 44px; font-size: 16px;">
+                            <span class="point-dash">-</span>
+                            <input type="number" class="input-text" placeholder="Max" onchange="updateUI()" style="height: 44px; font-size: 16px;">
+                        </div>
+                    </div>
+                    <div class="point-item">
+                        <label>LS</label>
+                        <div class="point-inputs" style="flex: 1;">
+                            <input type="number" class="input-text" placeholder="Min" onchange="updateUI()" style="height: 44px; font-size: 16px;">
+                            <span class="point-dash">-</span>
+                            <input type="number" class="input-text" placeholder="Max" onchange="updateUI()" style="height: 44px; font-size: 16px;">
+                        </div>
+                    </div>
+                    <div class="point-item">
+                        <label>TM</label>
+                        <div class="point-inputs" style="flex: 1;">
+                            <input type="number" class="input-text" placeholder="Min" onchange="updateUI()" style="height: 44px; font-size: 16px;">
+                            <span class="point-dash">-</span>
+                            <input type="number" class="input-text" placeholder="Max" onchange="updateUI()" style="height: 44px; font-size: 16px;">
+                        </div>
+                    </div>
+                    <div class="point-item">
+                        <label>HH</label>
+                        <div class="point-inputs">
+                            <input type="number" class="input-text" placeholder="Min" onchange="updateUI()">
+                            <span class="point-dash">-</span>
+                            <input type="number" class="input-text" placeholder="Max" onchange="updateUI()">
+                        </div>
+                    </div>
+                    <div class="point-item">
+                        <label>NQ</label>
+                        <div class="point-inputs" style="flex: 1;">
+                            <input type="number" class="input-text" placeholder="Min" onchange="updateUI()" style="height: 44px; font-size: 16px;">
+                            <span class="point-dash">-</span>
+                            <input type="number" class="input-text" placeholder="Max" onchange="updateUI()" style="height: 44px; font-size: 16px;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TỔNG HỢP 3 CÁT TINH & TỈ LỆ -->
+                <div class="filter-row"
+                    style="margin-top: 15px; border-top: 1px dashed var(--border); padding-top: 15px;">
+                    <div class="point-item">
+                        <label>Tổng 3 Cát Tinh (TY+SK+DN)</label>
+                        <div class="point-inputs" style="width: fit-content;">
+                            <input type="number" id="total3Min" class="input-text" placeholder="Min"
+                                onchange="updateUI()" style="width: 100px;">
+                            <span class="point-dash">-</span>
+                            <input type="number" id="total3Max" class="input-text" placeholder="Max"
+                                onchange="updateUI()" style="width: 100px;">
+                        </div>
+                    </div>
+                    <div class="point-item">
+                        <label>Tỉ Lệ 3 Cát Tinh (Tổng 3 / Tổng 8)</label>
+                        <div class="point-inputs" style="width: fit-content;">
+                            <input type="number" id="ratio3Min" class="input-text" placeholder="Min %"
+                                onchange="updateUI()" style="width: 100px;">
+                            <span class="point-dash">-</span>
+                            <input type="number" id="ratio3Max" class="input-text" placeholder="Max %"
+                                onchange="updateUI()" style="width: 100px;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TỈ LỆ CHI TIẾT TỪNG SAO TRONG TỔNG 3 -->
+                <div class="points-grid" style="margin-top: 10px; background: #f1f5f9;">
+                    <div class="point-item">
+                        <label>% Thiên Y (TY)</label>
+                        <div class="point-inputs">
+                            <input type="number" id="pctTYMin" class="input-text" placeholder="Min %"
+                                onchange="updateUI()">
+                            <span class="point-dash">-</span>
+                            <input type="number" id="pctTYMax" class="input-text" placeholder="Max %"
+                                onchange="updateUI()">
+                        </div>
+                    </div>
+                    <div class="point-item">
+                        <label>% Sinh Khí (SK)</label>
+                        <div class="point-inputs">
+                            <input type="number" id="pctSKMin" class="input-text" placeholder="Min %"
+                                onchange="updateUI()">
+                            <span class="point-dash">-</span>
+                            <input type="number" id="pctSKMax" class="input-text" placeholder="Max %"
+                                onchange="updateUI()">
+                        </div>
+                    </div>
+                    <div class="point-item">
+                        <label>% Diên Niên (DN)</label>
+                        <div class="point-inputs">
+                            <input type="number" id="pctDNMin" class="input-text" placeholder="Min %"
+                                onchange="updateUI()">
+                            <span class="point-dash">-</span>
+                            <input type="number" id="pctDNMax" class="input-text" placeholder="Max %"
+                                onchange="updateUI()">
+                        </div>
+                    </div>
+                    <div class="point-item"
+                        style="justify-content: center; opacity: 0.5; font-size: 10px; font-style: italic;">
+                        (% tính theo Tổng 3)
+                    </div>
+                </div>
+
+                <!-- QUẺ DỊCH -->
+                <h3>Chọn Quẻ Dịch</h3>
+                <div style="position:relative; margin-bottom: 10px;">
+                    <svg style="position:absolute; left:12px; top:12px; color:#a0aec0;"
+                        xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text" placeholder="Gõ tên quẻ để tìm..." onkeyup="findQue(this)" class="input-text"
+                        style="padding-left:38px;">
+                </div>
+                <div class="que-scroll chip-group" id="queBox"></div>
+
+            </div>
+
+            <div class="modal-footer" style="display: flex; gap: 10px;">
+                <button class="btn-main" style="background: #f1f5f9; color: var(--text-main); border: 1px solid var(--border); box-shadow: none;" onclick="resetFilters()">ĐẶT LẠI</button>
+                <button class="btn-main" onclick="executeMainSearch()">XEM KẾT QUẢ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL CHI TIẾT SIM -->
+    <div class="modal" id="detailModal">
+        <div class="modal-content" style="max-width: 600px; padding: 0; overflow: hidden;">
+            <button class="close-modal" onclick="toggleDetail(false)"
+                style="position: absolute; right: 20px; top: 20px; z-index: 10; background: rgba(255,255,255,0.2); color: #fff;">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                    stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+
+            <div class="detail-header">
+                <span class="detail-num" id="d-num">098.555.7979</span>
+                <div class="detail-price" id="d-price">8.500.000đ</div>
+                <div class="detail-tags">
+                    <span class="telco-badge" id="d-telco"
+                        style="background:rgba(255,255,255,0.1); padding: 4px 12px; border-radius: 20px; color: #fff;">Viettel</span>
+                    <span class="tag-menh" id="d-menh" style="padding: 4px 12px; border-radius: 20px;">Mệnh Thủy</span>
+                </div>
+            </div>
+
+            <div class="modal-body" style="padding: 0 25px 25px 25px;">
+                <div class="section-title">Phân tích Âm Dương</div>
+                <div class="yy-analysis">
+                    <div class="yy-stat">
+                        <div class="yy-lbl">Số lượng Âm</div>
+                        <div class="yy-val" id="d-yy-am">5</div>
+                    </div>
+                    <div style="width: 1px; height: 30px; background: #cbd5e1;"></div>
+                    <div class="yy-stat">
+                        <div class="yy-lbl">Số lượng Dương</div>
+                        <div class="yy-val" id="d-yy-duong">5</div>
+                    </div>
+                    <div style="width: 1px; height: 30px; background: #cbd5e1;"></div>
+                    <div class="yy-stat">
+                        <div class="yy-lbl">Trạng thái</div>
+                        <div class="yy-val" id="d-yy-status" style="font-size: 16px; color: var(--primary);">Cân bằng
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-title">Tiến trình Năng lượng (Bát tinh)</div>
+                <div class="chart-box-wrapper" style="height: 250px; padding: 10px;">
+                    <canvas id="chartEnergy"></canvas>
+                </div>
+                <div id="d-stars-meaning"
+                    style="margin-top: 12px; font-size: 13px; color: #475569; line-height: 1.5; font-style: italic; background: #f8fafc; padding: 12px; border-radius: 10px; border-left: 4px solid var(--primary);">
+                    <!-- Ý nghĩa chung của các sao -->
+                </div>
+
+                <div class="section-title">Điểm số 8 Cát - Hung Tinh</div>
+                <div class="chart-box-wrapper" style="height: 220px; padding: 10px;">
+                    <canvas id="chartBar8"></canvas>
+                </div>
+
+                <div class="section-title">Tỉ Lệ Chuyên Sâu</div>
+                <div class="charts-grid">
+                    <div class="chart-box-wrapper">
+                        <h5>Phân bổ Nhóm Cát (TY-SK-DN)</h5>
+                        <div class="chart-container-canvas">
+                            <canvas id="chartRatio3"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-box-wrapper">
+                        <h5>Đối soát Cát / Hung (Tổng)</h5>
+                        <div class="chart-container-canvas">
+                            <canvas id="chartRatio4"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-title">Quẻ Dịch Chủ Quản</div>
+                <div class="que-detail-box">
+                    <div class="que-visual" id="d-que-icon"></div>
+                    <div class="que-info-text">
+                        <b id="d-que-name">Địa Thiên Thái</b>
+                        <p id="d-que-desc">Quẻ chủ về sự hanh thông, thái bình, vạn vật giao hòa, mọi việc đều thuận lợi
+                            như ý.</p>
+                    </div>
+                </div>
+
+                <div class="detail-footer-btns">
+                    <button class="btn-detail btn-copy-full" onclick="copyDetail()">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
+                        </svg>
+                        Copy đầy đủ
+                    </button>
+                    <button class="btn-detail btn-zalo">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                            <path
+                                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.35-.01-1.02-.2-1.52-.37-.62-.2-1.11-.31-1.07-.65.02-.18.27-.36.75-.55 2.94-1.28 4.91-2.12 5.89-2.52 2.79-1.12 3.37-1.32 3.75-1.32.08 0 .27.02.39.12.1.08.13.19.14.28.01.07.01.2.01.28z" />
+                        </svg>
+                        Zalo Thợ Sim
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL Ý NGHĨA TỔ HỢP -->
+    <div id="combinationModal">
+        <div class="comb-content">
+            <button class="comb-close" onclick="toggleCombModal(false)">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M18 6L6 18M6 6l12 12"></path>
+                </svg>
+            </button>
+            <div class="comb-title" id="combTitle">TỔ HỢP SAO</div>
+            <div class="comb-desc" id="combDesc">Bấm vào các đoạn nối trên biểu đồ để xem ý nghĩa kết hợp giữa 2 cặp sao.</div>
+        </div>
+    </div>
+
+    <!-- MÀN HÌNH TẢI DỮ LIỆU -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <div style="margin-top: 15px; font-weight: 700; color: var(--text-main); font-size: 16px;" id="loadingText">Đang
+            tải dữ liệu gốc...</div>
+    </div>
+
+    <script>
+        console.log("SIM_ANALYTICS_V8_REFINED_FINAL");
+        // ======= CẤU HÌNH API =======
+        const API_URL = "https://script.google.com/macros/s/AKfycbz-i1jY00WDxgbf0Vgx-m8wPO4RegslOnu-vVixp-AhLy6F_Ix7eggk6H4uTRwLIr4E/exec"; // Thay Link Google Apps Script vào đây
+
+        // ======= GLOBAL STATE =======
+        const QUERIES_64 = ["Thuần Càn", "Thuần Khôn", "Thủy Lôi Truân", "Sơn Thủy Mông", "Thủy Thiên Nhu", "Thiên Thủy Tụng", "Địa Thủy Sư", "Thủy Địa Tỷ", "Phong Thiên Tiểu Súc", "Thiên Trạch Lý", "Địa Thiên Thái", "Thiên Địa Bĩ", "Thiên Hỏa Đồng Nhân", "Hỏa Thiên Đại Hữu", "Địa Sơn Khiêm", "Lôi Địa Dự", "Trạch Lôi Tùy", "Sơn Phong Cổ", "Địa Trạch Lâm", "Phong Địa Quan", "Hỏa Lôi Phệ Hạp", "Sơn Hỏa Bí", "Sơn Địa Bác", "Địa Lôi Phục", "Thiên Lôi Vô Vọng", "Sơn Thiên Đại Súc", "Sơn Lôi Di", "Trạch Phong Đại Quá", "Thuần Khảm", "Thuần Ly", "Trạch Sơn Hàm", "Lôi Phong Hằng", "Thiên Sơn Độn", "Lôi Thiên Đại Tráng", "Hỏa Địa Tấn", "Địa Hỏa Minh Di", "Phong Hỏa Gia Nhân", "Hỏa Trạch Khuê", "Thủy Sơn Kiển", "Lôi Thủy Giải", "Sơn Trạch Tổn", "Phong Lôi Ích", "Trạch Thiên Quải", "Thiên Phong Cấu", "Trạch Địa Tụy", "Địa Phong Thăng", "Trạch Thủy Khốn", "Thủy Phong Tỉnh", "Trạch Hỏa Cách", "Hỏa Phong Đỉnh", "Thuần Chấn", "Thuần Cấn", "Phong Sơn Tiệm", "Lôi Trạch Quy Muội", "Lôi Hỏa Phong", "Hỏa Sơn Lữ", "Thuần Tốn", "Thuần Đoài", "Phong Thủy Hoán", "Thủy Trạch Tiết", "Phong Trạch Trung Phu", "Lôi Trạch Tiểu Quá", "Thủy Hỏa Ký Tế", "Hỏa Thủy Vị Tế"];
+        let FULL_DATA = [];
+        let filteredData = [];
+        let currentRenderCount = 0;
+        const CHUNK_SIZE = 100;
+
+
+        let starComboFilter = null;
+        let excluded = [];
+        let isSelectionMode = false;
+        let selectedSims = new Set(); // Dùng Set để lưu số gốc (sr) của sim đang chọn
+
+        let chartR3 = null;
+        let chartR4 = null;
+        let chartBar8 = null;
+        let chartEnergy = null;
+
+        const STAR_NAME_MAP = {
+            "TY": "Thiên Y", "SK": "Sinh Khí", "DN": "Diên Niên", "PV": "Phục Vị",
+            "LS": "Lục Sát", "TM": "Tuyệt Mệnh", "HH": "Họa Hại", "NQ": "Ngũ Quỷ"
+        };
+
+        const ELEMENT_INFO = {
+            "Kim": { 
+                hop: "Thủy, Thổ", 
+                khac: "Mộc",
+                intro: "Đại diện cho sức mạnh, sự tinh tế và quyết đoán. Người mệnh Kim thường cương trực, có khả năng tổ chức tốt."
+            },
+            "Mộc": { 
+                hop: "Hỏa, Thủy", 
+                khac: "Thổ",
+                intro: "Đại diện cho sự tăng trưởng, linh hoạt và nhân từ. Người mệnh Mộc giàu lòng vị tha, thích giúp đỡ mọi người."
+            },
+            "Thủy": { 
+                hop: "Mộc, Kim", 
+                khac: "Hỏa",
+                intro: "Đại diện cho sự thông minh, uyển chuyển và thấu hiểu. Người mệnh Thủy giỏi giao tiếp, nhạy bén trong xử lý tình huống."
+            },
+            "Hỏa": { 
+                hop: "Hỏa, Thổ", 
+                khac: "Thủy",
+                intro: "Đại diện cho đam mê, năng lượng và công lý. Người mệnh Hỏa quyết liệt, dũng cảm nhưng đôi khi nóng nảy."
+            },
+            "Thổ": { 
+                hop: "Kim, Hỏa", 
+                khac: "Thủy",
+                intro: "Đại diện cho sự ổn định, tin cậy và bao dung. Người mệnh Thổ khiêm tốn, điềm đạm và là chỗ dựa vững chắc."
+            }
+        };
+
+        // Data từ VBA: Cấu trúc điểm và loại sao
+        const STAR_DATA = {
+            "13": ["TY", 100], "31": ["TY", 100], "68": ["TY", 75], "86": ["TY", 75], "94": ["TY", 50], "49": ["TY", 50], "72": ["TY", 25], "27": ["TY", 25],
+            "14": ["SK", 100], "41": ["SK", 100], "67": ["SK", 75], "76": ["SK", 75], "93": ["SK", 50], "39": ["SK", 50], "82": ["SK", 25], "28": ["SK", 25],
+            "19": ["DN", 100], "91": ["DN", 100], "78": ["DN", 75], "87": ["DN", 75], "43": ["DN", 50], "34": ["DN", 50], "26": ["DN", 25], "62": ["DN", 25],
+            "11": ["PV", 100], "22": ["PV", 100], "88": ["PV", 75], "99": ["PV", 75], "77": ["PV", 50], "66": ["PV", 50], "44": ["PV", 25], "33": ["PV", 25],
+            "16": ["LS", 100], "61": ["LS", 100], "74": ["LS", 75], "47": ["LS", 75], "38": ["LS", 50], "83": ["LS", 50], "92": ["LS", 25], "29": ["LS", 25],
+            "12": ["TM", 100], "21": ["TM", 100], "69": ["TM", 75], "96": ["TM", 75], "37": ["TM", 50], "73": ["TM", 50], "84": ["TM", 25], "48": ["TM", 25],
+            "17": ["HH", 100], "71": ["HH", 100], "98": ["HH", 75], "89": ["HH", 75], "64": ["HH", 50], "46": ["HH", 50], "32": ["HH", 25], "23": ["HH", 25],
+            "18": ["NQ", 100], "81": ["NQ", 100], "97": ["NQ", 75], "79": ["NQ", 75], "36": ["NQ", 50], "63": ["NQ", 50], "42": ["NQ", 25], "24": ["NQ", 25]
+        };
+
+        const STAR_COMBINATIONS = {
+            "TYTY": "THIÊN Y + THIÊN Y <RẤT TỐT> --> Tụ tập, tăng cường năng lượng tài phú, có lợi cho hôn nhân",
+            "TYSK": "THIÊN Y + SINH KHÍ <RẤT TỐT> --> Nhiều quý nhân bằng hữu, hào phóng, nhân duyên tốt. Hợp tác làm ăn tốt",
+            "TYDN": "THIÊN Y + DIÊN NIÊN <RẤT TỐT> --> Có ý tự làm chủ, giỏi về đầu tư lập nghiệp. Giỏi quản lý tài chính, không tiêu tiền bừa bãi",
+            "TYPV": "THIÊN Y + PHỤC VỊ <RẤT TỐT> --> Từ trường Thiên Y được kéo dài, biểu thị nguồn tài lộc liên tục. Chính đào hoa",
+            "TYLS": "THIÊN Y + LỤC SÁT --> Nam dễ vì phụ nữ mà dễ phá tài, thiên đào hoa, ảnh hưởng đến tình cảm hôn nhân. Cặp này thường chi tiêu tiền cho gia đình, làm đẹp, phụ nữ",
+            "TYHH": "THIÊN Y + HỌA HẠI --> Thích dùng tiền, sĩ diện, thích mua đồ ăn, thích lấy lòng. Vì miệng mà phá tài",
+            "TYTM": "THIÊN Y + TUYỆT MỆNH --> Có tiền sẽ đi đầu tư, suy nghĩ không chặt chẽ, dễ phá tài, đầu tư dễ mất. Không hài hòa, dễ đổ vỡ tình cảm",
+            "TYNQ": "THIÊN Y + NGŨ QUỶ --> Suy nghĩ không ổn định gây hao tổn tài",
+            "SKTY": "SINH KHÍ + THIÊN Y <RẤT TỐT> --> Thông qua quý nhân mang đến tài phú",
+            "SKSK": "SINH KHÍ + SINH KHÍ <RẤT TỐT> --> Tập hợp tăng cường năng lượng quý nhân",
+            "SKDN": "SINH KHÍ + DIÊN NIÊN <RẤT TỐT> --> Thông qua quý nhân mang đến công việc tốt, thăng tiến trong công việc",
+            "SKPV": "SINH KHÍ + PHỤC VỊ <TỐT> --> Từ trường sinh khí được kéo dài",
+            "SKLS": "SINH KHÍ + LỤC SÁT --> Khéo léo chinh phục người khác, mật ngọt chết ruồi",
+            "SKHH": "SINH KHÍ + HỌA HẠI --> Tự nhận bản thân tốt, nói ra dễ gây tranh cãi ầm ĩ",
+            "SKTM": "SINH KHÍ + TUYỆT MỆNH --> Rất vui vẻ phấn đấu vì mộng vĩ đại, nhưng không nhất thiết phải thực hiện",
+            "SKNQ": "SINH KHÍ + NGŨ QUỶ --> Khéo đưa đẩy, vui vẻ thất thường, tâm cơ khó đoán",
+            "DNTY": "DIÊN NIÊN + THIÊN Y <RẤT TỐT> --> Dựa vào năng lực bản thân để kiếm tiền. Diên niên lớn + Thiên Y nhỏ = CV vất vả mà thu lợi ít. Diên Niên nhở + Thiên Y lớn = Kiếm tiền nhẹ nhõm",
+            "DNSK": "DIÊN NIÊN + SINH KHÍ <RẤT TỐT> --> Công việc vui vẻ không áp lực, có năng lực làm việc mạnh mẽ",
+            "DNDN": "DIÊN NIÊN + DIÊN NIÊN <RẤT TỐT> --> Năng lực chuyên nghiệp mạnh, có khả năng lãnh đạo, có quyền lợi",
+            "DNPV": "DIÊN NIÊN + PHỤC VỊ <TỐT> --> Cố gắng làm việc, có trách nhiệm, chịu được áp lực. Kéo dài từ trường Diên niên",
+            "DNLS": "DIÊN NIÊN + LỤC SÁT --> Công việc làm không vui, thường u buồn, không quả quyết",
+            "DNHH": "DIÊN NIÊN + HỌA HẠI --> Không ngừng phàn nàn, khó chịu, năng lực lãnh đạo bị cản trở, hay gặp tiểu nhân. Quyền lực bị uy hiếp, làm việc dễ hối hận",
+            "DNTM": "DIÊN NIÊN + TUYỆT MỆNH --> Không muốn làm việc, trong công việc phần lớn gặp khó khăn trắc trở. Không có tâm tình học tập, có ý thức học nhưng kết quả không tốt. Tình cảm không tốt, quan hệ nhân mạch không tốt",
+            "DNNQ": "DIÊN NIÊN + NGŨ QUỶ <XẤU> --> Công việc vừa làm vừa nghĩ biến báo, suy nghĩ nhiều",
+            "PVTY": "PHỤC VỊ + THIÊN Y <TỐT> --> Thông qua kiên trì chờ đợi mà tạo ra tài phú lớn",
+            "PVSK": "PHỤC VỊ + SINH KHÍ <TỐT> --> Súc thế năng lượng Sinh khí để Sinh khí càng đại hữu",
+            "PVDN": "PHỤC VỊ + DIÊN NIÊN <TỐT> --> Tăng cường năng lượng Diên niên, năng lực càng lớn mạnh, đạt quyền lợi",
+            "PVPV": "PHỤC VỊ + PHỤC VỊ --> Vận sức chờ phát động, tăng cường thế lực Phục vị",
+            "PVLS": "PHỤC VỊ + LỤC SÁT <XẤU> --> Vận sức chờ phát động, tăng cường thế lực Lục sát",
+            "PVHH": "PHỤC VỊ + HỌA HẠI <RẤT XẤU> --> Nói cứng rắn, tự cho mình đúng",
+            "PVTM": "PHỤC VỊ + TUYỆT MỆNH <XẤU> --> Súc thế xung động, trong công việc rất liều",
+            "PVNQ": "PHỤC VỊ + NGŨ QUỶ <XẤU> --> Vận sức chờ phát động, tăng cường thế lực Ngũ quỷ",
+            "LSTY": "LỤC SÁT + THIÊN Y <TỐT> --> Thông qua ngành dịch vụ mà kiếm tiền. Cần cho các công việc yêu cầu tỉ mỉ",
+            "LSSK": "LỤC SÁT + SINH KHÍ <RẤT TỐT> --> Nhân duyên tốt, nhiệt tình với mọi người, có quan hệ giao tiếp tốt",
+            "LSDN": "LỤC SÁT + DIÊN NIÊN <RẤT TỐT> --> Công tác hành chính hoặc phục vụ tốt, sẽ xử lý tốt mối quan hệ với nữ nhân",
+            "LSPV": "LỤC SÁT + PHỤC VỊ <XẤU> --> Từ trường Lục sát kéo dài. Sợ khó khăn",
+            "LSLS": "LỤC SÁT + LỤC SÁT <XẤU> --> Tăng cường cảm giác u buồn, có khuynh hướng tự kỷ. Cảm xúc không ổn định, quan hệ kết nối đột nhiên chuyển biến xấu. Đào hoa",
+            "LSHH": "LỤC SÁT + HỌA HẠI <XẤU> --> Không có tâm tình nói chuyện, dễ đắc tội với người khác",
+            "LSTM": "LỤC SÁT + TUYỆT MỆNH <XẤU> --> Cảm xúc vất vả cố gắng, cảm giác bị ức chế.Phá mối quan hệ trong hôn nhân, xã hội",
+            "LSNQ": "LỤC SÁT + NGŨ QUỶ <XẤU> --> Cảm xúc biến hóa thất thường, không có cảm giác an toàn",
+            "HHTY": "Họa Hại + THIÊN Y <TỐT> --> Thông qua lời nói mà kiếm tiền, các công việc như bán hàng, diễn thuyết, tư vấn…",
+            "HHSK": "HỌA HẠI + SINH KHÍ <RẤT TỐT> --> Khẩu tài tốt, nói có giá trị, nói người khác dễ nghe",
+            "HHDN": "HỌA HẠI + DIÊN NIÊN <RẤT TỐT> --> Ngành nghề công việc về nói. Có năng lực, ăn nói tốt. Phần lớn lấy miệng là nghiệp",
+            "HHPV": "HỌA HẠI + PHỤC VỊ --> Từ trường Họa hại được kéo dài",
+            "HHLS": "Họa Hại + LỤC SÁT <XẤU> --> Nói ra không cần đáp lại, làm cho người khác buồn bực im lặng, cảm xúc không tốt. Cho vay khó đòi, dạ dày có vấn đề",
+            "HHHH": "Họa Hại + Họa Hại <XẤU> --> Nói thẳng, chiêu cãi vã, cứng rắn, mạnh miệng, cãi lộn, tính khí nóng nảy, hụt hơi, không kiên nhẫn",
+            "HHTM": "HỌA HẠI + TUYỆT MỆNH <XẤU> --> Nói chuyện dễ xung động. Dễ nói chuyện đả thương người",
+            "HHNQ": "HỌA HẠI + NGŨ QUỶ <XẤU> --> Biểu đạt toàn là lời nói kỳ dị khiến người khác không hiểu được",
+            "TMTY": "TUYỆT MỆNH + THIÊN Y <RẤT TỐT> --> Thông qua phấn đấu cố gắng mà kiếm tiền. Hoặc làm đầu tư",
+            "TMSK": "TUYỆT MỆNH + SINH KHÍ <RẤT TỐT> --> Đầu tư vui vẻ hưởng thụ kết quả",
+            "TMDN": "TUYỆT MỆNH + DIÊN NIÊN <TỐT> --> Công việc dám liều. Đầu tư quản lý tài sản",
+            "TMPV": "TUYỆT MỆNH + PHỤC VỊ --> Từ trường Tuyệt mệnh được kéo dài",
+            "TMLS": "TUYỆT MỆNH + LỤC SÁT <XẤU> --> Dễ bốc đồng, nóng nảy đưa ra quyết định. Đầu tư dễ bị mất tiền. Hôn nhân dễ có vấn đề",
+            "TMHH": "TUYỆT MỆNH + HỌA HẠI <XẤU> --> Lời nói xung đột, dễ làm tổn thương người khác, gây mấu thuẫn, dễ chiêu cảm tai nạn",
+            "TMTM": "TUYỆT MỆNH + TUYỆT MỆNH <XẤU> --> Chủ quan, dễ kích động, dễ cực đoan, dễ phá tài. Không nên đánh bạc, không dễ quản lý tài sản",
+            "TMNQ": "TUYỆT MỆNH + NGŨ QUỶ <XẤU> --> Dễ xung động, có ý nghĩ kỳ dị. Có thể làm hại người",
+            "NQTY": "NGŨ QUỶ + THIÊN Y <RẤT TỐT> --> Thông qua tài hoa ý tưởng mà kiếm tiền. Công việc cần cường độ linh hoạt của não",
+            "NQSK": "NGŨ QUỶ + SINH KHÍ <RẤT TỐT> --> Đầu óc linh hoạt, có nhiều ý tưởng tốt",
+            "NQDN": "NGŨ QUỶ + DIÊN NIÊN <TỐT> --> Công việc cần cường độ linh hoạt của não",
+            "NQPV": "NGŨ QUỶ + PHỤC VỊ --> Từ trường Ngũ quỷ kéo dài",
+            "NQLS": "NGŨ QUỶ + LỤC SÁT <XẤU> --> Ý nghĩ rất buồn bực. Hôn nhân dễ thay đổi",
+            "NQHH": "NGŨ QUỶ + HỌA HẠI <XẤU> --> Hay tự cho mình là giỏi, tự cao, tự đắc, tranh cãi",
+            "NQTM": "NGŨ QUỶ + TUYỆT MỆNH <XẤU> --> Tận dụng cơ hội, cố gắng thực hiện. Dám liều, tiêu dùng bốc đồng, dễ khởi phát bệnh tật",
+            "NQNQ": "NGŨ QUỶ + NGŨ QUỶ <XẤU> --> Có tài nhưng không ổn định, phản ứng nhanh nhưng gặp trắc trở. Ý nghĩ hay thay đổi"
+        };
+
+        const STAR_INFO = {
+            "TY": {
+                name: "THIÊN Y",
+                intro: "Đại diện cho Tiền bạc và tình cảm. Người có từ trường này thông minh thiện lương hào phóng, thích giúp người khác, không có tâm cơ - chính vì thế nên cũng dễ bị lừa gạt. Từ trường này mang lại tài chính và nhân duyên tốt cho người sử dụng.",
+                weak: "Nhược điểm của từ trường này là thiếu ý kiến độc lập, thiếu suy nghĩ khi giải quyết mọi việc. Nếu từ trường này quá nhiều sẽ gây ra áp lực, có vấn đề về sức khỏe như tuần hoàn máu, huyết áp"
+            },
+            "SK": {
+                name: "SINH KHÍ",
+                intro: "Đại diện cho Vui vẻ, may mắn, quý nhân. Từ trường này lạc quan, xử lý mọi việc bình tĩnh, ổn định, mang lại năng lượng tích cực cho người khác. Có bạn hữu, quý nhân giúp đỡ. Năng lượng này trợ tốt cho con cái và sức khỏe.",
+                weak: "Nhược điểm: Không tham vọng, dễ hài lòng, lười biếng, thiếu quyết đoán"
+            },
+            "DN": {
+                name: "DIÊN NIÊN",
+                intro: "Đại diện cho đàn ông; làm chủ; công việc. Người có từ trường này năng lực lãnh đạo tốt, kiếm tiền được do chính sức làm việc của bản thân; tinh thần trách nhiệm cao; quản lý tài chính tốt; khó tính; cầu toàn",
+                weak: "Nhược điểm của người có từ trường này là: Tự quyết, không dễ thuyết phục, bồn chồn, mệt mỏi và bận rộn. Từ trường mà mạnh làm họ có tính gia trưởng, dễ mắc các bệnh liên quan đến đau xương khớp, cổ vai gáy, đau đầu, rụng tóc, tinh thần mệt mỏi"
+            },
+            "PV": {
+                name: "PHỤC VỊ",
+                intro: "Đại diện cho sự bình tĩnh và ổn định. Phục vị là từ trường Lưỡng cực nó không mang năng lượng cụ thể, đứng cạnh hung tinh hay cát tinh nó kéo dài năng lượng đó. Phục vị là đứng yên, chờ cơ hội để tiếp tục trạng thái ban đầu.",
+                weak: "Phục vị có nhược điểm bị động, bướng bỉnh, do dự và bảo thủ, hay mâu thuẫn, sợ mạo hiểm, nhiều ý kiến và khả năng chịu rủi ro kém. Người có từ trường này cần chú ý sức khỏe về tim, não, các bệnh tiềm ẩn mang tính thoái hóa, mãn tính"
+            },
+            "LS": {
+                name: "LỤC SÁT",
+                intro: "Đại diện cho người phụ nữ, đào hoa. Người có từ trường này đầu óc nhạy cảm nhưng lại do dự, quá thận trọng, đa nghi và cảm xúc không ổn định và hay mâu thuẫn. Năng lượng này tinh tế, tỉ mỉ, thẩm mỹ tốt, giỏi giao tiếp, giỏi ngoại giao.",
+                weak: "Thích chưng diện, hay mua sắm, không giữ được tiền. Có sức hút đặc biệt là khác giới. Sức khỏe chú ý ruột non, dạ dày, da, tự kỷ"
+            },
+            "HH": {
+                name: "HỌA HẠI",
+                intro: "Đặc điểm là liên quan tới miệng - nói thẳng, cứng rắn, nóng nảy. Tuy nhiên nếu được kết hợp hợp lý thì lại biết ăn nói, khẩu tài tốt. Năng lượng này phù hợp cho những người có công việc liên quan tới ăn nói.",
+                weak: "Nhược điểm: nóng nảy, dễ mất bình tĩnh, quản lý tài chính yếu. Sức khỏe dễ ứng các bệnh về khoang miệng, bạch huyết, khí quản, hệ hô hấp, lá lách và dạ dày"
+            },
+            "TM": {
+                name: "TUYỆT MỆNH",
+                intro: "Từ trường này có năng khiếu về đầu tư, kinh doanh. Người có từ trường này dũng cảm, đầu óc linh hoạt, có khả năng phán đoán nhạy bén. Làm việc liều, bốc đồng, tham vọng, quyết đoán và chấp nhận rủi ro.",
+                weak: "Nhược điểm: Quyết định mạnh bạo nên dễ chủ quan, thích đầu tư mạo hiểm nên cũng dễ bị mất tiền, có khả năng kiếm tiền nhưng tiêu nhanh. Tính cách, thích ở một mình, khả năng phối hợp kém và luôn tự cho mình là đúng. Dễ bị gan, thận, bài tiết, hệ tiết niệu"
+            },
+            "NQ": {
+                name: "NGŨ QUỶ",
+                intro: "Người có năng lượng này chủ yếu về trí tuệ và tâm linh. Thông minh, đa nghi, phản ứng nhanh và trí tuệ hơn người, nhiều ý tưởng. Thích học hỏi mọi thứ. Luôn tìm kiếm sự thay đổi, không đi theo lối mòn",
+                weak: "Nhược điểm: Dễ ghét người khác, không dễ tin người, nhiều ý đồ xấu, thay đổi thất thường, hay lo lắng, lo xa, bất an, kiếm tiền không minh bạch, kiếm tiền nhanh nhưng tiêu rất nhanh. Sức khỏe: Tim mạch, tuần hoàn máu, máu huyết và miễn dịch"
+            }
+        };
+
+        const QUE_DETAILS = {
+            "Thủy Lôi Truân": { type: "Hung", desc: "Nạn dã. GIAN LAO. Yếu đuối, chưa đủ sức, ngần ngại, do dự, vất vả, phải nhờ sự giúp đỡ. Tiền hung hậu kiết: Trước dữ sau lành" },
+            "Thủy Phong Tỉnh": { type: "Bình Hòa", desc: "Tịnh dã. TRẦM LẶNG. Ở chỗ nào cứ ở yên chỗ đó, xuống sâu, vực thẳm có nước, dưới sâu, cái giếng. Kiền Khôn sất phối: Trời Đất phối hợp lại" },
+            "Thuần Khảm": { type: "Bình Hòa", desc: "Hãm dã. HÃM HIỂM. Hãm vào ở trong, xuyên sâu vào trong, đóng cửa lại, gập ghềnh, trắc trở, bắt buộc, kềm hãm, thắng. Khổ tận cam lai: Tượng hết khổ mới đến sướng" },
+            "Thủy Sơn Kiển": { type: "Hung", desc: "Nạn dã.TRỞ NGẠI. Cản ngăn, chận lại, chậm chạp, què, khó khăn.Bất năng tiến giả: không năng đi" },
+            "Thủy Địa Tỷ": { type: "Cát", desc: "Tư dã. CHỌN LỌC. Thân liền, gạn lọc, mật thiết, tư hữu riêng, trưởng đoàn, trưởng toán, chọn lựa. Khứ xàm nhiệm hiền : Bỏ nịnh dụng trung" },
+            "Sơn Thiên Đại Súc": { type: "Cát", desc: "Tụ dã. TÍCH TỤ. Chứa tụ, súc tích, lắng tụ một chỗ, dự trữ, đựng, để dành. Đồng loại hoan hội : Đồng loại hội họp vui vẻ, cục bộ" },
+            "Sơn Trạch Tốn": { type: "Bình Hòa", desc: "TỔN HẠI. Hao mất, thua thiệt, bớt kém, bớt phần dưới cho phần trên là tổn hại. Phòng nhân ám toán: tượng đề phòng sự ngầm hại, hao tổn" },
+            "Sơn Hỏa Bí": { type: "Cát", desc: "Sức dã. QUANG MINH. Trang sức, sửa sang, trang điểm, thấu suốt, rõ ràng. Quang minh thông đạt: Quang minh, sáng sủa, thấu suốt" },
+            "Sơn Lôi Di": { type: "Cát Hanh", desc: "Dưỡng dã. DUNG DƯỠNG. Chăm lo, tu bổ, càng thêm, ăn uống, bổ dưỡng, bồi dưỡng, ví như trời nuôi muôn vật, thánh nhân nuôi người. Phi long nhập uyên: Rồng vào vực nghỉ ngơi" },
+            "Sơn Phong Cổ": { type: "Hung", desc: "Sự dã. SỰ BIẾN. Có sự không yên trong lòng, làm ngờ vực, khua, đánh, mua chuốc cái hại, đánh trống, làm cho sợ sệt, sửa lại cái lỗi trước đã làm. Âm hại tương liên: Điều hại cùng có liên hệ" },
+            "Sơn Thủy Mông": { type: "Hung", desc: "Muội dã. BẤT MINH. Tối tăm, mờ ám, không minh bạch, che lấp, bao trùm, phủ chụp, ngu dại, ngờ nghệch. Thiên võng tứ trương: Lưới trời giăng bốn mặt" },
+            "Thuần Cấn": { type: "Bình Hòa", desc: "Chỉ dã. NGƯNG NGHỈ. Ngăn giữ, ở, thôi, dừng lại, đậy lại, gói ghém, ngăn cấm, vừa đúng chỗ. Thủ cựu đãi thời: Giữ mức cũ đợi thời" },
+            "Sơn Địa Bác": { type: "Hung", desc: "Lạc dã. TIÊU ĐIỀU. Đẽo gọt, lột cướp đi, không có lợi, rụng rớt, đến rồi lại đi, tản lạc, lạt lẽo nhau, xa lìa nhau, hoang vắng, buồn thảm. Lục thân băng thán: Bà con thân thích xa lìa nhau" },
+            "Địa Thiên Thái": { type: "Cát", desc: "Thông dã. ĐIỀU HÒA. Thông hiểu, am tường, hiểu biết, thông suốt, quen biết, quen thuộc. Thiên địa hòa xướng: Trời đất giao hoà" },
+            "Địa Trạch Lâm": { type: "Bình Hòa", desc: "Đại dã. BAO QUẢN. Việc lớn, người lớn, cha nuôi, vú nuôi, giáo học, nhà sư, kẻ cả, dạy dân, nhà thầu" },
+            "Địa Hỏa Minh Di": { type: "Hung", desc: "Thương dã. HẠI ĐAU. Thương tích, bịnh hoạn, buồn lo, đau lòng, ánh sáng bị thương. Kinh cức mãn đồ: Gai góc đầy đường" },
+            "Địa Lôi Phục": { type: "Bình Hòa", desc: "Phản dã. TÁI HỒI. Lại có, trở về, bên ngoài, phản phục. Sơn ngoại thanh sơn: Tượng ngoài núi lại còn có núi" },
+            "Địa Phong Thăng": { type: "Cát", desc: "Tiến dã. TIẾN THỦ. Thăng tiến, trực chỉ, tiến mau, bay lên, vọt tới trước, bay lên không trung, thăng chức, thăng hà. Phù giao trực thượng: Chòi đạp để ngoi lên trên" },
+            "Địa Thủy Sư": { type: "Cát", desc: "Chúng dã. CHÚNG TRỢ. Đông chúng, vừa làm thầy, vừa làm bạn, học hỏi lẫn nhau, níu nắm nhau qua truông, nâng đỡ. Sĩ chúng ủng tòng: Chúng ủng hộ nhau" },
+            "Địa Sơn Khiêm": { type: "Cát", desc: "Thoái dã. CÁO THOÁI. Khiêm tốn, nhún nhường, khiêm từ, cáo thoái, từ giã, lui vào trong, giữ gìn, nhốt vào trong, bế cửa. Thượng hạ mông lung : Trên dưới hoang mang" },
+            "Thuần Khôn": { type: "Đại Cát", desc: "Nhu thuận dã. NHU THUẬN. Thuận tòng, mềm dẻo, theo đường mà được lợi, hòa theo lẽ, chịu lấy" },
+            "Thuần Càn": { type: "Đại Cát", desc: "Chính yếu dã. CHÍNH YẾU: Cứng mạnh, khô, lớn, khỏe mạnh, đức không nghỉ. Nguyên Hanh Lợi Trinh: Vạn vật có khởi đầu, lớn lên, toại chí, hóa thành Kiện dã" },
+            "Thiên Trạch Lý": { type: "Cát", desc: "Lễ dã. LỘ HÀNH. Nghi lễ, có chừng mực, khuôn phép, dẫm lên, không cho đi sai, có ý chặn đường sái quá, hệ thống, pháp lý. Hổ lang đang đạo: Hổ lang đón đường" },
+            "Thiên Hỏa Đồng Nhân": { type: "Cát", desc: "Thân dã. THÂN THIỆN. Trên dưới cùng lòng, cùng người ưa thích, cùng một bọn người. Hiệp lực đồng tâm: Cùng người hiệp lực" },
+            "Thiên Lôi Vô Vọng": { type: "Hung", desc: "Thiên tai dã. XÂM LẤN. Tai vạ, lỗi bậy bạ, không lề lối, không quy củ, càn đại, chống đối, hứng chịu. Cương tự ngoại lai: Kẻ mạnh từ ngoài đến" },
+            "Thiên Phong Cấu": { type: "Bình Hòa", desc: "Ngộ dã. TƯƠNG NGỘ. Gặp gỡ, cấu kết, liên kết, kết hợp, móc nối, mềm gặp cứng. Phong vân bất trắc: Gặp gỡ thình lình, ít khi" },
+            "Thiên Thủy Tụng": { type: "Hung", desc: "Luận dã. BẤT HÒA. Bàn cãi, kiện tụng, bàn tính, cãi vã, tranh luận, bàn luận. Đại tiểu bất hòa: lớn nhỏ không hòa" },
+            "Thiên Sơn Độn": { type: "Hung", desc: "Thoái dã. ẨN TRÁ. Lui, ẩn khuất, tránh đời, lừa dối, trá hình, có ý trốn tránh, trốn cái mặt đưa thấy cái lưng. Báo ẩn nam sơn: Con báo ẩn ở núi Nam" },
+            "Thiên Địa Bỉ": { type: "Hung", desc: "Tắc dã. GIÁN CÁCH. Bế tắc, không thông, không tương cảm nhau, xui xẻo, dèm pha, chê bai lẫn nhau, mạnh ai nấy theo ý riêng. Thượng hạ tiếm loạn: Trên dưới lôi thôi" },
+            "Trạch Thiên Quải": { type: "Hung", desc: "Quyết dã. DỨT KHOÁT. Dứt hết, biên cương, ranh giới, thành phần, thành khoảnh, quyết định, quyết nghị, cổ phần, thôi, khai lề lối. Ích chi cực tắc quyết: Lợi đã cùng ắt thôi" },
+            "Thuần Đoài": { type: "Cát", desc: "Duyệt dã. HIỆN ĐẸP. Đẹp đẽ, ưa thích, vui hiện trên mặt, không buồn chán, cười nói, khuyết mẻ. Hỉ dật mi tu : Tượng vui hiện trên mặt, khẩu khí" },
+            "Trạch Hỏa Cách": { type: "Cát", desc: "Cải dã. CẢI BIẾN. Bỏ lối cũ, cải cách, hoán cải, cách tuyệt, cánh chim thay lông. Thiên uyên huyền cách: Tượng vực trời xa thẳm" },
+            "Trạch Lôi Tùy": { type: "Bình Hòa", desc: "Thuận dã. DI ĐỘNG. Cùng theo, mặc lòng, không có chí hướng, chỉ chìu theo, đại thể chủ việc di động, thuyên chuyển như chiếc xe. Phản phúc bất định: Loại không ở yên một chỗ" },
+            "Trạch Phong Đại Quá": { type: "Cát", desc: "Họa dã. CẢ QUÁ. Cả quá ắt tai họa, quá mực thường, quá nhiều, giàu cương nghị ở trong. Nộn thảo kinh sương : Tượng cỏ non bị sương tuyết" },
+            "Trạch Thủy Khốn": { type: "Bình Hòa", desc: "Nguy dã, nguy lo. Cùng quẫn, bị người làm ác, lo lắng, cùng khổ, mệt mỏi, nguy cấp, lo hiểm nạn. Thủ kỷ đãi thời: Giữ mình đợi thời" },
+            "Trạch Sơn Hàm": { type: "Cát", desc: "Cảm dã. THỤ CẢM. Cảm xúc, thọ nhận, cảm ứng, nghĩ đến, nghe thấy, xúc động. Nam nữ giao cảm : Nam nữ có tình ý" },
+            "Trạch Địa Tụy": { type: "Cát", desc: "Tụ dã. TRƯNG TẬP. Nhóm họp, biểu tình, dồn đống, quần tụ nhau lại, kéo đến, kéo thành bầy. Long vân tế hội: Rồng mây giao hội" },
+            "Hỏa Thiên Đại Hữu": { type: "Đại Cát", desc: "Khoan dã. CẢ CÓ. Thong dong, dung dưỡng nhiều, độ lượng rộng, có đức dầy, chiếu sáng lớn. Kim ngọc mãn đường: Vàng bạc đầy nhà" },
+            "Hỏa Trạch Khuê": { type: "Hung", desc: "Quai dã. HỖ TRỢ. Trái lìa, lìa xa, hai bên lợi dụng lẫn nhau, cơ biến quai xảo, như cung tên. Hồ giả hổ oai: Con hồ nhờ oai con hổ" },
+            "Thuần Ly": { type: "Cát", desc: "Lệ dã. SÁNG CHÓI. Sáng sủa, trống trải, trống trơn, tỏa ra, bám vào, phụ bám, phô trương ra ngoài. Môn hộ bất ninh: Nhà cửa không yên" },
+            "Hỏa Lôi Phệ Hạp": { type: "Bình Hòa", desc: "Khiết dã. CẮN HỢP. Cẩu hợp, bấu vấu, bấu quào, dày xéo, đay nghiến, phỏng vấn, hỏi han. Ủy mị bất chấn: Yếu đuối không chạy được" },
+            "Hỏa Phong Đỉnh": { type: "Cát", desc: "Định dã. NUNG ĐÚC. Đứng được, cậm đứng, trồng, nung nấu, rèn luyện, vững chắc, ước hẹn. Luyện dược thành đơn: Luyện thuốc thành linh đơn" },
+            "Hỏa Thủy Vị Tế": { type: "Hung", desc: "Thất dã. THẤT CÁCH. Thất bác, mất, thất bại, dở dang, chưa xong, nửa chùng. Ưu trung vọng hỷ: Trong cái lo có cái mừng" },
+            "Hỏa Sơn Lữ": { type: "Bình Hòa", desc: "Khách dã. THỨ YẾU. Đỗ nhờ, khách, ở đậu, tạm trú, kê vào, gá vào, ký ngụ bên ngoài, tính cách lang thang, ít người thân, không chính. Ỷ nhân tác giá: Nhờ người mai mối" },
+            "Hỏa Địa Tấn": { type: "Cát", desc: "Tiến dã. HIỂN HIỆN. Đi hoặc tới, tiến tới gần, theo mực thường, lửa đã hiện trên đất, trưng bày. Long kiến trình tường: Rồng hiện điềm lành" },
+            "Lôi Thiên Đại Tráng": { type: "Cát", desc: "Chí dã. TỰ CƯỜNG. Ý riêng, bụng nghĩ, hướng. Có chí khí vươn lên, hướng thượng, ở trên cao, tự lớn mạnh, tự lập, tự cường, tự quyết, tự xây dựng. Phượng tập đăng sơn: Phượng đậu trên núi" },
+            "Lôi Trạch Quy Muội": { type: "Hung", desc: "Tai dã. XÔN XAO. Tai nạn, rối ren, lôi thôi, nữ chi chung, gái lấy chồng.Rối trí, loạn tâm thần, om sòm, nước mắt cá sấu, xen kẽ, lẫn lộn" },
+            "Lôi Hỏa Phong": { type: "Cát", desc: "Thịnh dã. HÒA MỸ. Thịnh đại, được mùa, nhiều người góp sức. Chí đồng đạo hợp: Cùng đồng tâm hiệp lực" },
+            "Thuần Chấn": { type: "Bình Hòa", desc: "Động dã. ĐỘNG DỤNG. Rung động, sợ hãi do chấn động, phấn phát, nổ vang, chấn khởi, chấn kinh. Trùng trùng chấn kinh: Khắp cùng dấy động" },
+            "Lôi Phong Hằng": { type: "Cát", desc: "Cửu dã. TRƯỜNG CỬU. Lâu dài, chậm chạp, đạo lâu bền như vợ chồng, kéo dài câu chuyện, thâm giao, nghĩa cố tri, xưa, cũ. Trường cửu chi nghĩa: Lâu bền như đạo nghĩa vợ chồng" },
+            "Lôi Thủy Giải": { type: "Cát", desc: "Tán dã. NƠI NƠI. Làm cho tan đi, như làm tan sự nguy hiểm, giải phóng, giải tán, loan truyền, tuyên truyền, phân phát, lưu thông, ban rải, ân xá. Lôi vũ tác giải: Sấm động mưa bay" },
+            "Lôi Sơn Tiểu Quá": { type: "Bình Hòa", desc: "Quá dã. BẤT TÚC. Thiểu lý, thiểu não, hèn mọn, nhỏ nhặt, bẩn thiểu, thiếu cường lực. Thượng hạ truân chuyên: Trên dưới gian nan, vất vả, buồn thảm" },
+            "Lôi Địa Dự": { type: "Cát", desc: "Duyệt dã. THUẬN ĐỘNG. Dự bị, dự phòng, canh chừng, sớm, vui vầy. Thượng hạ duyệt dịch: Trên dưới vui vẻ" },
+            "Phong Thiên Tiểu Súc": { type: "Bình Hòa", desc: "Tắc dã. DỊ ĐỒNG. Lúc bế tắc, không đồng ý nhau, cô quả, súc oán, chứa mội oán giận, có ý trái lại, không hòa hợp, nhỏ nhen. Cầm sắt bất điệu : Tiếng đờn không hòa điệu" },
+            "Phong Trạch Trung Phu": { type: "Cát", desc: "Tín dã. TRUNG THẬT. Tín thật, không ngờ vực, có uy tín cho người tin tưởng, tín ngưỡng, ở trong" },
+            "Phong Hỏa Gia Nhân": { type: "Cát", desc: "Đồng dã. NẨY NỞ. Người nhà, gia đinh, cùng gia đình, đồng chủng, đồng nghiệp, cùng xóm, sinh sôi, khai thác mở mang thêm. Khai hoa kết tử : Trổ bông sinh trái, nẩy mầm" },
+            "Phong Lôi Ích": { type: "Cát", desc: "Ích dã. TIẾN ÍCH. Thêm được lợi, giúp dùm, tiếng dội xa, vượt lên, phóng mình tới. Hồng hộc xung tiêu: Chim hồng, chim hộc bay qua mây mù" },
+            "Thuần Tốn": { type: "Bình Hòa", desc: "Thuận dã. THUẬN NHẬP. Theo lên theo xuống, theo tới theo lui, có sự giấu diếm ở trong. Âm dương thăng giáng: Khí âm dương lên xuống giao hợp" },
+            "Phong Thủy Hoán": { type: "Hung", desc: "Tán dã. LY TÁN. Lan ra tràn lan, tán thất, trốn đi xa, lánh xa, thất nhân tâm, hao hớt. Thủy ngộ phong tắc hoán tán: Nước gặp gió thì phải tan, phải chạy" },
+            "Phong Sơn Tiệm": { type: "Cát", desc: "Tiến dã. TUẦN TỰ. Từ từ, thong thả đến, lần lần, bò tới, chậm chạp, nhai nhỏ nuốt vào. Phúc lộc đồng lâm: Phúc lộc cùng đến" },
+            "Phong Địa Quán": { type: "Bình Hòa", desc: "Quan dã. QUAN SÁT. Xem xét, trông coi, cảnh tượng xem thấy, thanh tra, lướt qua, sơ qua, sơn phết, quét nhà. Vân bình tụ tán: Bèo mây tan hợp" },
+            "Thủy Thiên Nhu": { type: "Cát", desc: "Thuận dã. TƯƠNG HỘI. Chờ đợi vì hiểm đằng trườc, thuận theo, quây quầng, hội tụ, vui hội, cứu xét, chầu về. Quân tử hoan hội: Quân tử vui vẻ hội họp, ăn uống chờ thời" },
+            "Thủy Trạch Tiết": { type: "Cát", desc: "Chỉ dã. GIẢM CHẾ. Ngăn ngừa, tiết độ, kềm chế, giảm bớt, chừng mực, nhiều thì tràn. Trạch thượng hữu thủy: Trên đầm có nước" },
+            "Thủy Hỏa Ký Tế": { type: "Đại Cát", desc: "Hợp dã. HIỆN HỢP. Gặp nhau, cùng nhau, đã xong, việc xong, hiện thực, ích lợi nhỏ. Hanh tiểu giả: Việc nhỏ thì thành" }
+        };
+
+        const STAR_COLORS = {
+            "TY": "#2196f3", "SK": "#4caf50", "DN": "#ffc107", "PV": "#e91e63",
+            "LS": "#607d8b", "TM": "#1a202c", "HH": "#ff5722", "NQ": "#9c27b0"
+        };
+
+        // Định nghĩa ánh xạ tên nhà mạng (Net Alias)
+        const netAlias = {
+            'viettel': ['viettel'],
+            'mobi': ['mobifone', 'mobi'],
+            'vina': ['vinaphone', 'vina'],
+            'vietnamobile': ['vietnamobile', 'vnm'],
+            'itel': ['itel'],
+            'wintel': ['wintel'],
+            'gmobile': ['gmobile', 'beeline']
+        };
+
+        // ======= FETCH DỮ LIỆU =======
+        async function loadDataFromAPI() {
+            if (API_URL === "YOUR_GOOGLE_SCRIPT_URL_HERE") {
+                alert("Bạn chưa cấu hình link API_URL của Google Apps Script trong file HTML!");
+                return;
+            }
+
+            const overlay = document.getElementById('loadingOverlay');
+            overlay.classList.add('active');
+            document.getElementById('loadingText').innerText = "Đang tải dữ liệu...";
+
+            try {
+                const res = await fetch(API_URL);
+                if (!res.ok) throw new Error("Network response was not ok");
+                FULL_DATA = await res.json();
+
+                document.getElementById('stTotal').innerText = FULL_DATA.length.toLocaleString('vi-VN');
+
+                // Render dữ liệu lần đầu
+                applyFilters();
+
+            } catch (error) {
+                console.error(error);
+                alert("Lỗi tải dữ liệu. Vui lòng thử lại!");
+            } finally {
+                overlay.classList.remove('active');
+            }
+        }
+
+        // ======= RENDER THEO CHUNK (LAZY LOAD) =======
+        function renderInitial() {
+            currentRenderCount = 0;
+            document.getElementById('simBody').innerHTML = '';
+            document.getElementById('simBody').scrollTop = 0;
+            renderNextChunk();
+        }
+
+        function renderNextChunk() {
+            if (currentRenderCount >= filteredData.length) return;
+
+            const container = document.getElementById('simBody');
+            const endIdx = Math.min(currentRenderCount + CHUNK_SIZE, filteredData.length);
+            let htmlChunk = '';
+
+            for (let i = currentRenderCount; i < endIdx; i++) {
+                htmlChunk += createSimCardHTML(filteredData[i]);
+            }
+
+            container.insertAdjacentHTML('beforeend', htmlChunk);
+            currentRenderCount = endIdx;
+
+            // Cập nhật nhãn đếm hiển thị (vd: Đang xem 100 / 500)
+            const stCountTag = document.getElementById('stCount');
+            if (stCountTag) {
+                stCountTag.innerText = currentRenderCount.toLocaleString('vi-VN');
+            }
+        }
+
+        // Observer cho Infinite Scroll
+        const observer = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting) {
+                renderNextChunk();
+            }
+        }, { rootMargin: '200px' });
+
+        window.onload = function () {
+            init();
+            observer.observe(document.getElementById('loadMoreTrigger'));
+            
+            // Tải dữ liệu ngay khi mở trang
+            loadDataFromAPI();
+            
+            // Thiết lập đồng bộ mỗi 15 phút (15 * 60 * 1000)
+            setInterval(() => {
+                console.log("Đang tự động cập nhật dữ liệu...");
+                loadDataFromAPI();
+            }, 900000);
+        };
+
+        // ======= TẠO HTML ĐỘNG =======
+        function cleanVN(str) {
+            if (!str) return "";
+            // Aggressive normalization: Strip all accents and handle common Vietnamese encoding variations
+            let s = str.toString().toLowerCase().normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .replace(/đ/g, "d")
+                .trim();
+            // Handle specific tone-placement common words in this app
+            if (s.includes("hoa")) return "hoa";
+            if (s.includes("thuy")) return "thuy";
+            if (s.includes("moc")) return "moc";
+            if (s.includes("tho")) return "tho";
+            if (s.includes("kim")) return "kim";
+            return s;
+        }
+
+        function formatPriceDynamic(num) {
+            if (!num) return "Liên hệ";
+
+            let mode = 'vnd';
+            const checkedRadio = document.querySelector('input[name="priceFmtStyle"]:checked');
+            if (checkedRadio) mode = checkedRadio.value;
+
+            // Vd: num = 2250000 
+            const v = Math.round(num / 100000); // 22.5 làm tròn 23
+
+            if (mode === 'TrDot') {
+                return (v / 10) + 'Tr'; // 2.3Tr
+            } else if (mode === 'TrChar') {
+                const intP = Math.floor(v / 10);
+                const decP = v % 10;
+                return decP > 0 ? `${intP}Tr${decP}` : `${intP}Tr`; // 2Tr3
+            } else if (mode === 'Trieu') {
+                return (v / 10) + ' Triệu';
+            } else if (mode === 'K') {
+                return Math.round(num / 1000) + 'K';
+            }
+            return num.toLocaleString('vi-VN') + "đ";
+        }
+
+        function createSimCardHTML(d) {
+            // Format hiển thị giá
+            const priceFmt = formatPriceDynamic(parseInt(d.g || 0));
+            
+            // Ép kiểu số cho toàn bộ 8 sao để tính toán chính xác
+            const vTY = parseInt(d.ty || 0);
+            const vSK = parseInt(d.sk || 0);
+            const vDN = parseInt(d.dn || 0);
+            const vPV = parseInt(d.pb || 0);
+            const vLS = parseInt(d.ln || 0);
+            const vTM = parseInt(d.th || 0);
+            const vHH = parseInt(d.hp || 0);
+            const vNQ = parseInt(d.tl || 0);
+
+            const sum3 = vTY + vSK + vDN || 1;
+            const pTY = Math.round((vTY / sum3) * 100);
+            const pSK = Math.round((vSK / sum3) * 100);
+            const pDN = 100 - pTY - pSK;
+
+            // Tính 2 cặp sao cuối
+            const energy = getEnergyProgression(d.sr);
+            let last2Stars = "Chưa rõ";
+            let last2Keys = "";
+            if (energy.length >= 2) {
+                const s1 = energy[energy.length - 2].type;
+                const s2 = energy[energy.length - 1].type;
+                last2Keys = s1 + "," + s2;
+                last2Stars = (STAR_NAME_MAP[s1] || s1) + " - " + (STAR_NAME_MAP[s2] || s2);
+            } else if (energy.length === 1) {
+                const s1 = energy[0].type;
+                last2Keys = s1;
+                last2Stars = STAR_NAME_MAP[s1] || s1;
+            }
+
+            // Trạng thái thẻ chọn
+            const isChecked = selectedSims.has(String(d.sr)) ? 'checked' : '';
+
+            // Class theo Mệnh, nhà mạng, yy-status
+            const menhClass = "menh-" + (d.m || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d");
+            const telcoClass = d.n && d.n.toLowerCase().includes('viettel') ? 'telco-viettel' :
+                d.n && d.n.toLowerCase().includes('mobi') ? 'telco-mobi' : 'telco-vina';
+
+            let yyColor = "var(--text-main)", yyText = "Cân bằng";
+            if (d.ys === -1) { yyColor = "#1e88e5"; yyText = "Âm thịnh"; }
+            if (d.ys === 1) { yyColor = "#e53935"; yyText = "Dương thịnh"; }
+
+            const cleanMenh = cleanVN(d.m);
+            const cleanQue = cleanVN(d.qn);
+
+            // Đóng gói data-* attribute để phục vụ popup nhanh
+            const dAttrs = `data-num="${d.s}" data-sr="${d.sr}" data-price="${priceFmt}" data-telco="${d.n}" ` +
+                `data-menh="${d.m}" data-yy-am="${d.a}" data-yy-duong="${d.d}" data-yy-status="${yyText}" ` +
+                `data-que-name="${d.qn || ''}" data-que-desc="${d.qd || ''}" data-stars-meaning="${d.yn || ''}" ` +
+                `data-stars="TY:${vTY},SK:${vSK},DN:${vDN},PV:${vPV},LS:${vLS},TM:${vTM},HH:${vHH},NQ:${vNQ}"`;
+
+            return `
+        <div class="sim-card" onclick="showDetail(this)" ${dAttrs}>
+            <input type="checkbox" class="sim-checkbox" value="${d.sr}" onclick="event.stopPropagation(); toggleSimSelect(this)" onchange="updateCounter()" ${isChecked}>
+            <div class="sim-card-content">
+                <div class="card-row-top">
+                    <div class="card-main-info">
+                        <span class="telco-badge ${telcoClass}">${d.n}</span>
+                        <div class="sim-num">${d.s}</div>
+                    </div>
+                    <div class="price">${priceFmt}</div>
+                </div>
+                <div class="card-row-bottom">
+                    <div class="tag-row">Mệnh: <span class="tag-menh ${menhClass}" data-type="menh" data-clean="${cleanMenh}" data-orig="${d.m}" onmouseenter="showTagTooltip(event, 'menh', '${d.m}')" onmouseleave="hideTagTooltip()">${d.m}</span></div>
+                    <div class="tag-row">Cát Tinh: <span class="tag-cat-tinh" data-type="stars" data-clean="${last2Keys}" data-orig="${last2Stars}" onmouseenter="showTagTooltip(event, 'stars', '${last2Keys}')" onmouseleave="hideTagTooltip()">${last2Stars}</span></div>
+                    <div class="tag-row">Quẻ: <span class="tag-que" data-type="que" data-clean="${cleanQue}" data-orig="${d.qn || ''}" onmouseenter="showTagTooltip(event, 'que', '${d.qn}')" onmouseleave="hideTagTooltip()">${d.qn || ''}</span></div>
+                </div>
+                <div class="card-row-ratio">
+                    <span>TY: <b>${pTY}%</b></span>
+                    <span>SK: <b>${pSK}%</b></span>
+                    <span>DN: <b>${pDN}%</b></span>
+                    <span style="color:var(--border); margin: 0 -5px;">|</span>
+                    <span>Âm: <b>${d.a}</b></span>
+                    <span>Dương: <b>${d.d}</b></span>
+                    <span style="color:${yyColor}">${yyText}</span>
+                </div>
+            </div>
+        </div>
+        `;
+        }
+
+        // Logic phối hợp VBA: Tách cặp và tính điểm năng lượng
+        function getEnergyProgression(num) {
+            const s = num.toString().replace(/[^0-9]/g, ''); // Bỏ substring(1) để nhận diện cặp đầu tiên dù d.sr có 0 đầu hay không
+            const steps = [];
+            let i = 0;
+            while (i < s.length - 1) {
+                if (s[i] !== "0" && s[i] !== "5") {
+                    for (let j = i + 1; j < s.length; j++) {
+                        if (s[j] !== "0" && s[j] !== "5") {
+                            const cap = s[i] + s[j];
+                            const giua = s.substring(i + 1, j);
+                            const fullSeq = s.substring(i, j + 1);
+                            
+                            let count5 = 0;
+                            for (let char of giua) if (char === "5") count5++;
+                            
+                            if (STAR_DATA[cap]) {
+                                const [type, baseScore] = STAR_DATA[cap];
+                                const finalScore = baseScore * (1 + count5);
+                                steps.push({
+                                    seq: fullSeq,
+                                    pair: cap,
+                                    type: type,
+                                    score: finalScore
+                                });
+                            }
+                            break;
+                        }
+                    }
+                }
+                i++;
+            }
+            return steps;
+        }
+
+        // ======= LOGIC LỌC ĐỊNH DẠNG (WILDCARD *) =======
+        function matchWildcard(pattern, text) {
+            if (!pattern || !text) return false;
+            // Chuyển vd: "098*" thành regex "^098.*$"
+            const safeP = pattern.trim()
+                .replace(/[.+?^${}()|[\]\\]/g, '\\$&') // escape special regex chars (trừ *)
+                .replace(/\*/g, '.*');
+            return new RegExp('^' + safeP + '$', 'i').test(text);
+        }
+
+        function checkPatterns(inputStr, evalFunc) {
+            if (!inputStr) return true;
+            const pts = inputStr.split(',').map(p => p.trim()).filter(x => x);
+            if (pts.length === 0) return true;
+            // Tồn tại ít nhất 1 pattern khớp
+            for (let p of pts) {
+                if (evalFunc(p)) return true;
+            }
+            return false;
+        }
+
+        function executeMainSearch() {
+            updateUI();
+            toggleModal(false);
+        }
+
+        function updateUI() {
+            // Cập nhật nhãn "Né số" (nếu có)
+            const exSt = document.getElementById('st-ex');
+            if (exSt) {
+                const exList = excluded.length ? "Né số: " + excluded.sort().join(", ") : "";
+                const exStrElem = document.getElementById('excludeString');
+                const exStr = exStrElem ? exStrElem.value.trim() : "";
+                exSt.innerText = exList + (exStr ? (exList ? " & " : "") + "Né cặp: " + exStr : "");
+            }
+
+            // reset stCount label before rendering
+            const stCountTag = document.getElementById('stCount');
+            if (stCountTag) stCountTag.innerText = "0";
+
+            applyFilters();
+            renderInitial();
+            syncQuickFilters(); 
+            
+            // Cập nhật bộ đếm tổng số lượng đã lọc được
+            const stTotalTag = document.getElementById('stTotal');
+            if (stTotalTag) {
+                stTotalTag.innerText = filteredData.length.toLocaleString('vi-VN');
+            }
+            renderFilterChips();
+        }
+
+        function syncQuickFilters() {
+            // 1. Đồng bộ Nhà mạng & Tính toán số lượng từng mạng
+            const netChecked = Array.from(document.querySelectorAll('.net-cb:checked')).map(cb => cb.value.toLowerCase().trim());
+            
+            // Đếm số lượng SIM cho từng mạng dựa trên FULL_DATA
+            const netCounts = {};
+            FULL_DATA.forEach(d => {
+                if (!d.n) return;
+                const telco = String(d.n).toLowerCase();
+                for (let key in netAlias) {
+                    if (netAlias[key].some(alias => telco.includes(alias))) {
+                        netCounts[key] = (netCounts[key] || 0) + 1;
+                        break;
+                    }
+                }
+            });
+
+            document.querySelectorAll('.quick-net-chip').forEach(chip => {
+                const netKey = (chip.getAttribute('data-net') || "").toLowerCase().trim();
+                const count = netCounts[netKey] || 0;
+                const baseName = chip.innerText.split('(')[0].trim();
+                
+                // Cập nhật text kèm số lượng
+                chip.innerText = `${baseName} (${count})`;
+                
+                if (netChecked.includes(netKey)) chip.classList.add('active');
+                else chip.classList.remove('active');
+            });
+
+
+            // 3. Đồng bộ Sắp xếp
+            if (currentSort) {
+                const hSort = document.getElementById('headerSort');
+                if (hSort) hSort.value = currentSort;
+            }
+        }
+
+        function toggleQuickNet(netValue) {
+            const cbs = document.querySelectorAll('.net-cb');
+            const targetVal = netValue.trim().toLowerCase();
+            
+            // Tìm xem checkbox hiện tại có đang được chọn duy nhất không
+            let currentChecked = Array.from(cbs).filter(cb => cb.checked);
+            let isTargetAlreadyOnlyOne = currentChecked.length === 1 && currentChecked[0].value.toLowerCase() === targetVal;
+
+            if (isTargetAlreadyOnlyOne) {
+                // Nếu đã chọn đúng mạng này và là duy nhất -> Bỏ chọn (để xem tất cả)
+                currentChecked[0].checked = false;
+            } else {
+                // Nếu đang chọn mạng khác hoặc chưa chọn gì -> Chỉ chọn mạng này
+                cbs.forEach(cb => {
+                    cb.checked = (cb.value.toLowerCase() === targetVal);
+                });
+            }
+            
+            updateUI();
+        }
+
+        function toggleCustomPrice(cb) {
+            const card = document.getElementById('customPriceCard');
+            if (card) {
+                card.style.display = cb.checked ? 'block' : 'none';
+                if (!cb.checked) {
+                    // Reset custom inputs when hiding
+                    document.getElementById('priceMin').value = '';
+                    document.getElementById('priceMax').value = '';
+                }
+            }
+            updateUI();
+        }
+
+        function updateQuickPV() {
+            const keCuoi = document.getElementById('quickKeCuoi').value;
+            const cuoi = document.getElementById('quickCuoi').value;
+
+            let pattern = "";
+            if (cuoi) {
+                pattern = "*" + (keCuoi ? keCuoi + "-" : "") + cuoi;
+            }
+
+            // Điền vào ô input trong modal
+            const targetInput = document.getElementById('searchPV');
+            if (targetInput) {
+                targetInput.value = pattern;
+                updateUI();
+            }
+        }
+
+        // ======= QUICK TAG FILTER =======
+        let pendingFilter = null;
+
+        function showTagTooltip(e, type, value) {
+            const tooltip = document.getElementById('tagTooltip');
+            let content = "";
+
+            if (type === 'menh') {
+                const searchVal = cleanVN(value);
+                const key = Object.keys(ELEMENT_INFO).find(k => cleanVN(k) === searchVal);
+                const info = ELEMENT_INFO[key] || { intro: "Chưa có thông tin cho mệnh này.", hop: "N/A", khac: "N/A" };
+                content = `<b>Mệnh ${key || value}</b>${info.intro}<hr><span class="label">Tương hợp:</span> <span class="value">${info.hop}</span><br><span class="label">Tương khắc:</span> <span class="value">${info.khac}</span>`;
+            } else if (type === 'stars') {
+                const stars = value.split(',');
+                if (stars.length === 2) {
+                    const comb = stars[0] + stars[1];
+                    const intro1 = STAR_INFO[stars[0]]?.intro || "";
+                    const intro2 = STAR_INFO[stars[1]]?.intro || "";
+                    const combMeaning = STAR_COMBINATIONS[comb] || "Chưa có luận giải tổ hợp này.";
+                    content = `<b>Tổ hợp: ${STAR_NAME_MAP[stars[0]]} + ${STAR_NAME_MAP[stars[1]]}</b>${combMeaning}<hr><span class="label">${STAR_NAME_MAP[stars[0]]}:</span> ${intro1}<br><br><span class="label">${STAR_NAME_MAP[stars[1]]}:</span> ${intro2}`;
+                } else if (stars.length === 1 && stars[0]) {
+                    const info = STAR_INFO[stars[0]];
+                    content = `<b>Sao ${STAR_NAME_MAP[stars[0]]}</b>${info?.intro || ""}<hr><span class="label">Nhược điểm:</span> ${info?.weak || "N/A"}`;
+                }
+            } else if (type === 'que') {
+                const q = QUE_DETAILS[value];
+                if (q) {
+                    content = `<b>Quẻ ${value}</b><span class="tag-que type-${q.type.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/\s/g, "")}" style="margin: 0 0 8px 0">${q.type}</span><br>${q.desc}`;
+                } else {
+                    content = `<b>Quẻ ${value}</b>Chưa có mô tả chi tiết cho quẻ này.`;
+                }
+            }
+
+            if (!content) return;
+
+            tooltip.innerHTML = content;
+            tooltip.style.display = 'block';
+
+            const rect = tooltip.getBoundingClientRect();
+            let top = e.clientY - rect.height - 15;
+            let left = e.clientX + 15;
+
+            if (top < 10) top = e.clientY + 15;
+            if (left + rect.width > window.innerWidth - 10) left = e.clientX - rect.width - 15;
+
+            tooltip.style.top = top + "px";
+            tooltip.style.left = left + "px";
+        }
+
+        function hideTagTooltip() {
+            const tooltip = document.getElementById('tagTooltip');
+            if (tooltip) tooltip.style.display = 'none';
+        }
+
+
+        // Event delegation cho các thẻ tag trên SIM (Mệnh, Quẻ, Cát Tinh)
+        document.addEventListener('click', function(e) {
+            const tag = e.target.closest('.tag-menh, .tag-que, .tag-cat-tinh');
+            if (tag) {
+                e.stopPropagation();
+                e.preventDefault();
+                const type = tag.getAttribute('data-type');
+                const cleanVal = tag.getAttribute('data-clean');
+                const origVal = tag.getAttribute('data-orig');
+
+                if (type && cleanVal) {
+                    // Áp dụng bộ lọc ngay lập tức
+                    if (type === 'menh') {
+                        document.querySelectorAll('.menh-cb').forEach(cb => {
+                            cb.checked = (cleanVN(cb.value) === cleanVal);
+                        });
+                    } else if (type === 'que') {
+                        // Tìm checkbox quẻ trong modal
+                        document.querySelectorAll('.q-cb').forEach(cb => {
+                            cb.checked = (cleanVN(cb.value) === cleanVal);
+                        });
+                    } else if (type === 'stars') {
+                        starComboFilter = cleanVal;
+                    }
+                    
+                    updateUI();
+                    
+                    // Cuộn lên đầu và hiển thị thông báo nhẹ (nếu cần)
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            }
+        }, true);
+
+        // ======= RENDER FILTER CHIPS =======
+        function renderFilterChips() {
+            const board = document.getElementById('activeFiltersBoard');
+            if (!board) return;
+            board.innerHTML = "";
+
+            let chips = [];
+
+            // 1. Text Search
+            const qSim = document.getElementById('searchSim')?.value;
+            const qMain = document.getElementById('mainSearch')?.value;
+            if (qSim) chips.push({ type: 'sim', label: `SIM: ${qSim}`, value: qSim });
+            if (qMain && qMain !== qSim) chips.push({ type: 'main', label: `Tìm: ${qMain}`, value: qMain });
+
+            // 2. Nhà mạng
+            document.querySelectorAll('.net-cb:checked').forEach(cb => {
+                chips.push({ type: 'net', label: cb.value, value: cb.value });
+            });
+
+            // 3. Mệnh
+            document.querySelectorAll('.menh-cb:checked').forEach(cb => {
+                chips.push({ type: 'menh', label: `Mệnh: ${cb.value}`, value: cb.value });
+            });
+
+            // 4. Quẻ
+            document.querySelectorAll('.q-cb:checked').forEach(cb => {
+                chips.push({ type: 'que', label: `Quẻ: ${cb.value}`, value: cb.value });
+            });
+
+            // 5. Khoảng giá
+            document.querySelectorAll('.price-cb:checked').forEach(cb => {
+                chips.push({ type: 'priceCb', label: `Giá: ${cb.value}`, value: cb.value });
+            });
+
+            // 6. Âm Dương
+            document.querySelectorAll('.am-duong-cb:checked').forEach(cb => {
+                const lbl = cb.value == "-1" ? "Âm" : (cb.value == "1" ? "Dương" : "Cân bằng");
+                chips.push({ type: 'yy', label: lbl, value: cb.value });
+            });
+
+            if (chips.length === 0) {
+                board.style.display = "none";
+                return;
+            }
+
+            // 7. Lọc Cát Tinh Nhanh
+            if (starComboFilter) {
+                const labels = starComboFilter.split(',').map(s => STAR_NAME_MAP[s] || s);
+                const comboName = labels.join(' - ');
+                chips.push({ type: 'stars', label: `Tổ hợp: ${comboName}`, value: starComboFilter });
+            }
+
+            if (chips.length === 0) {
+                board.style.display = "none";
+                return;
+            }
+
+            board.style.display = "flex";
+            
+            // Chip đặc biệt: Bỏ tất cả
+            const clearAllChip = document.createElement('div');
+            clearAllChip.className = "filter-chip";
+            clearAllChip.style.background = "var(--primary)";
+            clearAllChip.style.color = "#fff";
+            clearAllChip.style.borderColor = "var(--primary)";
+            clearAllChip.innerHTML = `<span>BỎ LỌC TẤT CẢ</span>`;
+            clearAllChip.onclick = resetFilters;
+            board.appendChild(clearAllChip);
+
+            chips.forEach(c => {
+                const chip = document.createElement('div');
+                chip.className = "filter-chip";
+                chip.innerHTML = `
+                    <span>${c.label}</span>
+                    <span class="remove-icon" onclick="removeSingleFilter('${c.type}', '${c.value}')">✕</span>
+                `;
+                board.appendChild(chip);
+            });
+        }
+
+        function removeSingleFilter(type, value) {
+            if (type === 'sim') document.getElementById('searchSim').value = "";
+            if (type === 'main') document.getElementById('mainSearch').value = "";
+            if (type === 'net') {
+                document.querySelectorAll('.net-cb').forEach(cb => { if(cb.value === value) cb.checked = false; });
+            }
+            if (type === 'menh') {
+                document.querySelectorAll('.menh-cb').forEach(cb => { if(cleanVN(cb.value) === cleanVN(value)) cb.checked = false; });
+            }
+            if (type === 'que') {
+                document.querySelectorAll('.q-cb').forEach(cb => { if(cleanVN(cb.value) === cleanVN(value)) cb.checked = false; });
+            }
+            if (type === 'priceCb') {
+                document.querySelectorAll('.price-cb').forEach(cb => { if(cb.value === value) cb.checked = false; });
+            }
+            if (type === 'yy') {
+                document.querySelectorAll('.am-duong-cb').forEach(cb => { if(cb.value === value) cb.checked = false; });
+            }
+            if (type === 'stars') {
+                starComboFilter = null;
+            }
+            updateUI();
+        }
+
+        function resetFilters() {
+            // 1. Clear search inputs (Header + Modal)
+            const mainSearch = document.getElementById('mainSearch');
+            if (mainSearch) mainSearch.value = "";
+            
+            document.querySelectorAll('.modal-body input[type="text"], .modal-body input[type="number"]').forEach(input => {
+                input.value = "";
+            });
+
+            // 2. Uncheck all checkboxes (Network, Menh, AD, Price, HungTinh)
+            document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                cb.checked = false;
+            });
+
+            // 3. Reset Select/Sort fields
+            const hSort = document.getElementById('headerSort');
+            if (hSort) hSort.value = "default";
+            currentSort = "default";
+
+            // 4. Clear search suggestions (Que Dịch)
+            const qBox = document.getElementById('queBox');
+            if (qBox) qBox.innerHTML = "";
+
+            // 5. Reset TY-DN / Star Combo
+            starComboFilter = null;
+            
+            // 6. Update UI
+            updateUI();
+        }
+
+        function applyFilters() {
+            if (!FULL_DATA.length) return;
+
+            // Lấy giá trị các ô Lọc
+            const qSim = document.getElementById('searchSim') ? document.getElementById('searchSim').value : '';
+            const qMain = document.getElementById('mainSearch') ? document.getElementById('mainSearch').value : '';
+            const simQuery = qSim || qMain; // Tìm kiếm chính
+
+            const qStars = document.getElementById('searchStars') ? document.getElementById('searchStars').value : '';
+            const qPV = document.getElementById('searchPV') ? document.getElementById('searchPV').value : '';
+            const qPVBT = document.getElementById('searchPVBT') ? document.getElementById('searchPVBT').value : '';
+            const qCTBT = document.getElementById('searchCTBT') ? document.getElementById('searchCTBT').value : '';
+
+            // Các chuỗi né tránh trong Nhóm 3
+            const xCTBT = document.getElementById('excludeCTBT') ? document.getElementById('excludeCTBT').value : '';
+            const xPVBT = document.getElementById('excludePVBT') ? document.getElementById('excludePVBT').value : '';
+
+            // Lấy toàn bộ 8 điểm số Min-Max từ Grid
+            const pInputs = document.querySelectorAll('.points-grid .point-item');
+            const starLimits = {};
+            const starNames = ['ty', 'sk', 'dn', 'pb', 'ln', 'th', 'hp', 'tl'];
+            pInputs.forEach((item, idx) => {
+                if (idx < 8) {
+                    const name = starNames[idx];
+                    const minElem = item.querySelectorAll('input')[0];
+                    const maxElem = item.querySelectorAll('input')[1];
+                    const min = minElem ? minElem.value : '';
+                    const max = maxElem ? maxElem.value : '';
+                    starLimits[name] = {
+                        min: min !== '' ? parseInt(min) : -Infinity,
+                        max: max !== '' ? parseInt(max) : Infinity
+                    };
+                }
+            });
+
+            // Lọc tổng hợp 3 Cát Tinh
+            const t3Min = document.getElementById('total3Min') ? parseInt(document.getElementById('total3Min').value) : -Infinity;
+            const t3Max = document.getElementById('total3Max') ? parseInt(document.getElementById('total3Max').value) : Infinity;
+            const r3Min = document.getElementById('ratio3Min') ? parseInt(document.getElementById('ratio3Min').value) : -Infinity;
+            const r3Max = document.getElementById('ratio3Max') ? parseInt(document.getElementById('ratio3Max').value) : Infinity;
+
+            // Tránh hung tinh
+            const hungCbs = Array.from(document.querySelectorAll('.hung-cb:checked')).map(cb => cb.value);
+            const checkNo5 = hungCbs.includes("HungTinh-5");
+            const checkPV = hungCbs.includes("HungTinh-PhucVi");
+
+            // Mệnh, Nhà Mạng, Âm Dương
+            const menhCbs = Array.from(document.querySelectorAll('.menh-cb:checked')).map(cb => cleanVN(cb.value));
+            const netCbs = Array.from(document.querySelectorAll('.net-cb:checked')).map(cb => cleanVN(cb.value));
+            const yyCbs = Array.from(document.querySelectorAll('.am-duong-cb:checked')).map(cb => parseInt(cb.value));
+
+            // Khoảng giá
+            const priceCbs = Array.from(document.querySelectorAll('.price-cb:checked')).map(cb => cb.value);
+            const inputMin = document.getElementById('priceMin') ? document.getElementById('priceMin').value : '';
+            const inputMax = document.getElementById('priceMax') ? document.getElementById('priceMax').value : '';
+            const pMin = inputMin !== '' ? parseInt(inputMin) : 0;
+            const pMax = inputMax !== '' ? parseInt(inputMax) : Infinity;
+
+            // Quẻ Dịch
+            const queCbs = Array.from(document.querySelectorAll('.q-cb:checked')).map(cb => cleanVN(cb.value));
+
+            // Tỉ lệ % từng sao
+            const pTYMin = document.getElementById('pctTYMin') ? parseInt(document.getElementById('pctTYMin').value) : -Infinity;
+            const pTYMax = document.getElementById('pctTYMax') ? parseInt(document.getElementById('pctTYMax').value) : Infinity;
+            const pSKMin = document.getElementById('pctSKMin') ? parseInt(document.getElementById('pctSKMin').value) : -Infinity;
+            const pSKMax = document.getElementById('pctSKMax') ? parseInt(document.getElementById('pctSKMax').value) : Infinity;
+            const pDNMin = document.getElementById('pctDNMin') ? parseInt(document.getElementById('pctDNMin').value) : -Infinity;
+            const pDNMax = document.getElementById('pctDNMax') ? parseInt(document.getElementById('pctDNMax').value) : Infinity;
+
+            filteredData = FULL_DATA.filter(d => {
+                // == LỌC CÁT TINH NHANH (TỔ HỢP 2 CUỐI) ==
+                if (starComboFilter) {
+                    const energy = getEnergyProgression(d.sr);
+                    let combo = "";
+                    if (energy.length >= 2) combo = `${energy[energy.length - 2].type},${energy[energy.length - 1].type}`;
+                    else if (energy.length === 1) combo = energy[0].type;
+                    if (combo !== starComboFilter) return false;
+                }
+
+                // == FILTER: SỐ LOẠI TRỪ ==
+                if (excluded.length) {
+                    const srStr = String(d.sr);
+                    if (excluded.some(n => srStr.includes(String(n)))) return false;
+                }
+
+                // == FILTER: HUNG TINH ==
+                if (d.h5 == 1 && checkNo5) return false;
+
+                // == FILTER: GIÁ TIỀN ==
+                const simPrice = parseInt(d.g || 0);
+
+                // Checkbox giá
+                if (priceCbs.length > 0) {
+                    let matchPriceCb = false;
+                    for (let p of priceCbs) {
+                        if (p === "Dưới 1tr" && simPrice < 1000000) matchPriceCb = true;
+                        if (p === "1-5tr" && simPrice >= 1000000 && simPrice <= 5000000) matchPriceCb = true;
+                        if (p === "5-10tr" && simPrice > 5000000 && simPrice <= 10000000) matchPriceCb = true;
+                        if (p === "Trên 10tr" && simPrice > 10000000) matchPriceCb = true;
+                        if (p === "Khác") matchPriceCb = true;
+                    }
+                    if (!matchPriceCb) return false;
+                }
+
+                // Min/Max giá
+                if (simPrice < pMin || simPrice > pMax) return false;
+
+                // == FILTER: NHÀ MẠNG ==
+                if (netCbs.length > 0) {
+                    if (!d.n || !netCbs.some(net => cleanVN(d.n).includes(net))) return false;
+                }
+
+                // == FILTER: MỆNH ==
+                if (menhCbs.length > 0) {
+                    const simMenh = cleanVN(d.m);
+                    const match = menhCbs.some(m => simMenh.includes(m) || m.includes(simMenh));
+                    if (!match) return false;
+                }
+
+                // == FILTER: ÂM DƯƠNG ==
+                if (yyCbs.length > 0) {
+                    // d.ys trả về -1, 0, 1
+                    if (!yyCbs.includes(parseInt(d.ys))) return false;
+                }
+
+                // == FILTER: QUẺ DỊCH ==
+                if (queCbs.length > 0) {
+                    if (!d.qn || !queCbs.includes(cleanVN(d.qn))) return false;
+                }
+
+                // == FILTER: ĐỊNH DẠNG SỐ / CÁT TINH (*) ==
+                if (!checkPatterns(simQuery, p => {
+                    let pattern = p.trim();
+                    // Thông minh: Xóa số 0 ở đầu đoạn tìm kiếm vì chuỗi sr lưu nguyên gốc (vd 98... thay vì 098...)
+                    if (pattern.startsWith('0')) pattern = pattern.substring(1);
+                    return matchWildcard(pattern, String(d.sr));
+                })) return false;
+
+                if (!checkPatterns(qStars, p => matchWildcard(p, String(d.t1)))) return false;
+                if (!checkPatterns(qPV, p => matchWildcard(p, String(d.t2)))) return false;
+
+                // Theo Script của bạn: t3 là Mã PV Biến Tiến, t4 là Mã CT Biến Tính
+                if (!checkPatterns(qPVBT, p => matchWildcard(p, String(d.t3)))) return false;
+                if (xPVBT && checkPatterns(xPVBT, p => matchWildcard(p, String(d.t3)))) return false;
+
+                if (!checkPatterns(qCTBT, p => matchWildcard(p, String(d.t4)))) return false;
+                if (xCTBT && checkPatterns(xCTBT, p => matchWildcard(p, String(d.t4)))) return false;
+
+
+                // == FILTER: ĐIỂM SỐ 8 SAO ==
+                for (let name of starNames) {
+                    if (starLimits[name]) {
+                        const val = parseInt(d[name] || 0);
+                        if (val < starLimits[name].min || val > starLimits[name].max) return false;
+                    }
+                }
+
+                // == FILTER: TỔNG & TỈ LỆ 3 CÁT TINH ==
+                const vTY = parseInt(d.ty || 0);
+                const vSK = parseInt(d.sk || 0);
+                const vDN = parseInt(d.dn || 0);
+                const s3 = vTY + vSK + vDN;
+                if (!isNaN(t3Min) && s3 < t3Min) return false;
+                if (!isNaN(t3Max) && s3 > t3Max) return false;
+
+                const vPV = parseInt(d.pb || 0);
+                const vLS = parseInt(d.ln || 0);
+                const vTM = parseInt(d.th || 0);
+                const vHH = parseInt(d.hp || 0);
+                const vNQ = parseInt(d.tl || 0);
+                const s8 = vTY + vSK + vDN + vPV + vLS + vTM + vHH + vNQ || 1;
+                const r3 = Math.round((s3 / s8) * 100);
+                if (!isNaN(r3Min) && r3 < r3Min) return false;
+                if (!isNaN(r3Max) && r3 > r3Max) return false;
+
+                // == FILTER: TỈ LỆ CHI TIẾT TỪNG SAO (%) ==
+                const pctTY = Math.round((vTY / s3) * 100);
+                const pctSK = Math.round((vSK / s3) * 100);
+                const pctDN = Math.round((vDN / s3) * 100);
+                if (!isNaN(pTYMin) && pctTY < pTYMin) return false;
+                if (!isNaN(pTYMax) && pctTY > pTYMax) return false;
+                if (!isNaN(pSKMin) && pctSK < pSKMin) return false;
+                if (!isNaN(pSKMax) && pctSK > pSKMax) return false;
+                if (!isNaN(pDNMin) && pctDN < pDNMin) return false;
+                if (!isNaN(pDNMax) && pctDN > pDNMax) return false;
+
+                return true;
+            });
+
+            renderInitial(); 
+        }
+
+        // ======= DETAIL POPUP & SELECTION =======
+        function toggleSelectionMode() {
+            isSelectionMode = !isSelectionMode;
+            document.body.classList.toggle('selection-mode', isSelectionMode);
+            const fab = document.getElementById('fabSelect');
+            if (isSelectionMode) {
+                fab.querySelector('span').innerText = "Hủy chọn";
+                fab.style.background = "#e53e3e";
+            } else {
+                fab.querySelector('span').innerText = "Chọn SIM";
+                fab.style.background = "#1a202c";
+                toggleSelectAll(false); // Reset when exit
+            }
+        }
+
+        function toggleSimSelect(cb) {
+            if (cb.checked) selectedSims.add(cb.value);
+            else selectedSims.delete(cb.value);
+        }
+
+        function toggleSettingsModal(isShow) {
+            const modal = document.getElementById('settingsModal');
+            if (isShow) {
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            } else {
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+
+        function toggleDetail(isShow) {
+            const modal = document.getElementById('detailModal');
+            if (isShow) {
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            } else {
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+
+        function showDetail(el) {
+            // Ngăn chặn mở modal nếu người dùng click vào thẻ Mệnh hoặc Quẻ
+            if (window.event && window.event.target.closest('.tag-menh, .tag-que')) return;
+
+            if (isSelectionMode) {
+                const cb = el.querySelector('.sim-checkbox');
+                cb.checked = !cb.checked;
+                toggleSimSelect(cb);
+                updateCounter();
+                return;
+            }
+
+            const d = el.dataset;
+            document.getElementById('d-num').innerText = d.num;
+            document.getElementById('d-price').innerText = d.price;
+            document.getElementById('d-telco').innerText = d.telco;
+
+            const menhEl = document.getElementById('d-menh');
+            menhEl.innerText = "Mệnh " + d.menh;
+            menhEl.className = "tag-menh menh-" + d.menh.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d");
+
+            document.getElementById('d-stars-meaning').innerText = d.starsMeaning || "Chưa có luận giải Bát tinh.";
+
+            document.getElementById('d-yy-am').innerText = d.yyAm;
+            document.getElementById('d-yy-duong').innerText = d.yyDuong;
+            const stEl = document.getElementById('d-yy-status');
+            stEl.innerText = d.yyStatus;
+            if (d.yyStatus === "Âm thịnh") stEl.style.color = "#1e88e5";
+            else if (d.yyStatus === "Dương thịnh") stEl.style.color = "#e53935";
+            else stEl.style.color = "var(--text-main)";
+
+            const TRIGRAMS = {
+                "Thiên": "111", "Trạch": "011", "Hỏa": "101", "Lôi": "001",
+                "Phong": "110", "Thủy": "010", "Sơn": "100", "Địa": "000"
+            };
+
+            function renderHexagram(queName) {
+                const iconEl = document.getElementById('d-que-icon');
+                iconEl.innerHTML = '';
+                let upper = "", lower = "";
+
+                if (queName.startsWith("Thuần ")) {
+                    const t = queName.replace("Thuần ", "");
+                    upper = lower = TRIGRAMS[t] || "111";
+                } else {
+                    const parts = queName.split(' ');
+                    upper = TRIGRAMS[parts[0]] || "111";
+                    lower = TRIGRAMS[parts[1]] || "111";
+                }
+
+                // Hexagram = Upper (3 lines) + Lower (3 lines)
+                // Order: Top to Bottom (Line 6 to Line 1)
+                const fullMask = upper + lower; 
+                for (let i = 0; i < 6; i++) {
+                    const line = document.createElement('div');
+                    line.className = fullMask[i] === '1' ? 'que-line solid' : 'que-line broken';
+                    iconEl.appendChild(line);
+                }
+            }
+
+            const q = QUE_DETAILS[d.queName] || { type: "Bình Hòa", desc: d.queDesc };
+            document.getElementById('d-que-name').innerHTML = `${d.queName} <span class="tag-que type-${q.type.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/\s/g, "")}">${q.type}</span>`;
+            renderHexagram(d.queName);
+            document.getElementById('d-que-desc').innerText = q.desc;
+
+            // DRAW CHARTS
+            try {
+                renderDetailCharts(d.stars, d.sr);
+            } catch (e) {
+                console.error("Lỗi vẽ biểu đồ:", e);
+            }
+
+            toggleDetail(true);
+        }
+
+        function renderDetailCharts(starsStr, rawNum) {
+            const starMap = {};
+            starsStr.split(',').forEach(s => {
+                const [name, val] = s.split(':');
+                starMap[name] = parseInt(val) || 0;
+            });
+
+            const total8 = Object.values(starMap).reduce((a, b) => a + b, 0) || 1;
+            const sum3 = (starMap['TY'] || 0) + (starMap['SK'] || 0) + (starMap['DN'] || 0);
+
+            // Chart 1: Distribution within the 3 stars
+            const ctx1 = document.getElementById('chartRatio3').getContext('2d');
+            if (chartR3) chartR3.destroy();
+            chartR3 = new Chart(ctx1, {
+                type: 'pie',
+                data: {
+                    labels: ['Thiên Y (TY)', 'Sinh Khí (SK)', 'Diên Niên (DN)'],
+                    datasets: [{
+                        data: [starMap['TY'] || 0, starMap['SK'] || 0, starMap['DN'] || 0],
+                        backgroundColor: ['#2196f3', '#4caf50', '#ffc107'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            // Chart 2: Cát Tinh vs Hung Tinh (Total 8)
+            const ctx2 = document.getElementById('chartRatio4').getContext('2d');
+            const goodSum = (starMap['TY'] || 0) + (starMap['SK'] || 0) + (starMap['DN'] || 0) + (starMap['PV'] || 0);
+            const badSum = total8 - goodSum;
+
+            if (chartR4) chartR4.destroy();
+            chartR4 = new Chart(ctx2, {
+                type: 'pie',
+                data: {
+                    labels: ['Cát Tinh (Tốt)', 'Hung Tinh (Xấu)'],
+                    datasets: [{
+                        data: [goodSum, badSum],
+                        backgroundColor: ['#e91e63', '#2196f3'], 
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            // Chart 3: BAR CHART for 8 stars (NEW)
+            const ctx3 = document.getElementById('chartBar8').getContext('2d');
+            const barLabels = ['Thiên Y', 'Sinh Khí', 'Diên Niên', 'Phục Vị', 'Lục Sát', 'Tuyệt Mệnh', 'Họa Hại', 'Ngũ Quỷ'];
+            const barKeys = ['TY', 'SK', 'DN', 'PV', 'LS', 'TM', 'HH', 'NQ'];
+            const barData = barKeys.map(k => starMap[k] || 0);
+
+            // Colors: TY(Red), SK(Orange), DN(Yellow), PV(Pink), LS(Green), TM(Blue), HH(Cyan), NQ(Purple)
+            const barColors = ['#f44336', '#ff9800', '#ffeb3b', '#e91e63', '#4caf50', '#2196f3', '#00bcd4', '#9c27b0'];
+
+            if (chartBar8) chartBar8.destroy();
+            chartBar8 = new Chart(ctx3, {
+                type: 'bar',
+                data: {
+                    labels: barLabels,
+                    datasets: [{
+                        label: 'Điểm số',
+                        data: barData,
+                        backgroundColor: barColors,
+                        borderRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    onClick: (e, activeEls) => {
+                        if (activeEls.length > 0) {
+                            const idx = activeEls[0].index;
+                            const key = barKeys[idx];
+                            const color = barColors[idx];
+                            const info = STAR_INFO[key];
+                            if (info) {
+                                const titleEl = document.getElementById('combTitle');
+                                titleEl.innerText = info.name;
+                                titleEl.style.color = color;
+
+                                document.getElementById('combDesc').innerHTML = `
+                                    <div style="text-align: left; font-size: 14px; line-height: 1.6;">
+                                        <div style="margin-bottom: 15px;">
+                                            <b style="color: ${color}; display: block; margin-bottom: 5px;">📍 GIỚI THIỆU:</b>
+                                            <span style="color: #475569;">${info.intro}</span>
+                                        </div>
+                                        <div>
+                                            <b style="color: ${color}; display: block; margin-bottom: 5px;">⚠️ NHƯỢC ĐIỂM & SỨC KHỎE:</b>
+                                            <span style="color: #475569;">${info.weak}</span>
+                                        </div>
+                                    </div>
+                                `;
+                                toggleCombModal(true);
+                            }
+                        }
+                    },
+                    layout: {
+                        padding: { top: 20 }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: true }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { display: false },
+                            ticks: { display: false },
+                            border: { display: false },
+                            grace: '10%' // Tạo khoảng trống phía trên cho nhãn số
+                        },
+                        x: { grid: { display: false } }
+                    }
+                },
+                plugins: [{
+                    id: 'topLabels',
+                    afterDatasetsDraw(chart) {
+                        const { ctx, scales: { x, y } } = chart;
+                        chart.data.datasets[0].data.forEach((value, i) => {
+                            const xPos = x.getPixelForValue(i);
+                            const yPos = y.getPixelForValue(value);
+                            ctx.save();
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'bottom';
+                            ctx.font = '600 11px Inter';
+                            ctx.fillStyle = '#475569';
+                            ctx.fillText(value, xPos, yPos - 5);
+                            ctx.restore();
+                        });
+                    }
+                }]
+            });
+
+            // Chart 4: Biểu đồ Tiến hành Năng lượng (Biểu đồ SÓNG)
+            const energyData = getEnergyProgression(rawNum);
+            
+            // Cập nhật Ý nghĩa 2 cặp cuối vào ô "Gió thoảng mây bay"
+            const meaningEl = document.getElementById('d-stars-meaning');
+            if (energyData.length >= 2) {
+                const p1 = energyData[energyData.length - 2];
+                const p2 = energyData[energyData.length - 1];
+                const combKey = p1.type + p2.type;
+                const combMeaning = STAR_COMBINATIONS[combKey] || "Chưa có luận giải sự kết hợp này.";
+                meaningEl.innerHTML = `<b>Tổ hợp kết: ${p1.type} + ${p2.type}</b><br>${combMeaning}`;
+                meaningEl.style.color = '#1e293b'; 
+            } else {
+                meaningEl.innerText = "Gió thoảng mây bay (Không đủ dữ liệu cặp số)";
+            }
+
+            const ctx4 = document.getElementById('chartEnergy').getContext('2d');
+            
+            if (chartEnergy) chartEnergy.destroy();
+            chartEnergy = new Chart(ctx4, {
+                type: 'bar', // Sử dụng mixed chart với type gốc là bar
+                data: {
+                    labels: energyData.map(d => d.seq),
+                    datasets: [
+                        {
+                            label: 'Xu hướng',
+                            type: 'line', // Đường biểu diễn xu hướng
+                            data: energyData.map(d => d.score),
+                            borderColor: 'var(--primary)',
+                            backgroundColor: 'transparent',
+                            fill: false,
+                            tension: 0.4,
+                            borderWidth: 3,
+                            pointRadius: 4,
+                            pointBackgroundColor: '#fff',
+                            pointBorderColor: 'var(--primary)',
+                            pointBorderWidth: 2,
+                            zIndex: 10
+                        },
+                        {
+                            label: 'Điểm số',
+                            type: 'bar', // Cột biểu diễn điểm số
+                            data: energyData.map(d => d.score),
+                            backgroundColor: energyData.map(d => {
+                                const c = STAR_COLORS[d.type] || '#cbd5e1';
+                                return c + '80'; // 50% opacity for bars
+                            }),
+                            borderColor: energyData.map(d => STAR_COLORS[d.type] || '#cbd5e1'),
+                            borderWidth: 1,
+                            borderRadius: 6,
+                            barPercentage: 0.6
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'nearest',
+                        axis: 'x',
+                        intersect: false
+                    },
+                    onClick: (e, activeEls) => {
+                        if (activeEls.length > 0) {
+                            const idx = activeEls[0].index;
+                            if (idx > 0) {
+                                const prev = energyData[idx - 1].type;
+                                const curr = energyData[idx].type;
+                                const combKey = prev + curr;
+                                const desc = STAR_COMBINATIONS[combKey] || "Chưa có luận giải tổ hợp này.";
+                                const parts = desc.split(' --> ');
+                                const combName = parts[0] || (prev + " + " + curr);
+                                const combMean = parts[1] || desc;
+
+                                document.getElementById('combTitle').innerText = `Ý nghĩa cặp: ${energyData[idx - 1].seq} - ${energyData[idx].seq}`;
+                                document.getElementById('combDesc').innerHTML = `
+                                    <div style="margin-bottom: 12px; font-weight: 700; color: var(--primary); font-size: 16px;">
+                                        Tổ hợp: ${combName}
+                                    </div>
+                                    <div style="line-height: 1.6; color: var(--text-main);">
+                                        ${combMean}
+                                    </div>
+                                `;
+                                toggleCombModal(true);
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => {
+                                    const item = energyData[context.dataIndex];
+                                    return `Cặp ${item.seq}: ${item.score} điểm (${item.type})`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: { 
+                            beginAtZero: true, 
+                            max: Math.max(...energyData.map(d => d.score)) + 20,
+                            grid: { color: '#f1f5f9' },
+                            ticks: { 
+                                stepSize: 25,
+                                font: { size: 10 }
+                            }
+                        },
+                        x: { 
+                            grid: { display: false },
+                            ticks: {
+                                font: { size: 10, weight: '600' }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function toggleCombModal(isShow) {
+            const modal = document.getElementById('combinationModal');
+            if (isShow) {
+                modal.classList.add('active');
+            } else {
+                modal.classList.remove('active');
+                // Reset title color
+                const titleEl = document.getElementById('combTitle');
+                if (titleEl) titleEl.style.color = '';
+            }
+        }
+
+        function copyDetail() {
+            const num = document.getElementById('d-num').innerText.replace(/\./g, '');
+            const info = `SIM: ${num}\nGiá: ${document.getElementById('d-price').innerText}\nQuẻ: ${document.getElementById('d-que-name').innerText}`;
+            navigator.clipboard.writeText(info).then(() => alert("Đã copy thông tin!"));
+        }
+
+        function updateCounter() {
+            document.getElementById('selCount').innerText = selectedSims.size.toLocaleString('vi-VN');
+        }
+
+        function syncCheckboxes() {
+            document.querySelectorAll('.sim-checkbox').forEach(cb => {
+                cb.checked = selectedSims.has(String(cb.value));
+            });
+        }
+
+        function selectAllFiltered(checked) {
+            if (!checked) {
+                selectedSims.clear();
+            } else {
+                filteredData.forEach(d => selectedSims.add(String(d.sr)));
+            }
+            updateCounter();
+            syncCheckboxes();
+        }
+
+        function selectTopN() {
+            const limit = parseInt(document.getElementById('inputLimit').value) || 0;
+            if (limit <= 0) return;
+
+            // Chỉ chọn trong danh sách đang được lọc
+            const toSelect = filteredData.slice(0, limit);
+            toSelect.forEach(d => selectedSims.add(String(d.sr)));
+
+            updateCounter();
+            syncCheckboxes();
+        }
+
+        let currentSort = 'default';
+        function setSort(type) {
+            currentSort = type;
+
+            // Update UI
+            document.querySelectorAll('.sort-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('sort-' + type).classList.add('active');
+
+            // Logic Sort
+            if (type === 'asc') {
+                filteredData.sort((a, b) => parseInt(a.g || 0) - parseInt(b.g || 0));
+            } else if (type === 'desc') {
+                filteredData.sort((a, b) => parseInt(b.g || 0) - parseInt(a.g || 0));
+            } else {
+                // Mặc định (Trở về đúng thứ tự ban đầu của bộ lọc)
+                applyFilters();
+                return;
+            }
+
+            renderInitial();
+            toggleModal(false); // Đóng bộ lọc sau khi chọn sắp xếp
+            syncQuickFilters();
+        }
+
+        function copySelected() {
+            if (selectedSims.size === 0) { alert("Vui lòng chọn SIM!"); return; }
+            toggleCopyModal(true);
+        }
+
+        function toggleCopyModal(isShow) {
+            const modal = document.getElementById('copyModal');
+            if (isShow) {
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+                // Không ẩn menu chọn để người dùng biết mình đang thao tác trên bao nhiêu số
+            } else {
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+
+        function executeCopy(formatType) {
+            if (selectedSims.size === 0) return;
+
+            let results = [];
+
+            selectedSims.forEach(srVal => {
+                // Tìm chi tiết SIM trong data gốc thông qua sr
+                const obj = FULL_DATA.find(d => String(d.sr) === String(srVal));
+                if (!obj) {
+                    results.push(srVal); // Fallback
+                    return;
+                }
+
+                const numFmt = obj.s || obj.sr; // Số đẹp có chấm
+                const price = formatPriceDynamic(parseInt(obj.g || 0));
+                const menh = (obj.m && obj.m.trim() !== "") ? ("Mệnh " + obj.m) : "";
+
+                // Tính nhóm Cát Tinh
+                const vTY = parseInt(obj.ty || 0);
+                const vSK = parseInt(obj.sk || 0);
+                const vDN = parseInt(obj.dn || 0);
+                const sum = vTY + vSK + vDN || 1;
+                const pTY = Math.round((vTY / sum) * 100);
+                const pSK = Math.round((vSK / sum) * 100);
+                const pDN = 100 - pTY - pSK;
+                const ctFmt = `TY:${pTY}% SK:${pSK}% DN:${pDN}%`;
+
+                if (formatType === 1) {
+                    results.push(`${numFmt}`);
+                } else if (formatType === 2) {
+                    results.push(`${numFmt} - ${price}`);
+                } else if (formatType === 3) {
+                    const tail = menh ? ` - ${menh}` : '';
+                    results.push(`${numFmt} - ${price}${tail}`);
+                } else if (formatType === 4) {
+                    const tail1 = menh ? ` - ${menh}` : '';
+                    results.push(`${numFmt} - ${price}${tail1} - ${ctFmt}`);
+                }
+            });
+
+            const textToCopy = results.join('\n');
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                alert(`Đã copy ${selectedSims.size} số (Kèm thông tin) lưu vào bộ nhớ tạm!`);
+                toggleCopyModal(false);
+                toggleSelectionMode(); // Thoát chế độ chọn
+                selectedSims.clear();
+                updateCounter();
+            }).catch(err => {
+                alert("Lỗi khi copy. Vui lòng thử lại!");
+                console.error(err);
+            });
+        }
+
+        function init() {
+            const exG = document.getElementById('exGrid');
+            for (let i = 0; i <= 9; i++) {
+                const b = document.createElement('div');
+                b.className = 'num-btn'; b.innerText = i;
+                b.onclick = () => { b.classList.toggle('active'); toggleEx(i); applyFilters(); };
+                exG.appendChild(b);
+            }
+
+            document.getElementById('queBox').innerHTML = QUERIES_64.map(q => `
+            <label class="chip-label item-que">
+                <input type="checkbox" class="q-cb" value="${q}" onchange="updateUI()">
+                <span class="chip-text">${q}</span>
+            </label>
+        `).join('');
+        }
+
+        function toggleEx(n) {
+            if (excluded.includes(n)) excluded = excluded.filter(x => x !== n);
+            else excluded.push(n);
+        }
+
+        function toggleModal(isShow) {
+            const modal = document.getElementById('filterModal');
+            if (isShow) {
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            } else {
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+
+        function findQue(inp) {
+            const v = inp.value.toLowerCase();
+            document.querySelectorAll('#queBox .item-que').forEach(label => {
+                const txt = label.querySelector('.chip-text').innerText.toLowerCase();
+                label.style.display = txt.includes(v) ? 'inline-block' : 'none';
+            });
+        }
+
+        document.getElementById('filterModal').addEventListener('click', function (e) {
+            if (e.target === this) toggleModal(false);
+        });
+
+        function handleSearchEnter(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                executeMainSearch();
+            }
+        }
+    </script>
+    <div id="tagTooltip" class="tag-tooltip"></div>
+</body>
+
+</html>
