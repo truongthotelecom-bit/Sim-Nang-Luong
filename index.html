@@ -1618,7 +1618,7 @@
 
         .chart-container-canvas {
             position: relative;
-            height: 180px;
+            height: 160px; /* Bóp nhỏ chiều cao 1 chút để không bị tràn */
             width: 100%;
         }
 
@@ -2099,16 +2099,39 @@
             z-index: 10000;
             background: #334155;
             color: #f8fafc;
-            padding: 12px;
+            padding: 15px 12px 12px 12px;
             border-radius: 10px;
             font-size: 13px;
             max-width: 280px;
             width: max-content;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-            pointer-events: none;
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.4);
+            pointer-events: auto; /* Enable clicks */
             display: none;
             line-height: 1.5;
             border: 1px solid #475569;
+        }
+
+        .tooltip-close {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            color: #94a3b8;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 12px;
+            transition: 0.2s;
+            pointer-events: auto;
+        }
+
+        .tooltip-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
         }
 
         @media (max-width: 600px) {
@@ -2847,7 +2870,7 @@
                     </div>
                 </div>
 
-                <div class="section-title">Tiến trình Năng lượng (Bát tinh)</div>
+                <div class="section-title" style="color: var(--primary);">Tiến trình Năng lượng (Bát tinh)</div>
                 <div class="chart-box-wrapper" style="height: 250px; padding: 10px;">
                     <canvas id="chartEnergy"></canvas>
                 </div>
@@ -2979,7 +3002,7 @@
             },
             "Hỏa": {
                 hop: "Thổ, Hoả",
-                khac: "Thủy",
+                khac: "Kim",
                 intro: "Đại diện cho đam mê, năng lượng và công lý. Người mệnh Hỏa quyết liệt, dũng cảm nhưng đôi khi nóng nảy."
             },
             "Thổ": {
@@ -3660,7 +3683,9 @@
 
             if (!content) return;
 
-            tooltip.innerHTML = content;
+            // Thêm nút X đóng
+            const closeBtn = `<div class="tooltip-close" onclick="hideTagTooltip()">✕</div>`;
+            tooltip.innerHTML = closeBtn + content;
             tooltip.style.display = 'block';
 
             const rect = tooltip.getBoundingClientRect();
@@ -4296,6 +4321,39 @@
             const total8 = Object.values(starMap).reduce((a, b) => a + b, 0) || 1;
             const sum3 = (starMap['TY'] || 0) + (starMap['SK'] || 0) + (starMap['DN'] || 0);
 
+            // Mapping màu sắc cố định của 8 sao
+            const ENERGY_STAR_COLORS = {
+                'TY': '#f44336', 'SK': '#ff9800', 'DN': '#ffeb3b', 'PV': '#e91e63',
+                'LS': '#4caf50', 'TM': '#2196f3', 'HH': '#00bcd4', 'NQ': '#9c27b0'
+            };
+
+            // Hàm vẽ % và Tên trên biểu đồ tròn
+            const drawPiePercentages = (chart) => {
+                const { ctx, data } = chart;
+                ctx.save();
+                const total = data.datasets[0].data.reduce((a, b) => a + b, 0);
+                if (total === 0) return;
+
+                chart.getDatasetMeta(0).data.forEach((element, i) => {
+                    const value = data.datasets[0].data[i];
+                    if (value === 0) return;
+                    
+                    const label = data.labels[i].includes('(') ? data.labels[i].split('(')[1].replace(')', '') : data.labels[i].split(' ')[0];
+                    const percent = ((value / total) * 100).toFixed(0) + "%";
+                    const displayText = label + " " + percent;
+                    
+                    const { x, y } = element.tooltipPosition();
+                    
+                    ctx.fillStyle = '#fff';
+                    ctx.shadowColor = 'rgba(0,0,0,0.5)';
+                    ctx.shadowBlur = 4;
+                    ctx.font = 'bold 11px Inter';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(displayText, x, y);
+                });
+                ctx.restore();
+            };
+
             // Chart 1: Distribution within the 3 stars
             const ctx1 = document.getElementById('chartRatio3').getContext('2d');
             if (chartR3) chartR3.destroy();
@@ -4305,15 +4363,17 @@
                     labels: ['Thiên Y (TY)', 'Sinh Khí (SK)', 'Diên Niên (DN)'],
                     datasets: [{
                         data: [starMap['TY'] || 0, starMap['SK'] || 0, starMap['DN'] || 0],
-                        backgroundColor: ['#2196f3', '#4caf50', '#ffc107'],
-                        borderWidth: 0
+                        backgroundColor: [ENERGY_STAR_COLORS['TY'], ENERGY_STAR_COLORS['SK'], ENERGY_STAR_COLORS['DN']],
+                        borderWidth: 2,
+                        borderColor: '#fff'
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false } }
-                }
+                },
+                plugins: [{ id: 'pieLabels', afterDatasetsDraw: drawPiePercentages }]
             });
 
             // Chart 2: Cát Tinh vs Hung Tinh (Total 8)
@@ -4328,15 +4388,17 @@
                     labels: ['Cát Tinh (Tốt)', 'Hung Tinh (Xấu)'],
                     datasets: [{
                         data: [goodSum, badSum],
-                        backgroundColor: ['#e91e63', '#2196f3'],
-                        borderWidth: 0
+                        backgroundColor: ['#10b981', '#ef4444'], // Green for Good, Red for Bad
+                        borderWidth: 2,
+                        borderColor: '#fff'
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false } }
-                }
+                },
+                plugins: [{ id: 'pieLabels', afterDatasetsDraw: drawPiePercentages }]
             });
 
             // Chart 3: BAR CHART for 8 stars (NEW)
@@ -4344,9 +4406,7 @@
             const barLabels = ['Thiên Y', 'Sinh Khí', 'Diên Niên', 'Phục Vị', 'Lục Sát', 'Ngũ Quỷ', 'Họa Hại', 'Tuyệt Mệnh'];
             const barKeys = ['TY', 'SK', 'DN', 'PV', 'LS', 'NQ', 'HH', 'TM'];
             const barData = barKeys.map(k => starMap[k] || 0);
-
-            // Colors: TY(Red), SK(Orange), DN(Yellow), PV(Pink), LS(Green), TM(Blue), HH(Cyan), NQ(Purple)
-            const barColors = ['#f44336', '#ff9800', '#ffeb3b', '#e91e63', '#4caf50', '#2196f3', '#00bcd4', '#9c27b0'];
+            const barColors = barKeys.map(k => ENERGY_STAR_COLORS[k]);
 
             if (chartBar8) chartBar8.destroy();
             chartBar8 = new Chart(ctx3, {
@@ -4379,13 +4439,11 @@
                         if (activeEls.length > 0) {
                             const idx = activeEls[0].index;
                             const key = barKeys[idx];
-                            const color = barColors[idx];
+                            const color = ENERGY_STAR_COLORS[key];
                             const info = STAR_INFO[key];
                             if (info) {
-                                const titleEl = document.getElementById('combTitle');
-                                titleEl.innerText = info.name;
-                                titleEl.style.color = color;
-
+                                document.getElementById('combTitle').innerText = info.name;
+                                document.getElementById('combTitle').style.color = color;
                                 document.getElementById('combDesc').innerHTML = `
                                     <div style="text-align: left; font-size: 14px; line-height: 1.6;">
                                         <div style="margin-bottom: 15px;">
@@ -4402,21 +4460,10 @@
                             }
                         }
                     },
-                    layout: {
-                        padding: { top: 20 }
-                    },
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: { enabled: true }
-                    },
+                    layout: { padding: { top: 20 } },
+                    plugins: { legend: { display: false } },
                     scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: { display: false },
-                            ticks: { display: false },
-                            border: { display: false },
-                            grace: '10%' // Tạo khoảng trống phía trên cho nhãn số
-                        },
+                        y: { beginAtZero: true, grid: { display: false }, ticks: { display: false }, border: { display: false }, grace: '15%' },
                         x: { grid: { display: false } }
                     }
                 },
@@ -4430,8 +4477,8 @@
                             ctx.save();
                             ctx.textAlign = 'center';
                             ctx.textBaseline = 'bottom';
-                            ctx.font = '600 11px Inter';
-                            ctx.fillStyle = '#475569';
+                            ctx.font = 'bold 12px Inter';
+                            ctx.fillStyle = '#334155';
                             ctx.fillText(value, xPos, yPos - 5);
                             ctx.restore();
                         });
@@ -4441,8 +4488,6 @@
 
             // Chart 4: Biểu đồ Tiến hành Năng lượng (Biểu đồ SÓNG)
             const energyData = getEnergyProgression(rawNum);
-
-            // Cập nhật Ý nghĩa 2 cặp cuối vào ô "Gió thoảng mây bay"
             const meaningEl = document.getElementById('d-stars-meaning');
             if (energyData.length >= 2) {
                 const p1 = energyData[energyData.length - 2];
@@ -4456,51 +4501,43 @@
             }
 
             const ctx4 = document.getElementById('chartEnergy').getContext('2d');
-
             if (chartEnergy) chartEnergy.destroy();
             chartEnergy = new Chart(ctx4, {
-                type: 'bar', // Sử dụng mixed chart với type gốc là bar
+                type: 'bar',
                 data: {
                     labels: energyData.map(d => d.seq),
                     datasets: [
                         {
                             label: 'Xu hướng',
-                            type: 'line', // Đường biểu diễn xu hướng
+                            type: 'line',
                             data: energyData.map(d => d.score),
-                            borderColor: 'var(--primary)',
+                            borderColor: '#ef4444', // Red Line
                             backgroundColor: 'transparent',
                             fill: false,
                             tension: 0.4,
                             borderWidth: 3,
                             pointRadius: 4,
                             pointBackgroundColor: '#fff',
-                            pointBorderColor: 'var(--primary)',
+                            pointBorderColor: '#ef4444',
                             pointBorderWidth: 2,
                             zIndex: 10
                         },
                         {
                             label: 'Điểm số',
-                            type: 'bar', // Cột biểu diễn điểm số
+                            type: 'bar',
                             data: energyData.map(d => d.score),
-                            backgroundColor: energyData.map(d => {
-                                const c = STAR_COLORS[d.type] || '#cbd5e1';
-                                return c + '80'; // 50% opacity for bars
-                            }),
-                            borderColor: energyData.map(d => STAR_COLORS[d.type] || '#cbd5e1'),
+                            backgroundColor: energyData.map(d => ENERGY_STAR_COLORS[d.type] || '#cbd5e1'), // Star Specific Colors
+                            borderColor: energyData.map(d => ENERGY_STAR_COLORS[d.type] || '#cbd5e1'),
                             borderWidth: 1,
                             borderRadius: 6,
-                            barPercentage: 0.6
+                            barPercentage: 0.7
                         }
                     ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    interaction: {
-                        mode: 'nearest',
-                        axis: 'x',
-                        intersect: false
-                    },
+                    interaction: { mode: 'nearest', axis: 'x', intersect: false },
                     onClick: (e, activeEls) => {
                         if (activeEls.length > 0) {
                             const idx = activeEls[0].index;
@@ -4512,7 +4549,6 @@
                                 const parts = desc.split(' --> ');
                                 const combName = parts[0] || (prev + " + " + curr);
                                 const combMean = parts[1] || desc;
-
                                 document.getElementById('combTitle').innerText = `Ý nghĩa cặp: ${energyData[idx - 1].seq} - ${energyData[idx].seq}`;
                                 document.getElementById('combDesc').innerHTML = `
                                     <div style="margin-bottom: 12px; font-weight: 700; color: var(--primary); font-size: 16px;">
@@ -4526,35 +4562,45 @@
                             }
                         }
                     },
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            callbacks: {
-                                label: (context) => {
-                                    const item = energyData[context.dataIndex];
-                                    return `Cặp ${item.seq}: ${item.score} điểm (${item.type})`;
-                                }
-                            }
-                        }
-                    },
+                    plugins: { legend: { display: false } },
                     scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: Math.max(...energyData.map(d => d.score)) + 20,
-                            grid: { color: '#f1f5f9' },
-                            ticks: {
-                                stepSize: 25,
-                                font: { size: 10 }
-                            }
-                        },
-                        x: {
-                            grid: { display: false },
-                            ticks: {
-                                font: { size: 10, weight: '600' }
-                            }
-                        }
+                        y: { beginAtZero: true, max: Math.max(...energyData.map(d => d.score)) + 30, grid: { color: '#f1f5f9' }, ticks: { stepSize: 25, font: { size: 10 } } },
+                        x: { grid: { display: false }, ticks: { font: { size: 10, weight: '600' } } }
                     }
-                }
+                },
+                plugins: [{
+                    id: 'energyLabels',
+                    afterDatasetsDraw(chart) {
+                        const { ctx, scales: { x, y } } = chart;
+                        const fontSize = 11;
+                        ctx.save();
+                        ctx.font = `bold ${fontSize}px Inter`;
+                        ctx.textAlign = 'center';
+                        
+                        chart.data.datasets[1].data.forEach((value, i) => {
+                            const starType = energyData[i].type;
+                            const xPos = x.getPixelForValue(i);
+                            const yPos = y.getPixelForValue(value);
+                            const yBase = y.getPixelForValue(0);
+                            
+                            // Tính toán vị trí nhãn (giữa cột)
+                            let labelY = (yPos + yBase) / 2 + (fontSize / 2);
+                            
+                            // Nếu cột quá thấp (< 25px), đẩy nhãn lên trên đầu cột
+                            if (Math.abs(yBase - yPos) < 25) {
+                                ctx.fillStyle = '#334155';
+                                labelY = yPos - 5;
+                            } else {
+                                ctx.fillStyle = '#fff';
+                                ctx.shadowColor = 'rgba(0,0,0,0.3)';
+                                ctx.shadowBlur = 2;
+                            }
+                            
+                            ctx.fillText(starType, xPos, labelY);
+                        });
+                        ctx.restore();
+                    }
+                }]
             });
         }
 
