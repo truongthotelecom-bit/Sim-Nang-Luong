@@ -314,6 +314,57 @@
             animation: cardFadeIn 0.5s ease-out backwards;
         }
 
+           /* TECH FILTERS GRID */
+        .tech-filter-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .tech-filter-item {
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .tech-filter-item label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-main);
+        }
+
+        .tech-filter-pair {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tech-filter-pair input {
+            width: 100%;
+            padding: 6px 8px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            font-size: 13px;
+            text-align: center;
+            outline: none;
+        }
+
+        .tech-input-min:focus, .tech-input-max:focus {
+            border-color: var(--primary);
+            background: #fff;
+        }
+
+        @media (max-width: 600px) {
+            .tech-filter-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+        }
+
         @keyframes cardFadeIn {
             from {
                 opacity: 0;
@@ -431,7 +482,7 @@
         }
 
         .selection-mode .fab-select {
-            bottom: 100px;
+            bottom: 110px;
             background: var(--primary);
         }
 
@@ -467,7 +518,69 @@
             background-color: #fff;
         }
 
-        /* DRAGGABLE FAB SETTINGS */
+        /* MOBILE SEARCH MODE BUTTON (Mini) */
+        .mobile-mode-btn {
+            display: none; /* Ẩn trên Desktop */
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            border: 2px solid white;
+            color: white;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: 800;
+            font-size: 14px;
+            position: relative;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            transition: 0.3s;
+        }
+
+        .mobile-mode-btn.mode-1 { background: #ee0033; } /* Đỏ - Tìm Số */
+        .mobile-mode-btn.mode-2 { background: #00a859; } /* Xanh - Tìm t2 */
+        .mobile-mode-btn.mode-3 { background: #6b46c1; } /* Tím - Tìm t3 */
+
+        .mobile-mode-btn .mode-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #fff;
+            color: #1a202c;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        /* TOAST NOTIFICATION */
+        #toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #1a202c;
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 10000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transition: 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            opacity: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
         #fabSettings {
             position: fixed;
             width: 54px;
@@ -501,6 +614,11 @@
             opacity: 0.8;
             transform: scale(1.1);
             cursor: grabbing;
+        }
+
+        /* Khi đang chọn SIM, đẩy nút cài đặt lên cao hơn để nhường chỗ cho thanh công cụ */
+        .selection-mode #fabSettings {
+            bottom: 190px !important;
         }
 
 
@@ -764,10 +882,18 @@
                 justify-content: space-between;
             }
 
+            .search-mode-select {
+                display: none; /* Ẩn select trên Mobile */
+            }
+
+            .mobile-mode-btn {
+                display: flex; /* Hiện nút icon trên Mobile */
+            }
+
             .search-area {
                 flex-direction: row;
-                gap: 6px;
-                padding: 0 10px;
+                gap: 8px;
+                padding: 0 8px;
                 align-items: center;
             }
 
@@ -786,12 +912,8 @@
                 display: none;
             }
 
-            .btn-settings-trigger {
-                width: 40px;
-                height: 40px;
-                border-radius: 50%;
+            .search-mode-wrapper {
                 flex-shrink: 0;
-                padding: 0;
             }
 
             .search-input-wrapper input {
@@ -876,8 +998,8 @@
         .active-filter-nav {
             display: flex;
             align-items: center;
-            gap: 8px;
-            margin-left: auto;
+            gap: 10px;
+            flex-shrink: 0;
         }
 
         .btn-active-filters {
@@ -893,6 +1015,7 @@
             gap: 6px;
             cursor: pointer;
             transition: 0.2s;
+            white-space: nowrap;
         }
 
         .btn-active-filters span {
@@ -2003,6 +2126,11 @@
                     <option value="2">Tìm Theo Sao</option>
                     <option value="3">Tìm Theo Sao Đã Rút Gọn</option>
                 </select>
+                <!-- Nút chuyển chế độ Mini cho Mobile -->
+                <div id="mobileSearchModeBtn" class="mobile-mode-btn mode-1" onclick="cycleSearchModeMobile()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <div class="mode-badge">1</div>
+                </div>
             </div>
             <div class="search-input-wrapper">
                 <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
@@ -2024,6 +2152,14 @@
         </div>
 
         <div class="header-quick-bar">
+            <!-- Đưa Bộ lọc lên đầu theo yêu cầu -->
+            <div class="active-filter-nav">
+                <button class="btn-reset-all" onclick="resetFilters()" title="Xóa tất cả bộ lọc">✕</button>
+                <button class="btn-active-filters" onclick="toggleActiveFiltersDropdown()">
+                    Bộ lọc <span id="activeFilterCount">0</span>
+                </button>
+            </div>
+
             <select class="quick-select" id="headerSort" onchange="setSort(this.value)">
                 <option value="default">Sắp xếp</option>
                 <option value="asc">Giá thấp ↑</option>
@@ -2064,12 +2200,6 @@
                 <option value="NQ">Ngũ Quỷ</option>
             </select>
 
-            <div class="active-filter-nav">
-                <button class="btn-active-filters" onclick="toggleActiveFiltersDropdown()">
-                    Bộ lọc <span id="activeFilterCount">0</span>
-                </button>
-                <button class="btn-reset-all" onclick="resetFilters()" title="Xóa tất cả bộ lọc">✕</button>
-            </div>
 
             <div id="activeFiltersDropdown" class="active-filters-dropdown">
                 <!-- Danh sách chip lọc sẽ được render vào đây -->
@@ -2376,6 +2506,147 @@
                         style="padding-left:38px;">
                 </div>
                 <div class="que-scroll chip-group" id="queBox"></div>
+
+                <!-- THÔNG SỐ KỸ THUẬT CHUYÊN SÂU (CHIA 3 NHÓM) -->
+                <div style="margin-top: 25px; border-top: 1px dashed var(--border); padding-top: 20px;">
+                    <h3 style="margin-bottom: 5px;">Thông số kỹ thuật Nâng cao</h3>
+                    <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">Lọc SIM theo các chỉ số liên tiếp, tỉ lệ % và điểm số 8 sao.</p>
+                    
+                    <!-- Nhóm 1: Chỉ số liên tiếp -->
+                    <h4 style="font-size: 14px; color: var(--primary); margin: 15px 0 10px 0;">1. Chỉ số liên tiếp</h4>
+                    <div class="tech-filter-grid">
+                        <div class="tech-filter-item">
+                            <label>Cát liên tiếp (cat)</label>
+                            <div class="tech-filter-pair">
+                                <input type="number" id="min_c_cat" placeholder="Min" onchange="updateUI()">
+                                <span>-</span>
+                                <input type="number" id="max_c_cat" placeholder="Max" onchange="updateUI()">
+                            </div>
+                        </div>
+                        <div class="tech-filter-item">
+                            <label>Hung liên tiếp (hung)</label>
+                            <div class="tech-filter-pair">
+                                <input type="number" id="min_c_hung" placeholder="Min" onchange="updateUI()">
+                                <span>-</span>
+                                <input type="number" id="max_c_hung" placeholder="Max" onchange="updateUI()">
+                            </div>
+                        </div>
+                        <div class="tech-filter-item">
+                            <label>PV liên tiếp (pv)</label>
+                            <div class="tech-filter-pair">
+                                <input type="number" id="min_c_pv" placeholder="Min" onchange="updateUI()">
+                                <span>-</span>
+                                <input type="number" id="max_c_pv" placeholder="Max" onchange="updateUI()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Nhóm 2: Lọc Tỉ lệ % MỚI -->
+                    <h4 style="font-size: 14px; color: var(--primary); margin: 20px 0 10px 0;">2. Lọc Tỉ lệ Phần trăm (%)</h4>
+                    <div class="tech-filter-grid">
+                        <div class="tech-filter-item">
+                            <label>% Thiên Y / Tổng 3</label>
+                            <div class="tech-filter-pair">
+                                <input type="number" id="min_pct_ty" placeholder="Min %" onchange="updateUI()">
+                                <span>-</span>
+                                <input type="number" id="max_pct_ty" placeholder="Max %" onchange="updateUI()">
+                            </div>
+                        </div>
+                        <div class="tech-filter-item">
+                            <label>% Sinh Khí / Tổng 3</label>
+                            <div class="tech-filter-pair">
+                                <input type="number" id="min_pct_sk" placeholder="Min %" onchange="updateUI()">
+                                <span>-</span>
+                                <input type="number" id="max_pct_sk" placeholder="Max %" onchange="updateUI()">
+                            </div>
+                        </div>
+                        <div class="tech-filter-item">
+                            <label>% Diên Niên / Tổng 3</label>
+                            <div class="tech-filter-pair">
+                                <input type="number" id="min_pct_dn" placeholder="Min %" onchange="updateUI()">
+                                <span>-</span>
+                                <input type="number" id="max_pct_dn" placeholder="Max %" onchange="updateUI()">
+                            </div>
+                        </div>
+                        <div class="tech-filter-item">
+                            <label>% Tổng 3 sao / Tổng 8</label>
+                            <div class="tech-filter-pair">
+                                <input type="number" id="min_pct_3v8" placeholder="Min %" onchange="updateUI()">
+                                <span>-</span>
+                                <input type="number" id="max_pct_3v8" placeholder="Max %" onchange="updateUI()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Nhóm 3: Điểm 8 sao -->
+                    <h4 style="font-size: 14px; color: var(--primary); margin: 20px 0 10px 0;">3. Điểm số 8 sao</h4>
+                    <div class="tech-filter-grid">
+                        <div class="tech-filter-item">
+                            <label>Điểm Thiên Y (ty)</label>
+                            <div class="tech-filter-pair">
+                                <input type="number" id="min_ty" placeholder="Min" onchange="updateUI()">
+                                <span>-</span>
+                                <input type="number" id="max_ty" placeholder="Max" onchange="updateUI()">
+                            </div>
+                        </div>
+                        <div class="tech-filter-item">
+                            <label>Điểm Sinh Khí (sk)</label>
+                            <div class="tech-filter-pair">
+                                <input type="number" id="min_sk" placeholder="Min" onchange="updateUI()">
+                                <span>-</span>
+                                <input type="number" id="max_sk" placeholder="Max" onchange="updateUI()">
+                            </div>
+                        </div>
+                        <div class="tech-filter-item">
+                            <label>Điểm Diên Niên (dn)</label>
+                            <div class="tech-filter-pair">
+                                <input type="number" id="min_dn" placeholder="Min" onchange="updateUI()">
+                                <span>-</span>
+                                <input type="number" id="max_dn" placeholder="Max" onchange="updateUI()">
+                            </div>
+                        </div>
+                        <div class="tech-filter-item">
+                            <label>Điểm Phục Vị (pb)</label>
+                            <div class="tech-filter-pair">
+                                <input type="number" id="min_pb" placeholder="Min" onchange="updateUI()">
+                                <span>-</span>
+                                <input type="number" id="max_pb" placeholder="Max" onchange="updateUI()">
+                            </div>
+                        </div>
+                        <div class="tech-filter-item">
+                            <label>Điểm Lục Sát (ln)</label>
+                            <div class="tech-filter-pair">
+                                <input type="number" id="min_ln" placeholder="Min" onchange="updateUI()">
+                                <span>-</span>
+                                <input type="number" id="max_ln" placeholder="Max" onchange="updateUI()">
+                            </div>
+                        </div>
+                        <div class="tech-filter-item">
+                            <label>Điểm Tuyệt Mệnh (tl)</label>
+                            <div class="tech-filter-pair">
+                                <input type="number" id="min_tl" placeholder="Min" onchange="updateUI()">
+                                <span>-</span>
+                                <input type="number" id="max_tl" placeholder="Max" onchange="updateUI()">
+                            </div>
+                        </div>
+                        <div class="tech-filter-item">
+                            <label>Điểm Họa Hại (hp)</label>
+                            <div class="tech-filter-pair">
+                                <input type="number" id="min_hp" placeholder="Min" onchange="updateUI()">
+                                <span>-</span>
+                                <input type="number" id="max_hp" placeholder="Max" onchange="updateUI()">
+                            </div>
+                        </div>
+                        <div class="tech-filter-item">
+                            <label>Điểm Thổ? (th)</label>
+                            <div class="tech-filter-pair">
+                                <input type="number" id="min_th" placeholder="Min" onchange="updateUI()">
+                                <span>-</span>
+                                <input type="number" id="max_th" placeholder="Max" onchange="updateUI()">
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
             </div>
 
@@ -3333,10 +3604,40 @@
                 chips.push({ type: 'stars', label: `Tổ hợp: ${labels.join('-')}`, value: starComboFilter });
             }
 
-            // 9. Tránh hung tinh
+            // 9. Trnh hung tinh
             document.querySelectorAll('.hung-cb:checked').forEach(cb => {
                 const label = cb.parentElement.querySelector('.chip-text')?.innerText || cb.value;
                 chips.push({ type: 'hung', label: label, value: cb.value });
+            });
+
+            // 10. Thng s? k? thu?t (Min/Max)
+            const techFields = ['c_cat', 'c_hung', 'c_pv', 'ty', 'sk', 'dn', 'pb', 'ln', 'tl', 'hp', 'th'];
+            const techNameMap = {
+                c_cat: 'Ct liên ti?p', c_hung: 'Hung liên ti?p', c_pv: 'PV liên ti?p',
+                ty: 'Thiên Y', sk: 'Sinh Khí', dn: 'Diên Niên', pb: 'Ph?c V?',
+                ln: 'L?c Sát', tl: 'Tuy?t M?nh', hp: 'H?a H?i', th: 'th'
+            };
+            techFields.forEach(f => {
+                const min = document.getElementById(`min_${f}`)?.value;
+                const max = document.getElementById(`max_${f}`)?.value;
+                if (min || max) {
+                    const label = `${techNameMap[f]}: ${min || 0} - ${max || '∞'}`;
+                    chips.push({ type: 'tech', field: f, label: label });
+                }
+            });
+
+            // 11. Tỉ lệ phần trăm (%)
+            const pctFields = ['pct_ty', 'pct_sk', 'pct_dn', 'pct_3v8'];
+            const pctNameMap = {
+                pct_ty: '% TY/Tổng 3', pct_sk: '% SK/Tổng 3', pct_dn: '% DN/Tổng 3', pct_3v8: '% Tổng 3/8'
+            };
+            pctFields.forEach(f => {
+                const min = document.getElementById(`min_${f}`)?.value;
+                const max = document.getElementById(`max_${f}`)?.value;
+                if (min || max) {
+                    const label = `${pctNameMap[f]}: ${min || 0}-${max || '100'}%`;
+                    chips.push({ type: 'pct', field: f, label: label });
+                }
             });
 
             if (countLabel) countLabel.innerText = chips.length;
@@ -3361,9 +3662,10 @@
             chips.forEach(c => {
                 const chip = document.createElement('div');
                 chip.className = "filter-chip";
+                const removeArgs = (c.type === 'tech' || c.type === 'pct') ? `'${c.type}', '${c.field}'` : `'${c.type}', '${c.value}'`;
                 chip.innerHTML = `
                     <span>${c.label}</span>
-                    <span class="remove-icon" onclick="removeSingleFilter('${c.type}', '${c.value}')">✕</span>
+                    <span class="remove-icon" onclick="removeSingleFilter(${removeArgs})">✕</span>
                 `;
                 dropdown.appendChild(chip);
             });
@@ -3424,6 +3726,16 @@
             if (type === 'hung') {
                 document.querySelectorAll('.hung-cb').forEach(cb => { if (cb.value === value) cb.checked = false; });
             }
+            if (type === 'tech') {
+                const f = arguments[1] || value; // handling field from chip context
+                if (document.getElementById(`min_${f}`)) document.getElementById(`min_${f}`).value = "";
+                if (document.getElementById(`max_${f}`)) document.getElementById(`max_${f}`).value = "";
+            }
+            if (type === 'pct') {
+                const f = arguments[1] || value;
+                if (document.getElementById(`min_${f}`)) document.getElementById(`min_${f}`).value = "";
+                if (document.getElementById(`max_${f}`)) document.getElementById(`max_${f}`).value = "";
+            }
             updateUI();
         }
 
@@ -3442,8 +3754,8 @@
             // Reset checkboxes
             document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
 
-            // Reset radio/other inputs if any
-            document.querySelectorAll('.points-grid input, .price-range input, .percent-grid input').forEach(i => i.value = "");
+            // Reset các ô nhập số kỹ thuật, giá, tỉ lệ...
+            document.querySelectorAll('.points-grid input, .price-range input, .percent-grid input, .tech-filter-grid input').forEach(i => i.value = "");
 
             starComboFilter = null;
             excluded = [];
@@ -3477,6 +3789,30 @@
             const menhCbs = Array.from(document.querySelectorAll('.menh-cb:checked')).map(cb => cleanMenh(cb.value));
             const netCbs = Array.from(document.querySelectorAll('.net-cb:checked')).map(cb => cleanVN(cb.value));
             const yyCbs = Array.from(document.querySelectorAll('.am-duong-cb:checked')).map(cb => parseInt(cb.value));
+
+            // Technical Filters (Min/Max)
+            const techFields = ['c_cat', 'c_hung', 'c_pv', 'ty', 'sk', 'dn', 'pb', 'ln', 'tl', 'hp', 'th'];
+            const techValues = {};
+            techFields.forEach(f => {
+                const min = document.getElementById(`min_${f}`)?.value;
+                const max = document.getElementById(`max_${f}`)?.value;
+                techValues[f] = {
+                    min: min !== "" ? parseFloat(min) : -Infinity,
+                    max: max !== "" ? parseFloat(max) : Infinity
+                };
+            });
+
+            // Percentage Filters (NEW)
+            const pctFields = ['pct_ty', 'pct_sk', 'pct_dn', 'pct_3v8'];
+            const pctValues = {};
+            pctFields.forEach(f => {
+                const min = document.getElementById(`min_${f}`)?.value;
+                const max = document.getElementById(`max_${f}`)?.value;
+                pctValues[f] = {
+                    min: min !== "" ? parseFloat(min) : -Infinity,
+                    max: max !== "" ? parseFloat(max) : Infinity
+                };
+            });
 
             // Header Quick Selects
             const hNet = document.getElementById('headerNet')?.value || "";
@@ -3526,6 +3862,35 @@
 
                 // Min/Max giá
                 if (simPrice < pMin || simPrice > pMax) return false;
+
+                // == FILTER: THÔNG SỐ KỸ THUẬT (MIN/MAX) ==
+                for (let f of techFields) {
+                    const val = parseFloat(d[f] || 0);
+                    if (val < techValues[f].min || val > techValues[f].max) return false;
+                }
+
+                // == FILTER: TỈ LỆ % (PERCENTAGE) ==
+                const ty = parseFloat(d.ty || 0);
+                const sk = parseFloat(d.sk || 0);
+                const dn = parseFloat(d.dn || 0);
+                const pb = parseFloat(d.pb || 0);
+                const ln = parseFloat(d.ln || 0);
+                const tl = parseFloat(d.tl || 0);
+                const hp = parseFloat(d.hp || 0);
+                const th = parseFloat(d.th || 0);
+
+                const sum3 = ty + sk + dn;
+                const total8 = ty + sk + dn + pb + ln + tl + hp + th;
+
+                const pTY = sum3 > 0 ? (ty / sum3 * 100) : 0;
+                const pSK = sum3 > 0 ? (sk / sum3 * 100) : 0;
+                const pDN = sum3 > 0 ? (dn / sum3 * 100) : 0;
+                const p3v8 = total8 > 0 ? (sum3 / total8 * 100) : 0;
+
+                if (pTY < pctValues['pct_ty'].min || pTY > pctValues['pct_ty'].max) return false;
+                if (pSK < pctValues['pct_sk'].min || pSK > pctValues['pct_sk'].max) return false;
+                if (pDN < pctValues['pct_dn'].min || pDN > pctValues['pct_dn'].max) return false;
+                if (p3v8 < pctValues['pct_3v8'].min || p3v8 > pctValues['pct_3v8'].max) return false;
 
                 // == FILTER: NHÀ MẠNG ==
                 if (hNet || netCbs.length > 0) {
@@ -3784,14 +4149,26 @@
 
             if (chartBar8) chartBar8.destroy();
             chartBar8 = new Chart(ctx3, {
-                type: 'bar',
                 data: {
                     labels: barLabels,
                     datasets: [{
-                        label: 'Điểm số',
+                        type: 'bar',
+                        label: 'Điểm số (Cột)',
                         data: barData,
                         backgroundColor: barColors,
-                        borderRadius: 5
+                        borderRadius: 5,
+                        order: 2
+                    }, {
+                        type: 'line',
+                        label: 'Xu hướng (Đường)',
+                        data: barData,
+                        borderColor: '#f44336',
+                        backgroundColor: 'transparent',
+                        borderWidth: 3,
+                        pointBackgroundColor: '#f44336',
+                        pointRadius: 4,
+                        tension: 0.4,
+                        order: 1
                     }]
                 },
                 options: {
@@ -4212,9 +4589,9 @@
                 fab.style.bottom = 'auto';
                 fab.style.right = 'auto';
             } else {
-                // Default position
-                fab.style.bottom = '30px';
-                fab.style.right = '25px';
+                // Default position (nằm phía trên nút Chọn SIM một chút)
+                fab.style.bottom = '110px';
+                fab.style.right = '30px';
             }
 
             fab.addEventListener('mousedown', startDrag);
@@ -4291,6 +4668,8 @@
             const mode = document.getElementById('searchMode').value;
             const input = document.getElementById('mainSearch');
             const dataList = document.getElementById('searchSuggestions');
+            const mobileBtn = document.getElementById('mobileSearchModeBtn');
+
             if (!input || !dataList) return;
 
             dataList.innerHTML = "";
@@ -4300,10 +4679,10 @@
             if (mode === "1") {
                 placeholder = "Tìm số (Vd: 090*191, *999)";
             } else if (mode === "2") {
-                placeholder = "Tìm Cát Tinh (Vd: TY*, *DN, *SK)";
+                placeholder = "Tìm Theo Sao (Vd: TY*, *DN, *SK-DN)";
                 suggestions = STAR_LIST;
             } else if (mode === "3") {
-                placeholder = "Tìm Cát Tinh Rút Gọn (Vd: TY*, *DN, *SK)";
+                placeholder = "Sao Rút Gọn (Vd: TY*, *DN, *SK-DN)";
                 suggestions = PV_LIST;
             }
 
@@ -4314,8 +4693,50 @@
                 dataList.appendChild(opt);
             });
 
+            // Đồng bộ UI nút Mobile
+            if (mobileBtn) {
+                mobileBtn.className = `mobile-mode-btn mode-${mode}`;
+                const badge = mobileBtn.querySelector('.mode-badge');
+                if (badge) badge.innerText = mode;
+            }
+
             // Automatically re-filter
             applyFilters();
+        }
+
+        function cycleSearchModeMobile() {
+            const select = document.getElementById('searchMode');
+            if (!select) return;
+
+            let currentMode = parseInt(select.value);
+            let nextMode = currentMode + 1;
+            if (nextMode > 3) nextMode = 1;
+
+            select.value = nextMode;
+            updateSearchPlaceholders();
+
+            // Clear input khi đổi chế độ để tránh nhiễu
+            const input = document.getElementById('mainSearch');
+            if (input) input.value = "";
+
+            // Hiển thị thông báo
+            const modeNames = ["", "Tìm Số", "Tìm Theo Sao", "Tìm Sao Rút Gọn"];
+            showToast(`⚙️ Chế độ: ${modeNames[nextMode]}`);
+        }
+
+        function showToast(message) {
+            let toast = document.getElementById('toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'toast';
+                document.body.appendChild(toast);
+            }
+            toast.innerText = message;
+            toast.classList.add('show');
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
         }
 
         // Initialize things
