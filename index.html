@@ -10,7 +10,6 @@
     <!-- Thêm thư viện Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-
         :root {
             --primary: #d32f2f;
             --primary-hover: #b71c1c;
@@ -232,7 +231,7 @@
         .tag-menh:hover {
             filter: brightness(0.9);
             transform: translateY(-1.5px);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
         .menh-thuy {
@@ -316,8 +315,15 @@
         }
 
         @keyframes cardFadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .sim-card:hover {
@@ -630,7 +636,7 @@
             gap: 8px;
             border: 1px solid #e2e8f0;
             transition: 0.2s;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
         }
 
         .filter-chip:hover {
@@ -784,51 +790,148 @@
         .header-quick-bar {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             max-width: 1240px;
             margin: 0 auto;
-            padding: 10px 15px;
+            padding: 8px 15px;
             overflow-x: auto;
             white-space: nowrap;
             scrollbar-width: none;
-            /* Firefox */
         }
 
         .header-quick-bar::-webkit-scrollbar {
             display: none;
         }
 
-        /* Chrome/Safari */
-
-        .quick-filter-label {
-            font-size: 10px;
-            font-weight: 800;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            margin-right: -4px;
-        }
-
         .quick-select {
             background: #f1f5f9;
             border: 1px solid var(--border);
-            border-radius: 8px;
+            border-radius: 10px;
             padding: 8px 12px;
-            font-size: 12px;
-            font-weight: 700;
+            font-size: 13px;
+            font-weight: 600;
             color: var(--text-main);
             outline: none;
             cursor: pointer;
-            min-width: 100px;
+            min-width: 120px;
+            transition: all 0.2s;
+        }
+
+        .quick-select:hover {
+            background: #e2e8f0;
         }
 
         .quick-select:focus {
             border-color: var(--primary);
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
         }
 
-        .quick-net-scroll {
+        /* ACTIVE FILTER MENU STYLE */
+        .active-filter-nav {
             display: flex;
-            gap: 8px;
             align-items: center;
+            gap: 8px;
+            margin-left: auto;
+        }
+
+        .btn-active-filters {
+            background: #fff;
+            border: 1.5px solid var(--primary);
+            color: var(--primary);
+            padding: 7px 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-active-filters span {
+            background: var(--primary);
+            color: #fff;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 20px;
+        }
+
+        .btn-reset-all {
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fee2e2;
+            color: #ef4444;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-reset-all:hover {
+            background: #fecaca;
+            transform: rotate(90deg);
+        }
+
+        /* ACTIVE FILTERS DROPDOWN */
+        .active-filters-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 15px;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            padding: 15px;
+            min-width: 250px;
+            display: none;
+            z-index: 1100;
+            flex-wrap: wrap;
+            gap: 8px;
+            animation: dropdownFade 0.2s ease-out;
+        }
+
+        .active-filters-dropdown.active {
+            display: flex;
+        }
+
+        @keyframes dropdownFade {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .filter-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #f1f5f9;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            color: var(--text-main);
+            border: 1px solid var(--border);
+        }
+
+        .filter-chip .remove-icon {
+            cursor: pointer;
+            color: var(--text-muted);
+            font-size: 14px;
+            transition: 0.2s;
+        }
+
+        .filter-chip .remove-icon:hover {
+            color: var(--primary);
         }
 
         .quick-net-chip {
@@ -851,7 +954,8 @@
         .quick-net-chip.active {
             color: white;
             transform: translateY(-2px) scale(1.05);
-            font-weight: 900; /* Tăng độ đậm phông chữ */
+            font-weight: 900;
+            /* Tăng độ đậm phông chữ */
             border-width: 2px;
         }
 
@@ -1669,10 +1773,27 @@
             vertical-align: middle;
             text-transform: uppercase;
         }
-        .tag-que.type-cat, .tag-que.type-daicat { background: #e8f5e9; color: #2e7d32; }
-        .tag-que.type-hung { background: #ffebee; color: #c62828; }
-        .tag-que.type-binhhoa { background: #f1f5f9; color: #475569; }
-        .tag-que.type-cathanh { background: #fff3e0; color: #ef6c00; }
+
+        .tag-que.type-cat,
+        .tag-que.type-daicat {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .tag-que.type-hung {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .tag-que.type-binhhoa {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .tag-que.type-cathanh {
+            background: #fff3e0;
+            color: #ef6c00;
+        }
 
         /* HÌNH QUẺ DỊCH */
         .que-visual {
@@ -1684,7 +1805,7 @@
             padding: 6px;
             background: #fff;
             border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
             border: 1px solid #f1f5f9;
             align-items: center;
             justify-content: center;
@@ -1700,36 +1821,59 @@
             border-radius: 10px;
             font-size: 13px;
             max-width: 280px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
             pointer-events: none;
             display: none;
             line-height: 1.5;
             border: 1px solid #475569;
         }
-        .tag-tooltip b { color: #facc15; display: block; margin-bottom: 4px; }
-        .tag-tooltip hr { border: 0; border-top: 1px solid #475569; margin: 8px 0; }
-        .tag-tooltip .label { font-weight: 600; color: #94a3b8; }
-        .tag-tooltip .value { color: #f1f5f9; }
+
+        .tag-tooltip b {
+            color: #facc15;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .tag-tooltip hr {
+            border: 0;
+            border-top: 1px solid #475569;
+            margin: 8px 0;
+        }
+
+        .tag-tooltip .label {
+            font-weight: 600;
+            color: #94a3b8;
+        }
+
+        .tag-tooltip .value {
+            color: #f1f5f9;
+        }
+
         .que-line {
             height: 3px;
             width: 100%;
             border-radius: 2px;
         }
+
         .que-line.solid {
             background: #1e293b;
         }
+
         .que-line.broken {
             display: flex;
             justify-content: space-between;
             background: transparent !important;
         }
-        .que-line.broken::before, .que-line.broken::after {
+
+        .que-line.broken::before,
+        .que-line.broken::after {
             content: "";
             height: 3px;
             width: 42%;
             background: #1e293b;
             border-radius: 2px;
         }
+
         /* MODAL Ý NGHĨA TỔ HỢP */
         #combinationModal {
             display: none;
@@ -1788,7 +1932,6 @@
             height: 32px;
             border-radius: 50%;
             display: flex;
-            align-items: center;
             justify-content: center;
             cursor: pointer;
             color: #64748b;
@@ -1797,7 +1940,6 @@
 </head>
 
 <body>
-
     <header>
         <div class="search-area">
             <button class="btn-settings-trigger" onclick="toggleSettingsModal(true)" title="Cài đặt">
@@ -1818,13 +1960,6 @@
                     onkeypress="handleSearchEnter(event)">
                 <button class="btn-search-inline" onclick="executeMainSearch()">Tìm</button>
             </div>
-            <button class="btn-reset-main" onclick="resetFilters()" style="margin-right: 4px;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                    <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
-                    <path d="M3 3v5h5"></path>
-                </svg>
-                <span class="hidden-mobile">BỎ LỌC</span>
-            </button>
             <button class="btn-filter-trigger" onclick="toggleModal(true)">
                 <svg class="filter-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                     <path d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z" />
@@ -1833,7 +1968,6 @@
             </button>
         </div>
 
-        <!-- THANH LỌC NHANH TRONG HEADER (SẮP XẾP & MẠNG) -->
         <div class="header-quick-bar">
             <select class="quick-select" id="headerSort" onchange="setSort(this.value)">
                 <option value="default">Sắp xếp</option>
@@ -1841,18 +1975,54 @@
                 <option value="desc">Giá cao ↓</option>
             </select>
 
-            <div class="quick-net-scroll">
-                <div class="quick-net-chip" data-net="Viettel" onclick="toggleQuickNet('Viettel')">Viettel</div>
-                <div class="quick-net-chip" data-net="Mobi" onclick="toggleQuickNet('Mobi')">Mobifone</div>
-                <div class="quick-net-chip" data-net="Vina" onclick="toggleQuickNet('Vina')">Vinaphone</div>
-                <div class="quick-net-chip" data-net="Vietnamobile" onclick="toggleQuickNet('Vietnamobile')">VNM</div>
-                <div class="quick-net-chip" data-net="Itel" onclick="toggleQuickNet('Itel')">Itel</div>
-                <div class="quick-net-chip" data-net="Wintel" onclick="toggleQuickNet('Wintel')">Wintel</div>
+            <select class="quick-select" id="headerNet" onchange="updateUI()">
+                <option value="">Tất cả mạng</option>
+                <option value="Viettel">Viettel</option>
+                <option value="Mobi">Mobifone</option>
+                <option value="Vina">Vinaphone</option>
+                <option value="Vietnamobile">VNM</option>
+                <option value="Itel">Itel</option>
+                <option value="Wintel">Wintel</option>
+            </select>
+
+            <select class="quick-select" id="headerKeCuoi" onchange="updateUI()">
+                <option value="">Kế cuối (Trống)</option>
+                <option value="TY">Thiên Y</option>
+                <option value="SK">Sinh Khí</option>
+                <option value="DN">Diên Niên</option>
+                <option value="PV">Phục Vị</option>
+                <option value="LS">Lục Sát</option>
+                <option value="TM">Tuyệt Mệnh</option>
+                <option value="HH">Họa Hại</option>
+                <option value="NQ">Ngũ Quỷ</option>
+            </select>
+
+            <select class="quick-select" id="headerCuoi" onchange="updateUI()">
+                <option value="">Cuối (Chọn...)</option>
+                <option value="TY">Thiên Y</option>
+                <option value="SK">Sinh Khí</option>
+                <option value="DN">Diên Niên</option>
+                <option value="PV">Phục Vị</option>
+                <option value="LS">Lục Sát</option>
+                <option value="TM">Tuyệt Mệnh</option>
+                <option value="HH">Họa Hại</option>
+                <option value="NQ">Ngũ Quỷ</option>
+            </select>
+
+            <div class="active-filter-nav">
+                <button class="btn-active-filters" onclick="toggleActiveFiltersDropdown()">
+                    Bộ lọc <span id="activeFilterCount">0</span>
+                </button>
+                <button class="btn-reset-all" onclick="resetFilters()" title="Xóa tất cả bộ lọc">✕</button>
+            </div>
+
+            <div id="activeFiltersDropdown" class="active-filters-dropdown">
+                <!-- Danh sách chip lọc sẽ được render vào đây -->
             </div>
         </div>
     </header>
 
-    <div id="activeFiltersBoard" class="active-filters-board"></div>
+
 
     <!-- TRẠNG THÁI TẢI DỮ LIỆU -->
     <div class="main-layout container">
@@ -2178,17 +2348,41 @@
                     </div>
                 </div>
 
-                <!-- TRÁNH HUNG TINH (GIÁ TRỊ = 1) -->
+                <!-- TRÁNH HUNG TINH (CƠ BẢN & CHUYÊN SÂU) -->
                 <div style="margin-top: 25px; border-top: 1px dashed var(--border); padding-top: 20px;">
-                    <h3 style="margin-bottom: 12px;">Tránh Hung Tinh (Giá trị = 1)</h3>
-                    <div class="chip-group">
+                    <h3 style="margin-bottom: 12px;">Tránh Hung Tinh (Vi phạm)</h3>
+                    <div class="chip-group chip-group-3">
                         <label class="chip-label">
-                            <input type="checkbox" class="hung-cb" value="HungTinh-5" onchange="updateUI()">
-                            <span class="chip-text">Có số 5</span>
+                            <input type="checkbox" class="hung-cb" value="h5" onchange="updateUI()">
+                            <span class="chip-text">Vi phạm Hung 5</span>
                         </label>
                         <label class="chip-label">
-                            <input type="checkbox" class="hung-cb" value="HungTinh-PhucVi" onchange="updateUI()">
-                            <span class="chip-text">Kề Phục Vị</span>
+                            <input type="checkbox" class="hung-cb" value="vp2s5" onchange="updateUI()">
+                            <span class="chip-text">Vi phạm 2 số 5</span>
+                        </label>
+                        <label class="chip-label">
+                            <input type="checkbox" class="hung-cb" value="hpv" onchange="updateUI()">
+                            <span class="chip-text">Hung-PV-Hung</span>
+                        </label>
+                        <label class="chip-label">
+                            <input type="checkbox" class="hung-cb" value="vp2h" onchange="updateUI()">
+                            <span class="chip-text">Vi phạm 2 Hung</span>
+                        </label>
+                        <label class="chip-label">
+                            <input type="checkbox" class="hung-cb" value="vp2pv" onchange="updateUI()">
+                            <span class="chip-text">Vi phạm 2 Phục Vị</span>
+                        </label>
+                        <label class="chip-label">
+                            <input type="checkbox" class="hung-cb" value="vphvc" onchange="updateUI()">
+                            <span class="chip-text">Hung-PV-Cát</span>
+                        </label>
+                        <label class="chip-label">
+                            <input type="checkbox" class="hung-cb" value="vpchv" onchange="updateUI()">
+                            <span class="chip-text">Cát-PV-Hung</span>
+                        </label>
+                        <label class="chip-label">
+                            <input type="checkbox" class="hung-cb" value="vp0" onchange="updateUI()">
+                            <span class="chip-text">Vi phạm 0:0</span>
                         </label>
                     </div>
                 </div>
@@ -2222,49 +2416,61 @@
                     <div class="point-item">
                         <label>TY</label>
                         <div class="point-inputs" style="flex: 1;">
-                            <input type="number" class="input-text" placeholder="Min" onchange="updateUI()" style="height: 44px; font-size: 16px;">
+                            <input type="number" class="input-text" placeholder="Min" onchange="updateUI()"
+                                style="height: 44px; font-size: 16px;">
                             <span class="point-dash">-</span>
-                            <input type="number" class="input-text" placeholder="Max" onchange="updateUI()" style="height: 44px; font-size: 16px;">
+                            <input type="number" class="input-text" placeholder="Max" onchange="updateUI()"
+                                style="height: 44px; font-size: 16px;">
                         </div>
                     </div>
                     <div class="point-item">
                         <label>SK</label>
                         <div class="point-inputs" style="flex: 1;">
-                            <input type="number" class="input-text" placeholder="Min" onchange="updateUI()" style="height: 44px; font-size: 16px;">
+                            <input type="number" class="input-text" placeholder="Min" onchange="updateUI()"
+                                style="height: 44px; font-size: 16px;">
                             <span class="point-dash">-</span>
-                            <input type="number" class="input-text" placeholder="Max" onchange="updateUI()" style="height: 44px; font-size: 16px;">
+                            <input type="number" class="input-text" placeholder="Max" onchange="updateUI()"
+                                style="height: 44px; font-size: 16px;">
                         </div>
                     </div>
                     <div class="point-item">
                         <label>DN</label>
                         <div class="point-inputs" style="flex: 1;">
-                            <input type="number" class="input-text" placeholder="Min" onchange="updateUI()" style="height: 44px; font-size: 16px;">
+                            <input type="number" class="input-text" placeholder="Min" onchange="updateUI()"
+                                style="height: 44px; font-size: 16px;">
                             <span class="point-dash">-</span>
-                            <input type="number" class="input-text" placeholder="Max" onchange="updateUI()" style="height: 44px; font-size: 16px;">
+                            <input type="number" class="input-text" placeholder="Max" onchange="updateUI()"
+                                style="height: 44px; font-size: 16px;">
                         </div>
                     </div>
                     <div class="point-item">
                         <label>PV</label>
                         <div class="point-inputs" style="flex: 1;">
-                            <input type="number" class="input-text" placeholder="Min" onchange="updateUI()" style="height: 44px; font-size: 16px;">
+                            <input type="number" class="input-text" placeholder="Min" onchange="updateUI()"
+                                style="height: 44px; font-size: 16px;">
                             <span class="point-dash">-</span>
-                            <input type="number" class="input-text" placeholder="Max" onchange="updateUI()" style="height: 44px; font-size: 16px;">
+                            <input type="number" class="input-text" placeholder="Max" onchange="updateUI()"
+                                style="height: 44px; font-size: 16px;">
                         </div>
                     </div>
                     <div class="point-item">
                         <label>LS</label>
                         <div class="point-inputs" style="flex: 1;">
-                            <input type="number" class="input-text" placeholder="Min" onchange="updateUI()" style="height: 44px; font-size: 16px;">
+                            <input type="number" class="input-text" placeholder="Min" onchange="updateUI()"
+                                style="height: 44px; font-size: 16px;">
                             <span class="point-dash">-</span>
-                            <input type="number" class="input-text" placeholder="Max" onchange="updateUI()" style="height: 44px; font-size: 16px;">
+                            <input type="number" class="input-text" placeholder="Max" onchange="updateUI()"
+                                style="height: 44px; font-size: 16px;">
                         </div>
                     </div>
                     <div class="point-item">
                         <label>TM</label>
                         <div class="point-inputs" style="flex: 1;">
-                            <input type="number" class="input-text" placeholder="Min" onchange="updateUI()" style="height: 44px; font-size: 16px;">
+                            <input type="number" class="input-text" placeholder="Min" onchange="updateUI()"
+                                style="height: 44px; font-size: 16px;">
                             <span class="point-dash">-</span>
-                            <input type="number" class="input-text" placeholder="Max" onchange="updateUI()" style="height: 44px; font-size: 16px;">
+                            <input type="number" class="input-text" placeholder="Max" onchange="updateUI()"
+                                style="height: 44px; font-size: 16px;">
                         </div>
                     </div>
                     <div class="point-item">
@@ -2278,9 +2484,11 @@
                     <div class="point-item">
                         <label>NQ</label>
                         <div class="point-inputs" style="flex: 1;">
-                            <input type="number" class="input-text" placeholder="Min" onchange="updateUI()" style="height: 44px; font-size: 16px;">
+                            <input type="number" class="input-text" placeholder="Min" onchange="updateUI()"
+                                style="height: 44px; font-size: 16px;">
                             <span class="point-dash">-</span>
-                            <input type="number" class="input-text" placeholder="Max" onchange="updateUI()" style="height: 44px; font-size: 16px;">
+                            <input type="number" class="input-text" placeholder="Max" onchange="updateUI()"
+                                style="height: 44px; font-size: 16px;">
                         </div>
                     </div>
                 </div>
@@ -2348,6 +2556,40 @@
                     </div>
                 </div>
 
+                <!-- Lọc Số Lượng Cặp -->
+                <h3 style="margin-top: 25px; border-top: 1px dashed var(--border); padding-top: 20px;">Lọc Số Lượng Cặp
+                    (N, O, P)</h3>
+                <div class="points-grid">
+                    <div class="point-item">
+                        <label>Cặp Cát</label>
+                        <div class="point-inputs" style="flex: 1;">
+                            <input type="number" id="cCatMin" class="input-text" placeholder="Min"
+                                onchange="updateUI()">
+                            <span class="point-dash">-</span>
+                            <input type="number" id="cCatMax" class="input-text" placeholder="Max"
+                                onchange="updateUI()">
+                        </div>
+                    </div>
+                    <div class="point-item">
+                        <label>Cặp Hung</label>
+                        <div class="point-inputs" style="flex: 1;">
+                            <input type="number" id="cHungMin" class="input-text" placeholder="Min"
+                                onchange="updateUI()">
+                            <span class="point-dash">-</span>
+                            <input type="number" id="cHungMax" class="input-text" placeholder="Max"
+                                onchange="updateUI()">
+                        </div>
+                    </div>
+                    <div class="point-item">
+                        <label>Cặp PV</label>
+                        <div class="point-inputs" style="flex: 1;">
+                            <input type="number" id="cPvMin" class="input-text" placeholder="Min" onchange="updateUI()">
+                            <span class="point-dash">-</span>
+                            <input type="number" id="cPvMax" class="input-text" placeholder="Max" onchange="updateUI()">
+                        </div>
+                    </div>
+                </div>
+
                 <!-- QUẺ DỊCH -->
                 <h3>Chọn Quẻ Dịch</h3>
                 <div style="position:relative; margin-bottom: 10px;">
@@ -2365,7 +2607,9 @@
             </div>
 
             <div class="modal-footer" style="display: flex; gap: 10px;">
-                <button class="btn-main" style="background: #f1f5f9; color: var(--text-main); border: 1px solid var(--border); box-shadow: none;" onclick="resetFilters()">ĐẶT LẠI</button>
+                <button class="btn-main"
+                    style="background: #f1f5f9; color: var(--text-main); border: 1px solid var(--border); box-shadow: none;"
+                    onclick="resetFilters()">ĐẶT LẠI</button>
                 <button class="btn-main" onclick="executeMainSearch()">XEM KẾT QUẢ</button>
             </div>
         </div>
@@ -2482,7 +2726,8 @@
                 </svg>
             </button>
             <div class="comb-title" id="combTitle">TỔ HỢP SAO</div>
-            <div class="comb-desc" id="combDesc">Bấm vào các đoạn nối trên biểu đồ để xem ý nghĩa kết hợp giữa 2 cặp sao.</div>
+            <div class="comb-desc" id="combDesc">Bấm vào các đoạn nối trên biểu đồ để xem ý nghĩa kết hợp giữa 2 cặp
+                sao.</div>
         </div>
     </div>
 
@@ -2496,7 +2741,7 @@
     <script>
         console.log("SIM_ANALYTICS_V8_REFINED_FINAL");
         // ======= CẤU HÌNH API =======
-        const API_URL = "https://script.google.com/macros/s/AKfycbz-i1jY00WDxgbf0Vgx-m8wPO4RegslOnu-vVixp-AhLy6F_Ix7eggk6H4uTRwLIr4E/exec"; // Thay Link Google Apps Script vào đây
+        const API_URL = "https://script.google.com/macros/s/AKfycbwhmoVy4-Ju_aOHSKszlM-4qy-RsVsjblpsnvsVaMKBtJjrA0lsz-1sAyVHR7IdoHll/exec"; // Thay Link Google Apps Script vào đây
 
         // ======= GLOBAL STATE =======
         const QUERIES_64 = ["Thuần Càn", "Thuần Khôn", "Thủy Lôi Truân", "Sơn Thủy Mông", "Thủy Thiên Nhu", "Thiên Thủy Tụng", "Địa Thủy Sư", "Thủy Địa Tỷ", "Phong Thiên Tiểu Súc", "Thiên Trạch Lý", "Địa Thiên Thái", "Thiên Địa Bĩ", "Thiên Hỏa Đồng Nhân", "Hỏa Thiên Đại Hữu", "Địa Sơn Khiêm", "Lôi Địa Dự", "Trạch Lôi Tùy", "Sơn Phong Cổ", "Địa Trạch Lâm", "Phong Địa Quan", "Hỏa Lôi Phệ Hạp", "Sơn Hỏa Bí", "Sơn Địa Bác", "Địa Lôi Phục", "Thiên Lôi Vô Vọng", "Sơn Thiên Đại Súc", "Sơn Lôi Di", "Trạch Phong Đại Quá", "Thuần Khảm", "Thuần Ly", "Trạch Sơn Hàm", "Lôi Phong Hằng", "Thiên Sơn Độn", "Lôi Thiên Đại Tráng", "Hỏa Địa Tấn", "Địa Hỏa Minh Di", "Phong Hỏa Gia Nhân", "Hỏa Trạch Khuê", "Thủy Sơn Kiển", "Lôi Thủy Giải", "Sơn Trạch Tổn", "Phong Lôi Ích", "Trạch Thiên Quải", "Thiên Phong Cấu", "Trạch Địa Tụy", "Địa Phong Thăng", "Trạch Thủy Khốn", "Thủy Phong Tỉnh", "Trạch Hỏa Cách", "Hỏa Phong Đỉnh", "Thuần Chấn", "Thuần Cấn", "Phong Sơn Tiệm", "Lôi Trạch Quy Muội", "Lôi Hỏa Phong", "Hỏa Sơn Lữ", "Thuần Tốn", "Thuần Đoài", "Phong Thủy Hoán", "Thủy Trạch Tiết", "Phong Trạch Trung Phu", "Lôi Trạch Tiểu Quá", "Thủy Hỏa Ký Tế", "Hỏa Thủy Vị Tế"];
@@ -2507,6 +2752,7 @@
 
 
         let starComboFilter = null;
+        let activeFilterChips = [];
         let excluded = [];
         let isSelectionMode = false;
         let selectedSims = new Set(); // Dùng Set để lưu số gốc (sr) của sim đang chọn
@@ -2522,28 +2768,28 @@
         };
 
         const ELEMENT_INFO = {
-            "Kim": { 
-                hop: "Thủy, Thổ", 
+            "Kim": {
+                hop: "Thủy, Thổ",
                 khac: "Mộc",
                 intro: "Đại diện cho sức mạnh, sự tinh tế và quyết đoán. Người mệnh Kim thường cương trực, có khả năng tổ chức tốt."
             },
-            "Mộc": { 
-                hop: "Hỏa, Thủy", 
+            "Mộc": {
+                hop: "Hỏa, Thủy",
                 khac: "Thổ",
                 intro: "Đại diện cho sự tăng trưởng, linh hoạt và nhân từ. Người mệnh Mộc giàu lòng vị tha, thích giúp đỡ mọi người."
             },
-            "Thủy": { 
-                hop: "Mộc, Kim", 
+            "Thủy": {
+                hop: "Mộc, Kim",
                 khac: "Hỏa",
                 intro: "Đại diện cho sự thông minh, uyển chuyển và thấu hiểu. Người mệnh Thủy giỏi giao tiếp, nhạy bén trong xử lý tình huống."
             },
-            "Hỏa": { 
-                hop: "Hỏa, Thổ", 
+            "Hỏa": {
+                hop: "Hỏa, Thổ",
                 khac: "Thủy",
                 intro: "Đại diện cho đam mê, năng lượng và công lý. Người mệnh Hỏa quyết liệt, dũng cảm nhưng đôi khi nóng nảy."
             },
-            "Thổ": { 
-                hop: "Kim, Hỏa", 
+            "Thổ": {
+                hop: "Kim, Hỏa",
                 khac: "Thủy",
                 intro: "Đại diện cho sự ổn định, tin cậy và bao dung. Người mệnh Thổ khiêm tốn, điềm đạm và là chỗ dựa vững chắc."
             }
@@ -2767,17 +3013,74 @@
 
             try {
                 const res = await fetch(API_URL);
-                if (!res.ok) throw new Error("Network response was not ok");
-                FULL_DATA = await res.json();
+                if (!res.ok) throw new Error("Mạng không ổn định (HTTP " + res.status + ")");
+                
+                const rawData = await res.json();
+
+                if (!Array.isArray(rawData)) {
+                    throw new Error(rawData.error || "Dữ liệu trả về không hợp lệ (không phải mảng)");
+                }
+
+                console.log("Đã tải thành công:", rawData.length, "SIM");
+
+                FULL_DATA = rawData.map((item, index) => {
+                    try {
+                        return {
+                            ...item,
+                            // Đồng bộ phím với App Script của bạn
+                            m: String(item.m || "").trim(),
+                            qn: String(item.qn || "").trim(),
+                            dh: String(item.dh || "").trim(),
+                            g: Number(item.g || 0),
+                            
+                            // 8 SAO BÁT TINH (Phím từ App Script của bạn)
+                            ty: Number(item.ty || 0),
+                            sk: Number(item.sk || 0),
+                            dn: Number(item.dn || 0),
+                            pb: Number(item.pb || 0),
+                            ln: Number(item.ln || 0),
+                            tl: Number(item.tl || 0),
+                            hp: Number(item.hp || 0),
+                            th: Number(item.th || 0),
+
+                            // Vi phạm
+                            h5: Number(item.h5 || 0),
+                            hpv: Number(item.hpv || 0),
+                            vp2s5: Number(item.vp2s5 || 0),
+                            vp2h: Number(item.vp2h || 0),
+                            vp2pv: Number(item.vp2pv || 0),
+                            vphvc: Number(item.vphvc || 0),
+                            vpchv: Number(item.vpchv || 0),
+                            vp0: Number(item.vp0 || 0),
+
+                            // Cặp (N, O, P)
+                            c_cat: Number(item.c_cat || 0),
+                            c_hung: Number(item.c_hung || 0),
+                            c_pv: Number(item.c_pv || 0),
+
+                            // Âm dương
+                            a: Number(item.a || 0),
+                            d: Number(item.d || 0),
+                            ys: Number(item.ys || 0),
+
+                            // Các chuỗi xử lý (Y, Z, AA)
+                            t1: String(item.t1 || ""),
+                            t2: String(item.t2 || ""),
+                            t3: String(item.t3 || ""),
+                            t4: String(item.t4 || "")
+                        };
+                    } catch (e) {
+                        console.warn("Lỗi xử lý dòng " + (index + 1), e);
+                        return null;
+                    }
+                }).filter(x => x !== null);
 
                 document.getElementById('stTotal').innerText = FULL_DATA.length.toLocaleString('vi-VN');
-
-                // Render dữ liệu lần đầu
                 applyFilters();
 
             } catch (error) {
-                console.error(error);
-                alert("Lỗi tải dữ liệu. Vui lòng thử lại!");
+                console.error("Lỗi API Chi tiết:", error);
+                alert("Lỗi tải dữ liệu: " + error.message + "\n\nKiểm tra Console (F12) để xem chi tiết.");
             } finally {
                 overlay.classList.remove('active');
             }
@@ -2822,10 +3125,10 @@
         window.onload = function () {
             init();
             observer.observe(document.getElementById('loadMoreTrigger'));
-            
+
             // Tải dữ liệu ngay khi mở trang
             loadDataFromAPI();
-            
+
             // Thiết lập đồng bộ mỗi 15 phút (15 * 60 * 1000)
             setInterval(() => {
                 console.log("Đang tự động cập nhật dữ liệu...");
@@ -2836,12 +3139,16 @@
         // ======= TẠO HTML ĐỘNG =======
         function cleanVN(str) {
             if (!str) return "";
-            // Aggressive normalization: Strip all accents and handle common Vietnamese encoding variations
-            let s = str.toString().toLowerCase().normalize("NFD")
+            // Cơ bản: Bỏ dấu, chuyển thường, trim
+            return str.toString().toLowerCase().normalize("NFD")
                 .replace(/[\u0300-\u036f]/g, "")
                 .replace(/đ/g, "d")
                 .trim();
-            // Handle specific tone-placement common words in this app
+        }
+
+        // Chuyên dụng cho Mệnh: gom nhóm Kim, Mộc, Thủy, Hỏa, Thổ
+        function cleanMenh(str) {
+            let s = cleanVN(str);
             if (s.includes("hoa")) return "hoa";
             if (s.includes("thuy")) return "thuy";
             if (s.includes("moc")) return "moc";
@@ -2877,16 +3184,16 @@
         function createSimCardHTML(d) {
             // Format hiển thị giá
             const priceFmt = formatPriceDynamic(parseInt(d.g || 0));
-            
+
             // Ép kiểu số cho toàn bộ 8 sao để tính toán chính xác
             const vTY = parseInt(d.ty || 0);
             const vSK = parseInt(d.sk || 0);
             const vDN = parseInt(d.dn || 0);
             const vPV = parseInt(d.pb || 0);
             const vLS = parseInt(d.ln || 0);
-            const vTM = parseInt(d.th || 0);
-            const vHH = parseInt(d.hp || 0);
             const vNQ = parseInt(d.tl || 0);
+            const vHH = parseInt(d.hp || 0);
+            const vTM = parseInt(d.th || 0);
 
             const sum3 = vTY + vSK + vDN || 1;
             const pTY = Math.round((vTY / sum3) * 100);
@@ -2920,14 +3227,14 @@
             if (d.ys === -1) { yyColor = "#1e88e5"; yyText = "Âm thịnh"; }
             if (d.ys === 1) { yyColor = "#e53935"; yyText = "Dương thịnh"; }
 
-            const cleanMenh = cleanVN(d.m);
-            const cleanQue = cleanVN(d.qn);
+            const cleanMenhVal = cleanMenh(d.m);
+            const cleanQueVal = cleanVN(d.qn);
 
             // Đóng gói data-* attribute để phục vụ popup nhanh
             const dAttrs = `data-num="${d.s}" data-sr="${d.sr}" data-price="${priceFmt}" data-telco="${d.n}" ` +
                 `data-menh="${d.m}" data-yy-am="${d.a}" data-yy-duong="${d.d}" data-yy-status="${yyText}" ` +
-                `data-que-name="${d.qn || ''}" data-que-desc="${d.qd || ''}" data-stars-meaning="${d.yn || ''}" ` +
-                `data-stars="TY:${vTY},SK:${vSK},DN:${vDN},PV:${vPV},LS:${vLS},TM:${vTM},HH:${vHH},NQ:${vNQ}"`;
+                `data-que-name="${d.qn || ''}" data-que-desc="${d.qd || ''}" data-dh="${d.dh || ''}" data-stars-meaning="${d.yn || ''}" ` +
+                `data-stars="TY:${vTY},SK:${vSK},DN:${vDN},PV:${vPV},LS:${vLS},NQ:${vNQ},HH:${vHH},TM:${vTM}"`;
 
             return `
         <div class="sim-card" onclick="showDetail(this)" ${dAttrs}>
@@ -2941,9 +3248,9 @@
                     <div class="price">${priceFmt}</div>
                 </div>
                 <div class="card-row-bottom">
-                    <div class="tag-row">Mệnh: <span class="tag-menh ${menhClass}" data-type="menh" data-clean="${cleanMenh}" data-orig="${d.m}" onmouseenter="showTagTooltip(event, 'menh', '${d.m}')" onmouseleave="hideTagTooltip()">${d.m}</span></div>
+                    <div class="tag-row">Mệnh: <span class="tag-menh ${menhClass}" data-type="menh" data-clean="${cleanMenhVal}" data-orig="${d.m}" onmouseenter="showTagTooltip(event, 'menh', '${d.m}')" onmouseleave="hideTagTooltip()">${d.m}</span></div>
                     <div class="tag-row">Cát Tinh: <span class="tag-cat-tinh" data-type="stars" data-clean="${last2Keys}" data-orig="${last2Stars}" onmouseenter="showTagTooltip(event, 'stars', '${last2Keys}')" onmouseleave="hideTagTooltip()">${last2Stars}</span></div>
-                    <div class="tag-row">Quẻ: <span class="tag-que" data-type="que" data-clean="${cleanQue}" data-orig="${d.qn || ''}" onmouseenter="showTagTooltip(event, 'que', '${d.qn}')" onmouseleave="hideTagTooltip()">${d.qn || ''}</span></div>
+                    <div class="tag-row">Quẻ: <span class="tag-que" data-type="que" data-clean="${cleanQueVal}" data-orig="${d.qn || ''}" onmouseenter="showTagTooltip(event, 'que', '${d.qn}')" onmouseleave="hideTagTooltip()">${d.qn || ''}</span></div>
                 </div>
                 <div class="card-row-ratio">
                     <span>TY: <b>${pTY}%</b></span>
@@ -2971,10 +3278,10 @@
                             const cap = s[i] + s[j];
                             const giua = s.substring(i + 1, j);
                             const fullSeq = s.substring(i, j + 1);
-                            
+
                             let count5 = 0;
                             for (let char of giua) if (char === "5") count5++;
-                            
+
                             if (STAR_DATA[cap]) {
                                 const [type, baseScore] = STAR_DATA[cap];
                                 const finalScore = baseScore * (1 + count5);
@@ -3036,8 +3343,8 @@
 
             applyFilters();
             renderInitial();
-            syncQuickFilters(); 
-            
+            syncQuickFilters();
+
             // Cập nhật bộ đếm tổng số lượng đã lọc được
             const stTotalTag = document.getElementById('stTotal');
             if (stTotalTag) {
@@ -3049,7 +3356,7 @@
         function syncQuickFilters() {
             // 1. Đồng bộ Nhà mạng & Tính toán số lượng từng mạng
             const netChecked = Array.from(document.querySelectorAll('.net-cb:checked')).map(cb => cb.value.toLowerCase().trim());
-            
+
             // Đếm số lượng SIM cho từng mạng dựa trên FULL_DATA
             const netCounts = {};
             FULL_DATA.forEach(d => {
@@ -3067,10 +3374,10 @@
                 const netKey = (chip.getAttribute('data-net') || "").toLowerCase().trim();
                 const count = netCounts[netKey] || 0;
                 const baseName = chip.innerText.split('(')[0].trim();
-                
+
                 // Cập nhật text kèm số lượng
                 chip.innerText = `${baseName} (${count})`;
-                
+
                 if (netChecked.includes(netKey)) chip.classList.add('active');
                 else chip.classList.remove('active');
             });
@@ -3086,7 +3393,7 @@
         function toggleQuickNet(netValue) {
             const cbs = document.querySelectorAll('.net-cb');
             const targetVal = netValue.trim().toLowerCase();
-            
+
             // Tìm xem checkbox hiện tại có đang được chọn duy nhất không
             let currentChecked = Array.from(cbs).filter(cb => cb.checked);
             let isTargetAlreadyOnlyOne = currentChecked.length === 1 && currentChecked[0].value.toLowerCase() === targetVal;
@@ -3100,7 +3407,7 @@
                     cb.checked = (cb.value.toLowerCase() === targetVal);
                 });
             }
-            
+
             updateUI();
         }
 
@@ -3142,8 +3449,8 @@
             let content = "";
 
             if (type === 'menh') {
-                const searchVal = cleanVN(value);
-                const key = Object.keys(ELEMENT_INFO).find(k => cleanVN(k) === searchVal);
+                const searchVal = cleanMenh(value);
+                const key = Object.keys(ELEMENT_INFO).find(k => cleanMenh(k) === searchVal);
                 const info = ELEMENT_INFO[key] || { intro: "Chưa có thông tin cho mệnh này.", hop: "N/A", khac: "N/A" };
                 content = `<b>Mệnh ${key || value}</b>${info.intro}<hr><span class="label">Tương hợp:</span> <span class="value">${info.hop}</span><br><span class="label">Tương khắc:</span> <span class="value">${info.khac}</span>`;
             } else if (type === 'stars') {
@@ -3190,7 +3497,7 @@
 
 
         // Event delegation cho các thẻ tag trên SIM (Mệnh, Quẻ, Cát Tinh)
-        document.addEventListener('click', function(e) {
+        document.addEventListener('click', function (e) {
             const tag = e.target.closest('.tag-menh, .tag-que, .tag-cat-tinh');
             if (tag) {
                 e.stopPropagation();
@@ -3203,7 +3510,7 @@
                     // Áp dụng bộ lọc ngay lập tức
                     if (type === 'menh') {
                         document.querySelectorAll('.menh-cb').forEach(cb => {
-                            cb.checked = (cleanVN(cb.value) === cleanVal);
+                            cb.checked = (cleanMenh(cb.value) === cleanVal);
                         });
                     } else if (type === 'que') {
                         // Tìm checkbox quẻ trong modal
@@ -3213,21 +3520,36 @@
                     } else if (type === 'stars') {
                         starComboFilter = cleanVal;
                     }
-                    
+
                     updateUI();
-                    
+
                     // Cuộn lên đầu và hiển thị thông báo nhẹ (nếu cần)
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                 }
             }
         }, true);
 
-        // ======= RENDER FILTER CHIPS =======
-        function renderFilterChips() {
-            const board = document.getElementById('activeFiltersBoard');
-            if (!board) return;
-            board.innerHTML = "";
+        // ======= RENDER FILTER CHIPS (DROPDOWN VERSION) =======
+        function toggleActiveFiltersDropdown() {
+            const dd = document.getElementById('activeFiltersDropdown');
+            if (dd) dd.classList.toggle('active');
+        }
 
+        // Đóng dropdown khi click ngoài
+        document.addEventListener('click', function (e) {
+            const dd = document.getElementById('activeFiltersDropdown');
+            const btn = document.querySelector('.btn-active-filters');
+            if (dd && dd.classList.contains('active') && !dd.contains(e.target) && !btn.contains(e.target)) {
+                dd.classList.remove('active');
+            }
+        });
+
+        function renderFilterChips() {
+            const dropdown = document.getElementById('activeFiltersDropdown');
+            const countLabel = document.getElementById('activeFilterCount');
+            if (!dropdown) return;
+
+            dropdown.innerHTML = "";
             let chips = [];
 
             // 1. Text Search
@@ -3237,6 +3559,8 @@
             if (qMain && qMain !== qSim) chips.push({ type: 'main', label: `Tìm: ${qMain}`, value: qMain });
 
             // 2. Nhà mạng
+            const hNet = document.getElementById('headerNet')?.value;
+            if (hNet) chips.push({ type: 'net_h', label: hNet, value: hNet });
             document.querySelectorAll('.net-cb:checked').forEach(cb => {
                 chips.push({ type: 'net', label: cb.value, value: cb.value });
             });
@@ -3262,34 +3586,36 @@
                 chips.push({ type: 'yy', label: lbl, value: cb.value });
             });
 
-            if (chips.length === 0) {
-                board.style.display = "none";
-                return;
-            }
+            // 7. Lọc Cát Tinh Header
+            const hKC = document.getElementById('headerKeCuoi')?.value;
+            const hC = document.getElementById('headerCuoi')?.value;
+            if (hKC) chips.push({ type: 'kc', label: `KC: ${STAR_NAME_MAP[hKC] || hKC}`, value: hKC });
+            if (hC) chips.push({ type: 'c', label: `C: ${STAR_NAME_MAP[hC] || hC}`, value: hC });
 
-            // 7. Lọc Cát Tinh Nhanh
+            // 8. Lọc Tag SIM
             if (starComboFilter) {
                 const labels = starComboFilter.split(',').map(s => STAR_NAME_MAP[s] || s);
-                const comboName = labels.join(' - ');
-                chips.push({ type: 'stars', label: `Tổ hợp: ${comboName}`, value: starComboFilter });
+                chips.push({ type: 'stars', label: `Tổ hợp: ${labels.join('-')}`, value: starComboFilter });
             }
 
+            if (countLabel) countLabel.innerText = chips.length;
+
             if (chips.length === 0) {
-                board.style.display = "none";
+                dropdown.innerHTML = '<div style="color:var(--text-muted); font-size:12px; width:100%; text-align:center;">Chưa có bộ lọc nào</div>';
                 return;
             }
 
-            board.style.display = "flex";
-            
-            // Chip đặc biệt: Bỏ tất cả
-            const clearAllChip = document.createElement('div');
-            clearAllChip.className = "filter-chip";
-            clearAllChip.style.background = "var(--primary)";
-            clearAllChip.style.color = "#fff";
-            clearAllChip.style.borderColor = "var(--primary)";
-            clearAllChip.innerHTML = `<span>BỎ LỌC TẤT CẢ</span>`;
-            clearAllChip.onclick = resetFilters;
-            board.appendChild(clearAllChip);
+            // Nút xóa nhanh tất cả trong dropdown
+            const clearBtn = document.createElement('div');
+            clearBtn.className = "filter-chip";
+            clearBtn.style.background = "var(--primary)";
+            clearBtn.style.color = "#fff";
+            clearBtn.style.width = "100%";
+            clearBtn.style.justifyContent = "center";
+            clearBtn.style.fontWeight = "bold";
+            clearBtn.innerHTML = `<span>✕ BỎ TẤT CẢ</span>`;
+            clearBtn.onclick = resetFilters;
+            dropdown.appendChild(clearBtn);
 
             chips.forEach(c => {
                 const chip = document.createElement('div');
@@ -3298,28 +3624,43 @@
                     <span>${c.label}</span>
                     <span class="remove-icon" onclick="removeSingleFilter('${c.type}', '${c.value}')">✕</span>
                 `;
-                board.appendChild(chip);
+                dropdown.appendChild(chip);
             });
+        }
+
+        function updateUI(needsFilter = true) {
+            if (needsFilter) {
+                applyFilters();
+                return;
+            }
+            renderFilterChips();
+            // Cập nhật số lượng tổng
+            if (document.getElementById('stTotal')) {
+                document.getElementById('stTotal').innerText = filteredData.length.toLocaleString('vi-VN');
+            }
         }
 
         function removeSingleFilter(type, value) {
             if (type === 'sim') document.getElementById('searchSim').value = "";
             if (type === 'main') document.getElementById('mainSearch').value = "";
+            if (type === 'net_h') document.getElementById('headerNet').value = "";
             if (type === 'net') {
-                document.querySelectorAll('.net-cb').forEach(cb => { if(cb.value === value) cb.checked = false; });
+                document.querySelectorAll('.net-cb').forEach(cb => { if (cb.value === value) cb.checked = false; });
             }
             if (type === 'menh') {
-                document.querySelectorAll('.menh-cb').forEach(cb => { if(cleanVN(cb.value) === cleanVN(value)) cb.checked = false; });
+                document.querySelectorAll('.menh-cb').forEach(cb => { if (cleanVN(cb.value) === cleanVN(value)) cb.checked = false; });
             }
             if (type === 'que') {
-                document.querySelectorAll('.q-cb').forEach(cb => { if(cleanVN(cb.value) === cleanVN(value)) cb.checked = false; });
+                document.querySelectorAll('.q-cb').forEach(cb => { if (cleanVN(cb.value) === cleanVN(value)) cb.checked = false; });
             }
             if (type === 'priceCb') {
-                document.querySelectorAll('.price-cb').forEach(cb => { if(cb.value === value) cb.checked = false; });
+                document.querySelectorAll('.price-cb').forEach(cb => { if (cb.value === value) cb.checked = false; });
             }
             if (type === 'yy') {
-                document.querySelectorAll('.am-duong-cb').forEach(cb => { if(cb.value === value) cb.checked = false; });
+                document.querySelectorAll('.am-duong-cb').forEach(cb => { if (cb.value === value) cb.checked = false; });
             }
+            if (type === 'kc') document.getElementById('headerKeCuoi').value = "";
+            if (type === 'c') document.getElementById('headerCuoi').value = "";
             if (type === 'stars') {
                 starComboFilter = null;
             }
@@ -3327,33 +3668,53 @@
         }
 
         function resetFilters() {
-            // 1. Clear search inputs (Header + Modal)
-            const mainSearch = document.getElementById('mainSearch');
-            if (mainSearch) mainSearch.value = "";
-            
-            document.querySelectorAll('.modal-body input[type="text"], .modal-body input[type="number"]').forEach(input => {
-                input.value = "";
-            });
+            // 1. Search inputs
+            if (document.getElementById('mainSearch')) document.getElementById('mainSearch').value = "";
+            if (document.getElementById('searchSim')) document.getElementById('searchSim').value = "";
+            document.querySelectorAll('.modal-body input[type="text"], .modal-body input[type="number"]').forEach(i => i.value = "");
 
-            // 2. Uncheck all checkboxes (Network, Menh, AD, Price, HungTinh)
-            document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
-                cb.checked = false;
-            });
-
-            // 3. Reset Select/Sort fields
-            const hSort = document.getElementById('headerSort');
-            if (hSort) hSort.value = "default";
+            // 2. Header Selects
+            if (document.getElementById('headerNet')) document.getElementById('headerNet').value = "";
+            if (document.getElementById('headerKeCuoi')) document.getElementById('headerKeCuoi').value = "";
+            if (document.getElementById('headerCuoi')) document.getElementById('headerCuoi').value = "";
+            if (document.getElementById('headerSort')) document.getElementById('headerSort').value = "default";
             currentSort = "default";
 
-            // 4. Clear search suggestions (Que Dịch)
-            const qBox = document.getElementById('queBox');
-            if (qBox) qBox.innerHTML = "";
+            // 3. Checkboxes
+            document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
 
-            // 5. Reset TY-DN / Star Combo
+            // 4. Modal inputs & states
             starComboFilter = null;
-            
-            // 6. Update UI
-            updateUI();
+            excluded = [];
+
+            updateUI(true);
+            const dd = document.getElementById('activeFiltersDropdown');
+            if (dd) dd.classList.remove('active');
+        }
+
+        function resetFilters() {
+            // Reset searches
+            if (document.getElementById('mainSearch')) document.getElementById('mainSearch').value = "";
+            if (document.getElementById('searchSim')) document.getElementById('searchSim').value = "";
+
+            // Reset header dropdowns
+            if (document.getElementById('headerNet')) document.getElementById('headerNet').value = "";
+            if (document.getElementById('headerKeCuoi')) document.getElementById('headerKeCuoi').value = "";
+            if (document.getElementById('headerCuoi')) document.getElementById('headerCuoi').value = "";
+            if (document.getElementById('headerSort')) document.getElementById('headerSort').value = "default";
+
+            // Reset checkboxes
+            document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+
+            // Reset radio/other inputs if any
+            document.querySelectorAll('.points-grid input, .price-range input, .percent-grid input').forEach(i => i.value = "");
+
+            starComboFilter = null;
+            excluded = [];
+
+            updateUI(true);
+            const dd = document.getElementById('activeFiltersDropdown');
+            if (dd) dd.classList.remove('active');
         }
 
         function applyFilters() {
@@ -3403,9 +3764,28 @@
             const checkPV = hungCbs.includes("HungTinh-PhucVi");
 
             // Mệnh, Nhà Mạng, Âm Dương
-            const menhCbs = Array.from(document.querySelectorAll('.menh-cb:checked')).map(cb => cleanVN(cb.value));
+            const menhCbs = Array.from(document.querySelectorAll('.menh-cb:checked')).map(cb => cleanMenh(cb.value));
             const netCbs = Array.from(document.querySelectorAll('.net-cb:checked')).map(cb => cleanVN(cb.value));
             const yyCbs = Array.from(document.querySelectorAll('.am-duong-cb:checked')).map(cb => parseInt(cb.value));
+
+            // Tỉ lệ chi tiết
+            const pTYMin = document.getElementById('pctTYMin') ? parseInt(document.getElementById('pctTYMin').value) : -Infinity;
+            const pTYMax = document.getElementById('pctTYMax') ? parseInt(document.getElementById('pctTYMax').value) : Infinity;
+            const pSKMin = document.getElementById('pctSKMin') ? parseInt(document.getElementById('pctSKMin').value) : -Infinity;
+            const pSKMax = document.getElementById('pctSKMax') ? parseInt(document.getElementById('pctSKMax').value) : Infinity;
+            const pDNMin = document.getElementById('pctDNMin') ? parseInt(document.getElementById('pctDNMin').value) : -Infinity;
+            const pDNMax = document.getElementById('pctDNMax') ? parseInt(document.getElementById('pctDNMax').value) : Infinity;
+
+            const cCatMin = document.getElementById('cCatMin')?.value !== '' ? parseInt(document.getElementById('cCatMin').value) : -Infinity;
+            const cCatMax = document.getElementById('cCatMax')?.value !== '' ? parseInt(document.getElementById('cCatMax').value) : Infinity;
+            const cHungMin = document.getElementById('cHungMin')?.value !== '' ? parseInt(document.getElementById('cHungMin').value) : -Infinity;
+            const cHungMax = document.getElementById('cHungMax')?.value !== '' ? parseInt(document.getElementById('cHungMax').value) : Infinity;
+            const cPvMin = document.getElementById('cPvMin')?.value !== '' ? parseInt(document.getElementById('cPvMin').value) : -Infinity;
+            const cPvMax = document.getElementById('cPvMax')?.value !== '' ? parseInt(document.getElementById('cPvMax').value) : Infinity;
+            const hMin = document.getElementById('pairHungMin') ? parseInt(document.getElementById('pairHungMin').value) : -Infinity;
+            const hMax = document.getElementById('pairHungMax') ? parseInt(document.getElementById('pairHungMax').value) : Infinity;
+            const pvMin = document.getElementById('pairPVMin') ? parseInt(document.getElementById('pairPVMin').value) : -Infinity;
+            const pvMax = document.getElementById('pairPVMax') ? parseInt(document.getElementById('pairPVMax').value) : Infinity;
 
             // Khoảng giá
             const priceCbs = Array.from(document.querySelectorAll('.price-cb:checked')).map(cb => cb.value);
@@ -3414,24 +3794,28 @@
             const pMin = inputMin !== '' ? parseInt(inputMin) : 0;
             const pMax = inputMax !== '' ? parseInt(inputMax) : Infinity;
 
-            // Quẻ Dịch
+            // Quẻ Dịch - Matching log: chuẩn hóa mạnh hơn để khớp tuyệt đối
             const queCbs = Array.from(document.querySelectorAll('.q-cb:checked')).map(cb => cleanVN(cb.value));
 
-            // Tỉ lệ % từng sao
-            const pTYMin = document.getElementById('pctTYMin') ? parseInt(document.getElementById('pctTYMin').value) : -Infinity;
-            const pTYMax = document.getElementById('pctTYMax') ? parseInt(document.getElementById('pctTYMax').value) : Infinity;
-            const pSKMin = document.getElementById('pctSKMin') ? parseInt(document.getElementById('pctSKMin').value) : -Infinity;
-            const pSKMax = document.getElementById('pctSKMax') ? parseInt(document.getElementById('pctSKMax').value) : Infinity;
-            const pDNMin = document.getElementById('pctDNMin') ? parseInt(document.getElementById('pctDNMin').value) : -Infinity;
-            const pDNMax = document.getElementById('pctDNMax') ? parseInt(document.getElementById('pctDNMax').value) : Infinity;
+            // Header Quick Selects
+            const hNet = document.getElementById('headerNet')?.value || "";
+            const hKC = document.getElementById('headerKeCuoi')?.value || "";
+            const hC = document.getElementById('headerCuoi')?.value || "";
 
             filteredData = FULL_DATA.filter(d => {
                 // == LỌC CÁT TINH NHANH (TỔ HỢP 2 CUỐI) ==
+                // == LỌC CÁT TINH CHI TIẾT (HEADER & TAG) ==
+                const energy = getEnergyProgression(d.sr);
+                const eKC = energy.length >= 2 ? energy[energy.length - 2].type : (energy.length === 1 ? energy[0].type : "");
+                const eC = energy.length >= 1 ? energy[energy.length - 1].type : "";
+
+                // Lọc từ Header (Kế cuối / Cuối)
+                if (hKC && eKC !== hKC) return false;
+                if (hC && eC !== hC) return false;
+
+                // Lọc từ Click Tag SIM (Combo pattern)
                 if (starComboFilter) {
-                    const energy = getEnergyProgression(d.sr);
-                    let combo = "";
-                    if (energy.length >= 2) combo = `${energy[energy.length - 2].type},${energy[energy.length - 1].type}`;
-                    else if (energy.length === 1) combo = energy[0].type;
+                    let combo = energy.length >= 2 ? `${energy[energy.length - 2].type},${energy[energy.length - 1].type}` : (energy.length === 1 ? energy[0].type : "");
                     if (combo !== starComboFilter) return false;
                 }
 
@@ -3443,6 +3827,25 @@
 
                 // == FILTER: HUNG TINH ==
                 if (d.h5 == 1 && checkNo5) return false;
+
+                // == FILTER: TỈ LỆ 3 CÁT ==
+                const vTY_f = parseInt(d.ty || 0);
+                const vSK_f = parseInt(d.sk || 0);
+                const vDN_f = parseInt(d.dn || 0);
+                const sum3_f = vTY_f + vSK_f + vDN_f || 1;
+
+                const curPctTY = Math.round((vTY_f / sum3_f) * 100);
+                const curPctSK = Math.round((vSK_f / sum3_f) * 100);
+                const curPctDN = Math.round((vDN_f / sum3_f) * 100);
+
+                if (curPctTY < pTYMin || curPctTY > pTYMax) return false;
+                if (curPctSK < pSKMin || curPctSK > pSKMax) return false;
+                if (curPctDN < pDNMin || curPctDN > pDNMax) return false;
+
+                // == FILTER: SỐ LƯỢNG CẶP (N, O, P) ==
+                if (parseInt(d.c_cat || 0) < cCatMin || parseInt(d.c_cat || 0) > cCatMax) return false;
+                if (parseInt(d.c_hung || 0) < cHungMin || parseInt(d.c_hung || 0) > cHungMax) return false;
+                if (parseInt(d.c_pv || 0) < cPvMin || parseInt(d.c_pv || 0) > cPvMax) return false;
 
                 // == FILTER: GIÁ TIỀN ==
                 const simPrice = parseInt(d.g || 0);
@@ -3464,15 +3867,18 @@
                 if (simPrice < pMin || simPrice > pMax) return false;
 
                 // == FILTER: NHÀ MẠNG ==
-                if (netCbs.length > 0) {
-                    if (!d.n || !netCbs.some(net => cleanVN(d.n).includes(net))) return false;
+                if (hNet || netCbs.length > 0) {
+                    const simNet = cleanVN(d.n || "");
+                    const matchH = hNet ? simNet.includes(cleanVN(hNet)) : false;
+                    const matchCb = netCbs.length > 0 ? netCbs.some(net => simNet.includes(net)) : false;
+                    if (hNet && !matchH) return false; // Nếu chọn headerNet thì phải khớp
+                    if (netCbs.length > 0 && !matchCb) return false; // Nếu chọn checkbox thì phải khớp (OR logic trong checkbox)
                 }
 
                 // == FILTER: MỆNH ==
                 if (menhCbs.length > 0) {
-                    const simMenh = cleanVN(d.m);
-                    const match = menhCbs.some(m => simMenh.includes(m) || m.includes(simMenh));
-                    if (!match) return false;
+                    const simMenh = cleanMenh(d.m);
+                    if (!menhCbs.includes(simMenh)) return false;
                 }
 
                 // == FILTER: ÂM DƯƠNG ==
@@ -3481,21 +3887,25 @@
                     if (!yyCbs.includes(parseInt(d.ys))) return false;
                 }
 
-                // == FILTER: QUẺ DỊCH ==
+                // == FILTER: QUẺ DỊCH == (Sửa lỗi matching chính xác)
                 if (queCbs.length > 0) {
-                    if (!d.qn || !queCbs.includes(cleanVN(d.qn))) return false;
+                    if (!d.qn) return false;
+                    const simQueClean = cleanVN(d.qn);
+                    if (!queCbs.includes(simQueClean)) return false;
                 }
 
                 // == FILTER: ĐỊNH DẠNG SỐ / CÁT TINH (*) ==
                 if (!checkPatterns(simQuery, p => {
                     let pattern = p.trim();
-                    // Thông minh: Xóa số 0 ở đầu đoạn tìm kiếm vì chuỗi sr lưu nguyên gốc (vd 98... thay vì 098...)
                     if (pattern.startsWith('0')) pattern = pattern.substring(1);
                     return matchWildcard(pattern, String(d.sr));
                 })) return false;
 
-                if (!checkPatterns(qStars, p => matchWildcard(p, String(d.t1)))) return false;
-                if (!checkPatterns(qPV, p => matchWildcard(p, String(d.t2)))) return false;
+                // Cát Tinh (Chữ) - Sử dụng d.t2
+                if (!checkPatterns(qStars, p => matchWildcard(p, String(d.t2)))) return false;
+                
+                // Cát Tinh Chữ Rút Gọn - Sử dụng d.t3
+                if (!checkPatterns(qPV, p => matchWildcard(p, String(d.t3)))) return false;
 
                 // Theo Script của bạn: t3 là Mã PV Biến Tiến, t4 là Mã CT Biến Tính
                 if (!checkPatterns(qPVBT, p => matchWildcard(p, String(d.t3)))) return false;
@@ -3503,6 +3913,17 @@
 
                 if (!checkPatterns(qCTBT, p => matchWildcard(p, String(d.t4)))) return false;
                 if (xCTBT && checkPatterns(xCTBT, p => matchWildcard(p, String(d.t4)))) return false;
+
+                // == FILTER: VI PHẠM (TRÁNH HUNG TINH) ==
+                if (hungCbs.length > 0) {
+                    for (let v of hungCbs) {
+                        // v có thể là: 'h5', 'hpv', 'vp2h', 'vp2pv', 'vphvc', 'vpchv', 'vp0'
+                        if (d[v] == 1) return false;
+                    }
+                }
+
+
+                // (Đã dọn dẹp bộ lọc cũ tại đây)
 
 
                 // == FILTER: ĐIỂM SỐ 8 SAO ==
@@ -3545,7 +3966,11 @@
                 return true;
             });
 
-            renderInitial(); 
+            renderInitial();
+            updateUI(false);
+            if (document.getElementById('loadingOverlay')) {
+                document.getElementById('loadingOverlay').classList.remove('active');
+            }
         }
 
         // ======= DETAIL POPUP & SELECTION =======
@@ -3642,7 +4067,7 @@
 
                 // Hexagram = Upper (3 lines) + Lower (3 lines)
                 // Order: Top to Bottom (Line 6 to Line 1)
-                const fullMask = upper + lower; 
+                const fullMask = upper + lower;
                 for (let i = 0; i < 6; i++) {
                     const line = document.createElement('div');
                     line.className = fullMask[i] === '1' ? 'que-line solid' : 'que-line broken';
@@ -3651,7 +4076,7 @@
             }
 
             const q = QUE_DETAILS[d.queName] || { type: "Bình Hòa", desc: d.queDesc };
-            document.getElementById('d-que-name').innerHTML = `${d.queName} <span class="tag-que type-${q.type.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/\s/g, "")}">${q.type}</span>`;
+            document.getElementById('d-que-name').innerHTML = `${d.queName} <span style="font-size: 13px; color: var(--primary); margin-left: 8px;">(Động hào: ${d.dh || 'N/A'})</span> <span class="tag-que type-${q.type.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/\s/g, "")}">${q.type}</span>`;
             renderHexagram(d.queName);
             document.getElementById('d-que-desc').innerText = q.desc;
 
@@ -3707,7 +4132,7 @@
                     labels: ['Cát Tinh (Tốt)', 'Hung Tinh (Xấu)'],
                     datasets: [{
                         data: [goodSum, badSum],
-                        backgroundColor: ['#e91e63', '#2196f3'], 
+                        backgroundColor: ['#e91e63', '#2196f3'],
                         borderWidth: 0
                     }]
                 },
@@ -3720,8 +4145,8 @@
 
             // Chart 3: BAR CHART for 8 stars (NEW)
             const ctx3 = document.getElementById('chartBar8').getContext('2d');
-            const barLabels = ['Thiên Y', 'Sinh Khí', 'Diên Niên', 'Phục Vị', 'Lục Sát', 'Tuyệt Mệnh', 'Họa Hại', 'Ngũ Quỷ'];
-            const barKeys = ['TY', 'SK', 'DN', 'PV', 'LS', 'TM', 'HH', 'NQ'];
+            const barLabels = ['Thiên Y', 'Sinh Khí', 'Diên Niên', 'Phục Vị', 'Lục Sát', 'Ngũ Quỷ', 'Họa Hại', 'Tuyệt Mệnh'];
+            const barKeys = ['TY', 'SK', 'DN', 'PV', 'LS', 'NQ', 'HH', 'TM'];
             const barData = barKeys.map(k => starMap[k] || 0);
 
             // Colors: TY(Red), SK(Orange), DN(Yellow), PV(Pink), LS(Green), TM(Blue), HH(Cyan), NQ(Purple)
@@ -3808,7 +4233,7 @@
 
             // Chart 4: Biểu đồ Tiến hành Năng lượng (Biểu đồ SÓNG)
             const energyData = getEnergyProgression(rawNum);
-            
+
             // Cập nhật Ý nghĩa 2 cặp cuối vào ô "Gió thoảng mây bay"
             const meaningEl = document.getElementById('d-stars-meaning');
             if (energyData.length >= 2) {
@@ -3817,13 +4242,13 @@
                 const combKey = p1.type + p2.type;
                 const combMeaning = STAR_COMBINATIONS[combKey] || "Chưa có luận giải sự kết hợp này.";
                 meaningEl.innerHTML = `<b>Tổ hợp kết: ${p1.type} + ${p2.type}</b><br>${combMeaning}`;
-                meaningEl.style.color = '#1e293b'; 
+                meaningEl.style.color = '#1e293b';
             } else {
                 meaningEl.innerText = "Gió thoảng mây bay (Không đủ dữ liệu cặp số)";
             }
 
             const ctx4 = document.getElementById('chartEnergy').getContext('2d');
-            
+
             if (chartEnergy) chartEnergy.destroy();
             chartEnergy = new Chart(ctx4, {
                 type: 'bar', // Sử dụng mixed chart với type gốc là bar
@@ -3905,16 +4330,16 @@
                         }
                     },
                     scales: {
-                        y: { 
-                            beginAtZero: true, 
+                        y: {
+                            beginAtZero: true,
                             max: Math.max(...energyData.map(d => d.score)) + 20,
                             grid: { color: '#f1f5f9' },
-                            ticks: { 
+                            ticks: {
                                 stepSize: 25,
                                 font: { size: 10 }
                             }
                         },
-                        x: { 
+                        x: {
                             grid: { display: false },
                             ticks: {
                                 font: { size: 10, weight: '600' }
@@ -4120,6 +4545,7 @@
                 executeMainSearch();
             }
         }
+        init();
     </script>
     <div id="tagTooltip" class="tag-tooltip"></div>
 </body>
