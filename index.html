@@ -103,12 +103,22 @@
             font-weight: 600;
             font-size: 14px;
             cursor: pointer;
-            transition: 0.2s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .btn-search-inline:hover {
             background: #1a202c;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-search-inline.is-clear {
+            background: #e53e3e;
+            /* Màu đỏ cho nút Xóa */
+            color: white;
+        }
+
+        .btn-search-inline.is-clear:hover {
+            background: #c53030;
         }
 
         .btn-filter-trigger {
@@ -314,7 +324,7 @@
             animation: cardFadeIn 0.5s ease-out backwards;
         }
 
-           /* TECH FILTERS GRID */
+        /* TECH FILTERS GRID */
         .tech-filter-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -353,7 +363,8 @@
             outline: none;
         }
 
-        .tech-input-min:focus, .tech-input-max:focus {
+        .tech-input-min:focus,
+        .tech-input-max:focus {
             border-color: var(--primary);
             background: #fff;
         }
@@ -520,7 +531,8 @@
 
         /* MOBILE SEARCH MODE BUTTON (Mini) */
         .mobile-mode-btn {
-            display: none; /* Ẩn trên Desktop */
+            display: none;
+            /* Ẩn trên Desktop */
             width: 44px;
             height: 44px;
             border-radius: 12px;
@@ -532,13 +544,112 @@
             font-weight: 800;
             font-size: 14px;
             position: relative;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
             transition: 0.3s;
         }
 
-        .mobile-mode-btn.mode-1 { background: #ee0033; } /* Đỏ - Tìm Số */
-        .mobile-mode-btn.mode-2 { background: #00a859; } /* Xanh - Tìm t2 */
-        .mobile-mode-btn.mode-3 { background: #6b46c1; } /* Tím - Tìm t3 */
+        .mobile-mode-btn.mode-1 {
+            background: #ee0033;
+        }
+
+        /* Đỏ - Tìm Số */
+        .mobile-mode-btn.mode-2 {
+            background: #00a859;
+        }
+
+        /* Xanh - Tìm t2 */
+        .mobile-mode-btn.mode-3 {
+            background: #6b46c1;
+        }
+
+        /* Tím - Tìm t3 */
+
+        /* SEARCH MODE DROPDOWN MENU */
+        .search-mode-menu {
+            display: none;
+            position: absolute;
+            top: 55px;
+            left: 0;
+            background: white;
+            min-width: 180px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            z-index: 10001;
+            overflow: hidden;
+            animation: menuFadeIn 0.2s ease-out;
+        }
+
+        @keyframes menuFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .search-mode-menu.active {
+            display: block;
+        }
+
+        .mode-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: 0.2s;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .mode-dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .mode-dropdown-item:hover {
+            background: #f8fafc;
+        }
+
+        .mode-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .mode-dot.m1 {
+            background: #ee0033;
+        }
+
+        .mode-dot.m2 {
+            background: #00a859;
+        }
+
+        .mode-dot.m3 {
+            background: #6b46c1;
+        }
+
+        .mode-dropdown-item span {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .search-mode-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10000;
+        }
+
+        .search-mode-overlay.active {
+            display: block;
+        }
 
         .mobile-mode-btn .mode-badge {
             position: absolute;
@@ -553,7 +664,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
 
         /* TOAST NOTIFICATION */
@@ -569,7 +680,7 @@
             font-size: 14px;
             font-weight: 600;
             z-index: 10000;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             transition: 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
             opacity: 0;
             display: flex;
@@ -581,6 +692,7 @@
             transform: translateX(-50%) translateY(0);
             opacity: 1;
         }
+
         #fabSettings {
             position: fixed;
             width: 54px;
@@ -883,11 +995,13 @@
             }
 
             .search-mode-select {
-                display: none; /* Ẩn select trên Mobile */
+                display: none;
+                /* Ẩn select trên Mobile */
             }
 
             .mobile-mode-btn {
-                display: flex; /* Hiện nút icon trên Mobile */
+                display: flex;
+                /* Hiện nút icon trên Mobile */
             }
 
             .search-area {
@@ -1989,11 +2103,20 @@
             border-radius: 10px;
             font-size: 13px;
             max-width: 280px;
+            width: max-content;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
             pointer-events: none;
             display: none;
             line-height: 1.5;
             border: 1px solid #475569;
+        }
+
+        @media (max-width: 600px) {
+            .tag-tooltip {
+                max-width: calc(100vw - 40px);
+                font-size: 12px;
+                padding: 10px;
+            }
         }
 
         .tag-tooltip b {
@@ -2127,10 +2250,31 @@
                     <option value="3">Tìm Theo Sao Đã Rút Gọn</option>
                 </select>
                 <!-- Nút chuyển chế độ Mini cho Mobile -->
-                <div id="mobileSearchModeBtn" class="mobile-mode-btn mode-1" onclick="cycleSearchModeMobile()">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <div id="mobileSearchModeBtn" class="mobile-mode-btn mode-1" onclick="toggleModeMenu()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
                     <div class="mode-badge">1</div>
                 </div>
+
+                <!-- Menu xổ xuống mới -->
+                <div id="searchModeMenu" class="search-mode-menu">
+                    <div class="mode-dropdown-item" onclick="setSearchMode(1)">
+                        <div class="mode-dot m1"></div>
+                        <span>Tìm Số</span>
+                    </div>
+                    <div class="mode-dropdown-item" onclick="setSearchMode(2)">
+                        <div class="mode-dot m2"></div>
+                        <span>Tìm Theo Sao</span>
+                    </div>
+                    <div class="mode-dropdown-item" onclick="setSearchMode(3)">
+                        <div class="mode-dot m3"></div>
+                        <span>Sao Rút Gọn</span>
+                    </div>
+                </div>
+                <div id="searchModeOverlay" class="search-mode-overlay" onclick="toggleModeMenu()"></div>
             </div>
             <div class="search-input-wrapper">
                 <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
@@ -2138,10 +2282,10 @@
                     <circle cx="11" cy="11" r="8"></circle>
                     <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                 </svg>
-                <input type="text" id="mainSearch" placeholder="Tìm số (Vd: 090*191, *999)"
-                    onkeypress="handleSearchEnter(event)" list="searchSuggestions">
+                <input type="text" id="mainSearch" placeholder="Tìm số (Vd: *8268, *8268*)"
+                    onkeypress="handleSearchEnter(event)" oninput="syncSearchButtonState()" list="searchSuggestions">
                 <datalist id="searchSuggestions"></datalist>
-                <button class="btn-search-inline" onclick="executeMainSearch()">Tìm</button>
+                <button id="mainSearchBtn" class="btn-search-inline" onclick="executeMainSearch()">Tìm</button>
             </div>
             <button class="btn-filter-trigger" onclick="toggleModal(true)">
                 <svg class="filter-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -2431,11 +2575,11 @@
                     <div class="chip-group chip-group-3">
                         <label class="chip-label">
                             <input type="checkbox" class="hung-cb" value="h5" onchange="updateUI()">
-                            <span class="chip-text">Vi phạm Hung 5</span>
+                            <span class="chip-text">Giữa hung tinh có 5</span>
                         </label>
                         <label class="chip-label">
                             <input type="checkbox" class="hung-cb" value="vp2s5" onchange="updateUI()">
-                            <span class="chip-text">Vi phạm 2 số 5</span>
+                            <span class="chip-text">Giữa có 2 số 5 trở lên</span>
                         </label>
                         <label class="chip-label">
                             <input type="checkbox" class="hung-cb" value="hpv" onchange="updateUI()">
@@ -2443,11 +2587,11 @@
                         </label>
                         <label class="chip-label">
                             <input type="checkbox" class="hung-cb" value="vp2h" onchange="updateUI()">
-                            <span class="chip-text">Vi phạm 2 Hung</span>
+                            <span class="chip-text">2 hung tinh liên thủ</span>
                         </label>
                         <label class="chip-label">
                             <input type="checkbox" class="hung-cb" value="vp2pv" onchange="updateUI()">
-                            <span class="chip-text">Vi phạm 2 Phục Vị</span>
+                            <span class="chip-text">2 phục vị liên tiếp</span>
                         </label>
                         <label class="chip-label">
                             <input type="checkbox" class="hung-cb" value="vphvc" onchange="updateUI()">
@@ -2459,11 +2603,11 @@
                         </label>
                         <label class="chip-label">
                             <input type="checkbox" class="hung-cb" value="vp0" onchange="updateUI()">
-                            <span class="chip-text">Vi phạm 0:0</span>
+                            <span class="chip-text">Có 0 trong dãy số</span>
                         </label>
                         <label class="chip-label">
                             <input type="checkbox" class="hung-cb" value="cHt" onchange="updateUI()">
-                            <span class="chip-text" style="color: #c62828; font-weight:700;">Hung tinh cuối</span>
+                            <span class="chip-text" style="color: #c62828; font-weight:700;">Kết đuôi hung tinh</span>
                         </label>
                     </div>
                 </div>
@@ -2510,13 +2654,15 @@
                 <!-- THÔNG SỐ KỸ THUẬT CHUYÊN SÂU (CHIA 3 NHÓM) -->
                 <div style="margin-top: 25px; border-top: 1px dashed var(--border); padding-top: 20px;">
                     <h3 style="margin-bottom: 5px;">Thông số kỹ thuật Nâng cao</h3>
-                    <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">Lọc SIM theo các chỉ số liên tiếp, tỉ lệ % và điểm số 8 sao.</p>
-                    
+                    <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">Lọc SIM theo các chỉ số
+                        liên tiếp, tỉ lệ % và điểm số 8 sao.</p>
+
                     <!-- Nhóm 1: Chỉ số liên tiếp -->
-                    <h4 style="font-size: 14px; color: var(--primary); margin: 15px 0 10px 0;">1. Chỉ số liên tiếp</h4>
+                    <h4 style="font-size: 14px; color: var(--primary); margin: 15px 0 10px 0;">1. Cặp Cát Tinh, Hung
+                        Tinh, Phục Vị</h4>
                     <div class="tech-filter-grid">
                         <div class="tech-filter-item">
-                            <label>Cát liên tiếp (cat)</label>
+                            <label>Số cặp cát tinh</label>
                             <div class="tech-filter-pair">
                                 <input type="number" id="min_c_cat" placeholder="Min" onchange="updateUI()">
                                 <span>-</span>
@@ -2524,7 +2670,7 @@
                             </div>
                         </div>
                         <div class="tech-filter-item">
-                            <label>Hung liên tiếp (hung)</label>
+                            <label>Số cặp hung tinh</label>
                             <div class="tech-filter-pair">
                                 <input type="number" id="min_c_hung" placeholder="Min" onchange="updateUI()">
                                 <span>-</span>
@@ -2532,7 +2678,7 @@
                             </div>
                         </div>
                         <div class="tech-filter-item">
-                            <label>PV liên tiếp (pv)</label>
+                            <label>Số cặp phục vị</label>
                             <div class="tech-filter-pair">
                                 <input type="number" id="min_c_pv" placeholder="Min" onchange="updateUI()">
                                 <span>-</span>
@@ -2542,7 +2688,8 @@
                     </div>
 
                     <!-- Nhóm 2: Lọc Tỉ lệ % MỚI -->
-                    <h4 style="font-size: 14px; color: var(--primary); margin: 20px 0 10px 0;">2. Lọc Tỉ lệ Phần trăm (%)</h4>
+                    <h4 style="font-size: 14px; color: var(--primary); margin: 20px 0 10px 0;">2. Lọc Tỉ lệ Phần trăm
+                        (%)</h4>
                     <div class="tech-filter-grid">
                         <div class="tech-filter-item">
                             <label>% Thiên Y / Tổng 3</label>
@@ -2582,7 +2729,7 @@
                     <h4 style="font-size: 14px; color: var(--primary); margin: 20px 0 10px 0;">3. Điểm số 8 sao</h4>
                     <div class="tech-filter-grid">
                         <div class="tech-filter-item">
-                            <label>Điểm Thiên Y (ty)</label>
+                            <label>Điểm Thiên Y</label>
                             <div class="tech-filter-pair">
                                 <input type="number" id="min_ty" placeholder="Min" onchange="updateUI()">
                                 <span>-</span>
@@ -2590,7 +2737,7 @@
                             </div>
                         </div>
                         <div class="tech-filter-item">
-                            <label>Điểm Sinh Khí (sk)</label>
+                            <label>Điểm Sinh Khí</label>
                             <div class="tech-filter-pair">
                                 <input type="number" id="min_sk" placeholder="Min" onchange="updateUI()">
                                 <span>-</span>
@@ -2598,7 +2745,7 @@
                             </div>
                         </div>
                         <div class="tech-filter-item">
-                            <label>Điểm Diên Niên (dn)</label>
+                            <label>Điểm Diên Niên</label>
                             <div class="tech-filter-pair">
                                 <input type="number" id="min_dn" placeholder="Min" onchange="updateUI()">
                                 <span>-</span>
@@ -2606,7 +2753,7 @@
                             </div>
                         </div>
                         <div class="tech-filter-item">
-                            <label>Điểm Phục Vị (pb)</label>
+                            <label>Điểm Phục Vị</label>
                             <div class="tech-filter-pair">
                                 <input type="number" id="min_pb" placeholder="Min" onchange="updateUI()">
                                 <span>-</span>
@@ -2614,7 +2761,7 @@
                             </div>
                         </div>
                         <div class="tech-filter-item">
-                            <label>Điểm Lục Sát (ln)</label>
+                            <label>Điểm Lục Sát</label>
                             <div class="tech-filter-pair">
                                 <input type="number" id="min_ln" placeholder="Min" onchange="updateUI()">
                                 <span>-</span>
@@ -2622,7 +2769,7 @@
                             </div>
                         </div>
                         <div class="tech-filter-item">
-                            <label>Điểm Tuyệt Mệnh (tl)</label>
+                            <label>Điểm Tuyệt Mệnh</label>
                             <div class="tech-filter-pair">
                                 <input type="number" id="min_tl" placeholder="Min" onchange="updateUI()">
                                 <span>-</span>
@@ -2630,7 +2777,7 @@
                             </div>
                         </div>
                         <div class="tech-filter-item">
-                            <label>Điểm Họa Hại (hp)</label>
+                            <label>Điểm Họa Hại</label>
                             <div class="tech-filter-pair">
                                 <input type="number" id="min_hp" placeholder="Min" onchange="updateUI()">
                                 <span>-</span>
@@ -2638,7 +2785,7 @@
                             </div>
                         </div>
                         <div class="tech-filter-item">
-                            <label>Điểm Thổ? (th)</label>
+                            <label>Điểm Ngũ Quỷ</label>
                             <div class="tech-filter-pair">
                                 <input type="number" id="min_th" placeholder="Min" onchange="updateUI()">
                                 <span>-</span>
@@ -2816,27 +2963,27 @@
 
         const ELEMENT_INFO = {
             "Kim": {
-                hop: "Thủy, Thổ",
+                hop: "Thủy, Kim",
                 khac: "Mộc",
                 intro: "Đại diện cho sức mạnh, sự tinh tế và quyết đoán. Người mệnh Kim thường cương trực, có khả năng tổ chức tốt."
             },
             "Mộc": {
-                hop: "Hỏa, Thủy",
+                hop: "Hỏa, Mộc",
                 khac: "Thổ",
                 intro: "Đại diện cho sự tăng trưởng, linh hoạt và nhân từ. Người mệnh Mộc giàu lòng vị tha, thích giúp đỡ mọi người."
             },
             "Thủy": {
-                hop: "Mộc, Kim",
+                hop: "Mộc, Thuỷ",
                 khac: "Hỏa",
                 intro: "Đại diện cho sự thông minh, uyển chuyển và thấu hiểu. Người mệnh Thủy giỏi giao tiếp, nhạy bén trong xử lý tình huống."
             },
             "Hỏa": {
-                hop: "Hỏa, Thổ",
+                hop: "Thổ, Hoả",
                 khac: "Thủy",
                 intro: "Đại diện cho đam mê, năng lượng và công lý. Người mệnh Hỏa quyết liệt, dũng cảm nhưng đôi khi nóng nảy."
             },
             "Thổ": {
-                hop: "Kim, Hỏa",
+                hop: "Kim, Thổ",
                 khac: "Thủy",
                 intro: "Đại diện cho sự ổn định, tin cậy và bao dung. Người mệnh Thổ khiêm tốn, điềm đạm và là chỗ dựa vững chắc."
             }
@@ -3353,8 +3500,39 @@
             return false;
         }
 
+        let lastSearchedQuery = "";
+
+        function syncSearchButtonState() {
+            const input = document.getElementById('mainSearch');
+            const btn = document.getElementById('mainSearchBtn');
+            if (!input || !btn) return;
+
+            const val = input.value.trim();
+            if (val !== "" && val === lastSearchedQuery) {
+                btn.innerText = "Xóa";
+                btn.classList.add('is-clear');
+            } else {
+                btn.innerText = "Tìm";
+                btn.classList.remove('is-clear');
+            }
+        }
+
         function executeMainSearch() {
-            updateUI();
+            const input = document.getElementById('mainSearch');
+            const btn = document.getElementById('mainSearchBtn');
+
+            if (btn && btn.classList.contains('is-clear')) {
+                // Đang trạng thái Xóa -> Clear sạch
+                if (input) input.value = "";
+                lastSearchedQuery = "";
+                syncSearchButtonState();
+                updateUI();
+            } else {
+                // Đang trạng thái Tìm -> Thực hiện tìm
+                lastSearchedQuery = input ? input.value.trim() : "";
+                syncSearchButtonState();
+                updateUI();
+            }
             toggleModal(false);
         }
 
@@ -3486,11 +3664,34 @@
             tooltip.style.display = 'block';
 
             const rect = tooltip.getBoundingClientRect();
-            let top = e.clientY - rect.height - 15;
-            let left = e.clientX + 15;
+            const margin = 12;
+            const winW = window.innerWidth;
+            const winH = window.innerHeight;
 
-            if (top < 10) top = e.clientY + 15;
-            if (left + rect.width > window.innerWidth - 10) left = e.clientX - rect.width - 15;
+            // Vị trí mặc định: Phía trên và chính giữa con trỏ (hoặc chạm)
+            let top = e.clientY - rect.height - 15;
+            let left = e.clientX - (rect.width / 2);
+
+            // Kiểm tra tràn phải
+            if (left + rect.width > winW - margin) {
+                left = winW - rect.width - margin;
+            }
+
+            // Kiểm tra tràn trái
+            if (left < margin) {
+                left = margin;
+            }
+
+            // Kiểm tra tràn trên
+            if (top < margin) {
+                // Nếu tràn trên, đẩy xuống dưới con trỏ
+                top = e.clientY + 20;
+            }
+
+            // Kiểm tra tràn dưới (sau khi đã có thể bị đẩy xuống)
+            if (top + rect.height > winH - margin) {
+                top = winH - rect.height - margin;
+            }
 
             tooltip.style.top = top + "px";
             tooltip.style.left = left + "px";
@@ -4677,13 +4878,14 @@
             let suggestions = [];
 
             if (mode === "1") {
-                placeholder = "Tìm số (Vd: 090*191, *999)";
+                placeholder = "Tìm số (Vd: *8268, *8268*)";
+                suggestions = ["*8268", "*8268*"];
             } else if (mode === "2") {
-                placeholder = "Tìm Theo Sao (Vd: TY*, *DN, *SK-DN)";
-                suggestions = STAR_LIST;
+                placeholder = "Tìm Theo Sao (Vd: *SK-DN-TY*)";
+                suggestions = ["*SK-DN-TY", "*SK-DN-TY*"];
             } else if (mode === "3") {
-                placeholder = "Sao Rút Gọn (Vd: TY*, *DN, *SK-DN)";
-                suggestions = PV_LIST;
+                placeholder = "Sao Rút Gọn (Vd: *SK-DN-TY*)";
+                suggestions = ["*SK-DN-TY", "*SK-DN-TY*"];
             }
 
             input.placeholder = placeholder;
@@ -4693,7 +4895,7 @@
                 dataList.appendChild(opt);
             });
 
-            // Đồng bộ UI nút Mobile
+            // Đồng bộ UI nút Mobile (Màu sắc theo Mode)
             if (mobileBtn) {
                 mobileBtn.className = `mobile-mode-btn mode-${mode}`;
                 const badge = mobileBtn.querySelector('.mode-badge');
@@ -4704,24 +4906,30 @@
             applyFilters();
         }
 
-        function cycleSearchModeMobile() {
+        function toggleModeMenu() {
+            const menu = document.getElementById('searchModeMenu');
+            const overlay = document.getElementById('searchModeOverlay');
+            if (menu && overlay) {
+                menu.classList.toggle('active');
+                overlay.classList.toggle('active');
+            }
+        }
+
+        function setSearchMode(val) {
             const select = document.getElementById('searchMode');
-            if (!select) return;
+            if (select) {
+                select.value = val;
+                updateSearchPlaceholders();
 
-            let currentMode = parseInt(select.value);
-            let nextMode = currentMode + 1;
-            if (nextMode > 3) nextMode = 1;
+                // Clear input để nhập gợi ý mới
+                const input = document.getElementById('mainSearch');
+                if (input) input.value = "";
 
-            select.value = nextMode;
-            updateSearchPlaceholders();
-
-            // Clear input khi đổi chế độ để tránh nhiễu
-            const input = document.getElementById('mainSearch');
-            if (input) input.value = "";
-
-            // Hiển thị thông báo
-            const modeNames = ["", "Tìm Số", "Tìm Theo Sao", "Tìm Sao Rút Gọn"];
-            showToast(`⚙️ Chế độ: ${modeNames[nextMode]}`);
+                // Hiển thị thông báo
+                const modeNames = ["", "Tìm Số", "Tìm Theo Sao", "Tìm Sao Rút Gọn"];
+                showToast(`⚙️ Chế độ: ${modeNames[val]}`);
+            }
+            toggleModeMenu(); // Đóng menu
         }
 
         function showToast(message) {
