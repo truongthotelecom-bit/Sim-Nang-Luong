@@ -1618,7 +1618,8 @@
 
         .chart-container-canvas {
             position: relative;
-            height: 160px; /* Bóp nhỏ chiều cao 1 chút để không bị tràn */
+            height: 160px;
+            /* Bóp nhỏ chiều cao 1 chút để không bị tràn */
             width: 100%;
         }
 
@@ -1791,9 +1792,104 @@
             grid-template-columns: repeat(3, 1fr);
         }
 
+        /* MODAL LUẬN GIẢI KẾT HỢP (FIXED) */
+        #combinationModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #combinationModal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .comb-card {
+            background: white;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            transform: translateY(30px) scale(0.95);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        #combinationModal.active .comb-card {
+            transform: translateY(0) scale(1);
+        }
+
+        .comb-header {
+            padding: 30px;
+            background: linear-gradient(135deg, #1e293b, #334155);
+            color: white;
+            text-align: center;
+        }
+
+        .comb-header h3 {
+            margin: 0;
+            font-size: 24px;
+            color: white;
+            border: none;
+        }
+
+        .comb-body {
+            padding: 30px;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .comb-section {
+            margin-bottom: 25px;
+        }
+
+        .comb-section b {
+            display: block;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            color: var(--primary);
+        }
+
+        .comb-section p {
+            margin: 0;
+            line-height: 1.6;
+            color: #475569;
+            font-size: 15px;
+        }
+
+        .comb-btn-close {
+            width: 100%;
+            padding: 16px;
+            background: #f1f5f9;
+            border: none;
+            font-weight: 700;
+            color: #475569;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .comb-btn-close:hover {
+            background: #e2e8f0;
+            color: #1e293b;
+        }
+
         @media (max-width: 600px) {
-            .chip-group-3 {
-                grid-template-columns: repeat(2, 1fr);
+            .filter-row {
+                grid-template-columns: 1fr;
+                gap: 10px;
             }
         }
 
@@ -2105,7 +2201,8 @@
             max-width: 280px;
             width: max-content;
             box-shadow: 0 4px 25px rgba(0, 0, 0, 0.4);
-            pointer-events: auto; /* Enable clicks */
+            pointer-events: auto;
+            /* Enable clicks */
             display: none;
             line-height: 1.5;
             border: 1px solid #475569;
@@ -2376,7 +2473,7 @@
 
 
 
-    <!-- TRẠNG THÁI TẢI DỮ LIỆU -->
+    <!-- SCRIPTS MỚI (LUÔN ĐỂ Ở CUỐI) -->
     <div class="main-layout container">
         <!-- CỘT BÊN TRÁI (SIDEBAR - CHỈ HIỆN TRÊN MÁY TÍNH) -->
 
@@ -2935,17 +3032,18 @@
         </div>
     </div>
 
-    <!-- MODAL Ý NGHĨA TỔ HỢP -->
-    <div id="combinationModal">
-        <div class="comb-content">
-            <button class="comb-close" onclick="toggleCombModal(false)">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                    <path d="M18 6L6 18M6 6l12 12"></path>
-                </svg>
-            </button>
-            <div class="comb-title" id="combTitle">TỔ HỢP SAO</div>
-            <div class="comb-desc" id="combDesc">Bấm vào các đoạn nối trên biểu đồ để xem ý nghĩa kết hợp giữa 2 cặp
-                sao.</div>
+    <!-- MODAL LUẬN GIẢI TỔ HỢP (ĐẶT NGOÀI DETAIL MODAL) -->
+    <div id="combinationModal" onclick="if(event.target === this) toggleCombModal(false)">
+        <div class="comb-card">
+            <div class="comb-header">
+                <h3 id="combTitle">TỔ HỢP SAO</h3>
+            </div>
+            <div class="comb-body">
+                <div id="combDesc">
+                    Bấm vào các đoạn nối trên biểu đồ để xem ý nghĩa kết hợp giữa 2 cặp sao.
+                </div>
+            </div>
+            <button class="comb-btn-close" onclick="toggleCombModal(false)">ĐÓNG CỬA SỔ</button>
         </div>
     </div>
 
@@ -2958,7 +3056,7 @@
 
     <script>
         // ======= CẤU HÌNH API =======
-        const API_URL = "https://script.google.com/macros/s/AKfycbymNnjPgayIx5dNoz3dXLMYs2c_65q_GdwuthPdTrD6Eb1cofR0kkEeJy015RKq1pHu/exec"; // Thay Link Google Apps Script vào đây
+        const API_URL = "https://script.google.com/macros/s/AKfycbyg-xxZru4wK60WrCzGVpE40HYebuMK78L9tnb7xNYmWHqB7P5Bg5RyRllwodpCkWcl_g/exec"; // Thay Link Google Apps Script vào đây
 
         // ======= GLOBAL STATE =======
         const QUERIES_64 = ["Thuần Càn", "Thuần Khôn", "Thủy Lôi Truân", "Sơn Thủy Mông", "Thủy Thiên Nhu", "Thiên Thủy Tụng", "Địa Thủy Sư", "Thủy Địa Tỷ", "Phong Thiên Tiểu Súc", "Thiên Trạch Lý", "Địa Thiên Thái", "Thiên Địa Bĩ", "Thiên Hỏa Đồng Nhân", "Hỏa Thiên Đại Hữu", "Địa Sơn Khiêm", "Lôi Địa Dự", "Trạch Lôi Tùy", "Sơn Phong Cổ", "Địa Trạch Lâm", "Phong Địa Quan", "Hỏa Lôi Phệ Hạp", "Sơn Hỏa Bí", "Sơn Địa Bác", "Địa Lôi Phục", "Thiên Lôi Vô Vọng", "Sơn Thiên Đại Súc", "Sơn Lôi Di", "Trạch Phong Đại Quá", "Thuần Khảm", "Thuần Ly", "Trạch Sơn Hàm", "Lôi Phong Hằng", "Thiên Sơn Độn", "Lôi Thiên Đại Tráng", "Hỏa Địa Tấn", "Địa Hỏa Minh Di", "Phong Hỏa Gia Nhân", "Hỏa Trạch Khuê", "Thủy Sơn Kiển", "Lôi Thủy Giải", "Sơn Trạch Tổn", "Phong Lôi Ích", "Trạch Thiên Quải", "Thiên Phong Cấu", "Trạch Địa Tụy", "Địa Phong Thăng", "Trạch Thủy Khốn", "Thủy Phong Tỉnh", "Trạch Hỏa Cách", "Hỏa Phong Đỉnh", "Thuần Chấn", "Thuần Cấn", "Phong Sơn Tiệm", "Lôi Trạch Quy Muội", "Lôi Hỏa Phong", "Hỏa Sơn Lữ", "Thuần Tốn", "Thuần Đoài", "Phong Thủy Hoán", "Thủy Trạch Tiết", "Phong Trạch Trung Phu", "Lôi Trạch Tiểu Quá", "Thủy Hỏa Ký Tế", "Hỏa Thủy Vị Tế"];
@@ -2967,12 +3065,11 @@
         let currentRenderCount = 0;
         const CHUNK_SIZE = 100;
 
-
         let starComboFilter = null;
         let activeFilterChips = [];
         let excluded = [];
         let isSelectionMode = false;
-        let selectedSims = new Set(); // Dùng Set để lưu số gốc (sr) của sim đang chọn
+        let selectedSims = new Set();
 
         let chartR3 = null;
         let chartR4 = null;
@@ -2984,222 +3081,11 @@
             "LS": "Lục Sát", "TM": "Tuyệt Mệnh", "HH": "Họa Hại", "NQ": "Ngũ Quỷ"
         };
 
-        const ELEMENT_INFO = {
-            "Kim": {
-                hop: "Thủy, Kim",
-                khac: "Mộc",
-                intro: "Đại diện cho sức mạnh, sự tinh tế và quyết đoán. Người mệnh Kim thường cương trực, có khả năng tổ chức tốt."
-            },
-            "Mộc": {
-                hop: "Hỏa, Mộc",
-                khac: "Thổ",
-                intro: "Đại diện cho sự tăng trưởng, linh hoạt và nhân từ. Người mệnh Mộc giàu lòng vị tha, thích giúp đỡ mọi người."
-            },
-            "Thủy": {
-                hop: "Mộc, Thuỷ",
-                khac: "Hỏa",
-                intro: "Đại diện cho sự thông minh, uyển chuyển và thấu hiểu. Người mệnh Thủy giỏi giao tiếp, nhạy bén trong xử lý tình huống."
-            },
-            "Hỏa": {
-                hop: "Thổ, Hoả",
-                khac: "Kim",
-                intro: "Đại diện cho đam mê, năng lượng và công lý. Người mệnh Hỏa quyết liệt, dũng cảm nhưng đôi khi nóng nảy."
-            },
-            "Thổ": {
-                hop: "Kim, Thổ",
-                khac: "Thủy",
-                intro: "Đại diện cho sự ổn định, tin cậy và bao dung. Người mệnh Thổ khiêm tốn, điềm đạm và là chỗ dựa vững chắc."
-            }
-        };
-
-        // Data từ VBA: Cấu trúc điểm và loại sao
-        const STAR_DATA = {
-            "13": ["TY", 100], "31": ["TY", 100], "68": ["TY", 75], "86": ["TY", 75], "94": ["TY", 50], "49": ["TY", 50], "72": ["TY", 25], "27": ["TY", 25],
-            "14": ["SK", 100], "41": ["SK", 100], "67": ["SK", 75], "76": ["SK", 75], "93": ["SK", 50], "39": ["SK", 50], "82": ["SK", 25], "28": ["SK", 25],
-            "19": ["DN", 100], "91": ["DN", 100], "78": ["DN", 75], "87": ["DN", 75], "43": ["DN", 50], "34": ["DN", 50], "26": ["DN", 25], "62": ["DN", 25],
-            "11": ["PV", 100], "22": ["PV", 100], "88": ["PV", 75], "99": ["PV", 75], "77": ["PV", 50], "66": ["PV", 50], "44": ["PV", 25], "33": ["PV", 25],
-            "16": ["LS", 100], "61": ["LS", 100], "74": ["LS", 75], "47": ["LS", 75], "38": ["LS", 50], "83": ["LS", 50], "92": ["LS", 25], "29": ["LS", 25],
-            "12": ["TM", 100], "21": ["TM", 100], "69": ["TM", 75], "96": ["TM", 75], "37": ["TM", 50], "73": ["TM", 50], "84": ["TM", 25], "48": ["TM", 25],
-            "17": ["HH", 100], "71": ["HH", 100], "98": ["HH", 75], "89": ["HH", 75], "64": ["HH", 50], "46": ["HH", 50], "32": ["HH", 25], "23": ["HH", 25],
-            "18": ["NQ", 100], "81": ["NQ", 100], "97": ["NQ", 75], "79": ["NQ", 75], "36": ["NQ", 50], "63": ["NQ", 50], "42": ["NQ", 25], "24": ["NQ", 25]
-        };
-
-        const STAR_COMBINATIONS = {
-            "TYTY": "THIÊN Y + THIÊN Y <RẤT TỐT> --> Tụ tập, tăng cường năng lượng tài phú, có lợi cho hôn nhân",
-            "TYSK": "THIÊN Y + SINH KHÍ <RẤT TỐT> --> Nhiều quý nhân bằng hữu, hào phóng, nhân duyên tốt. Hợp tác làm ăn tốt",
-            "TYDN": "THIÊN Y + DIÊN NIÊN <RẤT TỐT> --> Có ý tự làm chủ, giỏi về đầu tư lập nghiệp. Giỏi quản lý tài chính, không tiêu tiền bừa bãi",
-            "TYPV": "THIÊN Y + PHỤC VỊ <RẤT TỐT> --> Từ trường Thiên Y được kéo dài, biểu thị nguồn tài lộc liên tục. Chính đào hoa",
-            "TYLS": "THIÊN Y + LỤC SÁT --> Nam dễ vì phụ nữ mà dễ phá tài, thiên đào hoa, ảnh hưởng đến tình cảm hôn nhân. Cặp này thường chi tiêu tiền cho gia đình, làm đẹp, phụ nữ",
-            "TYHH": "THIÊN Y + HỌA HẠI --> Thích dùng tiền, sĩ diện, thích mua đồ ăn, thích lấy lòng. Vì miệng mà phá tài",
-            "TYTM": "THIÊN Y + TUYỆT MỆNH --> Có tiền sẽ đi đầu tư, suy nghĩ không chặt chẽ, dễ phá tài, đầu tư dễ mất. Không hài hòa, dễ đổ vỡ tình cảm",
-            "TYNQ": "THIÊN Y + NGŨ QUỶ --> Suy nghĩ không ổn định gây hao tổn tài",
-            "SKTY": "SINH KHÍ + THIÊN Y <RẤT TỐT> --> Thông qua quý nhân mang đến tài phú",
-            "SKSK": "SINH KHÍ + SINH KHÍ <RẤT TỐT> --> Tập hợp tăng cường năng lượng quý nhân",
-            "SKDN": "SINH KHÍ + DIÊN NIÊN <RẤT TỐT> --> Thông qua quý nhân mang đến công việc tốt, thăng tiến trong công việc",
-            "SKPV": "SINH KHÍ + PHỤC VỊ <TỐT> --> Từ trường sinh khí được kéo dài",
-            "SKLS": "SINH KHÍ + LỤC SÁT --> Khéo léo chinh phục người khác, mật ngọt chết ruồi",
-            "SKHH": "SINH KHÍ + HỌA HẠI --> Tự nhận bản thân tốt, nói ra dễ gây tranh cãi ầm ĩ",
-            "SKTM": "SINH KHÍ + TUYỆT MỆNH --> Rất vui vẻ phấn đấu vì mộng vĩ đại, nhưng không nhất thiết phải thực hiện",
-            "SKNQ": "SINH KHÍ + NGŨ QUỶ --> Khéo đưa đẩy, vui vẻ thất thường, tâm cơ khó đoán",
-            "DNTY": "DIÊN NIÊN + THIÊN Y <RẤT TỐT> --> Dựa vào năng lực bản thân để kiếm tiền. Diên niên lớn + Thiên Y nhỏ = CV vất vả mà thu lợi ít. Diên Niên nhở + Thiên Y lớn = Kiếm tiền nhẹ nhõm",
-            "DNSK": "DIÊN NIÊN + SINH KHÍ <RẤT TỐT> --> Công việc vui vẻ không áp lực, có năng lực làm việc mạnh mẽ",
-            "DNDN": "DIÊN NIÊN + DIÊN NIÊN <RẤT TỐT> --> Năng lực chuyên nghiệp mạnh, có khả năng lãnh đạo, có quyền lợi",
-            "DNPV": "DIÊN NIÊN + PHỤC VỊ <TỐT> --> Cố gắng làm việc, có trách nhiệm, chịu được áp lực. Kéo dài từ trường Diên niên",
-            "DNLS": "DIÊN NIÊN + LỤC SÁT --> Công việc làm không vui, thường u buồn, không quả quyết",
-            "DNHH": "DIÊN NIÊN + HỌA HẠI --> Không ngừng phàn nàn, khó chịu, năng lực lãnh đạo bị cản trở, hay gặp tiểu nhân. Quyền lực bị uy hiếp, làm việc dễ hối hận",
-            "DNTM": "DIÊN NIÊN + TUYỆT MỆNH --> Không muốn làm việc, trong công việc phần lớn gặp khó khăn trắc trở. Không có tâm tình học tập, có ý thức học nhưng kết quả không tốt. Tình cảm không tốt, quan hệ nhân mạch không tốt",
-            "DNNQ": "DIÊN NIÊN + NGŨ QUỶ <XẤU> --> Công việc vừa làm vừa nghĩ biến báo, suy nghĩ nhiều",
-            "PVTY": "PHỤC VỊ + THIÊN Y <TỐT> --> Thông qua kiên trì chờ đợi mà tạo ra tài phú lớn",
-            "PVSK": "PHỤC VỊ + SINH KHÍ <TỐT> --> Súc thế năng lượng Sinh khí để Sinh khí càng đại hữu",
-            "PVDN": "PHỤC VỊ + DIÊN NIÊN <TỐT> --> Tăng cường năng lượng Diên niên, năng lực càng lớn mạnh, đạt quyền lợi",
-            "PVPV": "PHỤC VỊ + PHỤC VỊ --> Vận sức chờ phát động, tăng cường thế lực Phục vị",
-            "PVLS": "PHỤC VỊ + LỤC SÁT <XẤU> --> Vận sức chờ phát động, tăng cường thế lực Lục sát",
-            "PVHH": "PHỤC VỊ + HỌA HẠI <RẤT XẤU> --> Nói cứng rắn, tự cho mình đúng",
-            "PVTM": "PHỤC VỊ + TUYỆT MỆNH <XẤU> --> Súc thế xung động, trong công việc rất liều",
-            "PVNQ": "PHỤC VỊ + NGŨ QUỶ <XẤU> --> Vận sức chờ phát động, tăng cường thế lực Ngũ quỷ",
-            "LSTY": "LỤC SÁT + THIÊN Y <TỐT> --> Thông qua ngành dịch vụ mà kiếm tiền. Cần cho các công việc yêu cầu tỉ mỉ",
-            "LSSK": "LỤC SÁT + SINH KHÍ <RẤT TỐT> --> Nhân duyên tốt, nhiệt tình với mọi người, có quan hệ giao tiếp tốt",
-            "LSDN": "LỤC SÁT + DIÊN NIÊN <RẤT TỐT> --> Công tác hành chính hoặc phục vụ tốt, sẽ xử lý tốt mối quan hệ với nữ nhân",
-            "LSPV": "LỤC SÁT + PHỤC VỊ <XẤU> --> Từ trường Lục sát kéo dài. Sợ khó khăn",
-            "LSLS": "LỤC SÁT + LỤC SÁT <XẤU> --> Tăng cường cảm giác u buồn, có khuynh hướng tự kỷ. Cảm xúc không ổn định, quan hệ kết nối đột nhiên chuyển biến xấu. Đào hoa",
-            "LSHH": "LỤC SÁT + HỌA HẠI <XẤU> --> Không có tâm tình nói chuyện, dễ đắc tội với người khác",
-            "LSTM": "LỤC SÁT + TUYỆT MỆNH <XẤU> --> Cảm xúc vất vả cố gắng, cảm giác bị ức chế.Phá mối quan hệ trong hôn nhân, xã hội",
-            "LSNQ": "LỤC SÁT + NGŨ QUỶ <XẤU> --> Cảm xúc biến hóa thất thường, không có cảm giác an toàn",
-            "HHTY": "Họa Hại + THIÊN Y <TỐT> --> Thông qua lời nói mà kiếm tiền, các công việc như bán hàng, diễn thuyết, tư vấn…",
-            "HHSK": "HỌA HẠI + SINH KHÍ <RẤT TỐT> --> Khẩu tài tốt, nói có giá trị, nói người khác dễ nghe",
-            "HHDN": "HỌA HẠI + DIÊN NIÊN <RẤT TỐT> --> Ngành nghề công việc về nói. Có năng lực, ăn nói tốt. Phần lớn lấy miệng là nghiệp",
-            "HHPV": "HỌA HẠI + PHỤC VỊ --> Từ trường Họa hại được kéo dài",
-            "HHLS": "Họa Hại + LỤC SÁT <XẤU> --> Nói ra không cần đáp lại, làm cho người khác buồn bực im lặng, cảm xúc không tốt. Cho vay khó đòi, dạ dày có vấn đề",
-            "HHHH": "Họa Hại + Họa Hại <XẤU> --> Nói thẳng, chiêu cãi vã, cứng rắn, mạnh miệng, cãi lộn, tính khí nóng nảy, hụt hơi, không kiên nhẫn",
-            "HHTM": "HỌA HẠI + TUYỆT MỆNH <XẤU> --> Nói chuyện dễ xung động. Dễ nói chuyện đả thương người",
-            "HHNQ": "HỌA HẠI + NGŨ QUỶ <XẤU> --> Biểu đạt toàn là lời nói kỳ dị khiến người khác không hiểu được",
-            "TMTY": "TUYỆT MỆNH + THIÊN Y <RẤT TỐT> --> Thông qua phấn đấu cố gắng mà kiếm tiền. Hoặc làm đầu tư",
-            "TMSK": "TUYỆT MỆNH + SINH KHÍ <RẤT TỐT> --> Đầu tư vui vẻ hưởng thụ kết quả",
-            "TMDN": "TUYỆT MỆNH + DIÊN NIÊN <TỐT> --> Công việc dám liều. Đầu tư quản lý tài sản",
-            "TMPV": "TUYỆT MỆNH + PHỤC VỊ --> Từ trường Tuyệt mệnh được kéo dài",
-            "TMLS": "TUYỆT MỆNH + LỤC SÁT <XẤU> --> Dễ bốc đồng, nóng nảy đưa ra quyết định. Đầu tư dễ bị mất tiền. Hôn nhân dễ có vấn đề",
-            "TMHH": "TUYỆT MỆNH + HỌA HẠI <XẤU> --> Lời nói xung đột, dễ làm tổn thương người khác, gây mấu thuẫn, dễ chiêu cảm tai nạn",
-            "TMTM": "TUYỆT MỆNH + TUYỆT MỆNH <XẤU> --> Chủ quan, dễ kích động, dễ cực đoan, dễ phá tài. Không nên đánh bạc, không dễ quản lý tài sản",
-            "TMNQ": "TUYỆT MỆNH + NGŨ QUỶ <XẤU> --> Dễ xung động, có ý nghĩ kỳ dị. Có thể làm hại người",
-            "NQTY": "NGŨ QUỶ + THIÊN Y <RẤT TỐT> --> Thông qua tài hoa ý tưởng mà kiếm tiền. Công việc cần cường độ linh hoạt của não",
-            "NQSK": "NGŨ QUỶ + SINH KHÍ <RẤT TỐT> --> Đầu óc linh hoạt, có nhiều ý tưởng tốt",
-            "NQDN": "NGŨ QUỶ + DIÊN NIÊN <TỐT> --> Công việc cần cường độ linh hoạt của não",
-            "NQPV": "NGŨ QUỶ + PHỤC VỊ --> Từ trường Ngũ quỷ kéo dài",
-            "NQLS": "NGŨ QUỶ + LỤC SÁT <XẤU> --> Ý nghĩ rất buồn bực. Hôn nhân dễ thay đổi",
-            "NQHH": "NGŨ QUỶ + HỌA HẠI <XẤU> --> Hay tự cho mình là giỏi, tự cao, tự đắc, tranh cãi",
-            "NQTM": "NGŨ QUỶ + TUYỆT MỆNH <XẤU> --> Tận dụng cơ hội, cố gắng thực hiện. Dám liều, tiêu dùng bốc đồng, dễ khởi phát bệnh tật",
-            "NQNQ": "NGŨ QUỶ + NGŨ QUỶ <XẤU> --> Có tài nhưng không ổn định, phản ứng nhanh nhưng gặp trắc trở. Ý nghĩ hay thay đổi"
-        };
-
-        const STAR_INFO = {
-            "TY": {
-                name: "THIÊN Y",
-                intro: "Đại diện cho Tiền bạc và tình cảm. Người có từ trường này thông minh thiện lương hào phóng, thích giúp người khác, không có tâm cơ - chính vì thế nên cũng dễ bị lừa gạt. Từ trường này mang lại tài chính và nhân duyên tốt cho người sử dụng.",
-                weak: "Nhược điểm của từ trường này là thiếu ý kiến độc lập, thiếu suy nghĩ khi giải quyết mọi việc. Nếu từ trường này quá nhiều sẽ gây ra áp lực, có vấn đề về sức khỏe như tuần hoàn máu, huyết áp"
-            },
-            "SK": {
-                name: "SINH KHÍ",
-                intro: "Đại diện cho Vui vẻ, may mắn, quý nhân. Từ trường này lạc quan, xử lý mọi việc bình tĩnh, ổn định, mang lại năng lượng tích cực cho người khác. Có bạn hữu, quý nhân giúp đỡ. Năng lượng này trợ tốt cho con cái và sức khỏe.",
-                weak: "Nhược điểm: Không tham vọng, dễ hài lòng, lười biếng, thiếu quyết đoán"
-            },
-            "DN": {
-                name: "DIÊN NIÊN",
-                intro: "Đại diện cho đàn ông; làm chủ; công việc. Người có từ trường này năng lực lãnh đạo tốt, kiếm tiền được do chính sức làm việc của bản thân; tinh thần trách nhiệm cao; quản lý tài chính tốt; khó tính; cầu toàn",
-                weak: "Nhược điểm của người có từ trường này là: Tự quyết, không dễ thuyết phục, bồn chồn, mệt mỏi và bận rộn. Từ trường mà mạnh làm họ có tính gia trưởng, dễ mắc các bệnh liên quan đến đau xương khớp, cổ vai gáy, đau đầu, rụng tóc, tinh thần mệt mỏi"
-            },
-            "PV": {
-                name: "PHỤC VỊ",
-                intro: "Đại diện cho sự bình tĩnh và ổn định. Phục vị là từ trường Lưỡng cực nó không mang năng lượng cụ thể, đứng cạnh hung tinh hay cát tinh nó kéo dài năng lượng đó. Phục vị là đứng yên, chờ cơ hội để tiếp tục trạng thái ban đầu.",
-                weak: "Phục vị có nhược điểm bị động, bướng bỉnh, do dự và bảo thủ, hay mâu thuẫn, sợ mạo hiểm, nhiều ý kiến và khả năng chịu rủi ro kém. Người có từ trường này cần chú ý sức khỏe về tim, não, các bệnh tiềm ẩn mang tính thoái hóa, mãn tính"
-            },
-            "LS": {
-                name: "LỤC SÁT",
-                intro: "Đại diện cho người phụ nữ, đào hoa. Người có từ trường này đầu óc nhạy cảm nhưng lại do dự, quá thận trọng, đa nghi và cảm xúc không ổn định và hay mâu thuẫn. Năng lượng này tinh tế, tỉ mỉ, thẩm mỹ tốt, giỏi giao tiếp, giỏi ngoại giao.",
-                weak: "Thích chưng diện, hay mua sắm, không giữ được tiền. Có sức hút đặc biệt là khác giới. Sức khỏe chú ý ruột non, dạ dày, da, tự kỷ"
-            },
-            "HH": {
-                name: "HỌA HẠI",
-                intro: "Đặc điểm là liên quan tới miệng - nói thẳng, cứng rắn, nóng nảy. Tuy nhiên nếu được kết hợp hợp lý thì lại biết ăn nói, khẩu tài tốt. Năng lượng này phù hợp cho những người có công việc liên quan tới ăn nói.",
-                weak: "Nhược điểm: nóng nảy, dễ mất bình tĩnh, quản lý tài chính yếu. Sức khỏe dễ ứng các bệnh về khoang miệng, bạch huyết, khí quản, hệ hô hấp, lá lách và dạ dày"
-            },
-            "TM": {
-                name: "TUYỆT MỆNH",
-                intro: "Từ trường này có năng khiếu về đầu tư, kinh doanh. Người có từ trường này dũng cảm, đầu óc linh hoạt, có khả năng phán đoán nhạy bén. Làm việc liều, bốc đồng, tham vọng, quyết đoán và chấp nhận rủi ro.",
-                weak: "Nhược điểm: Quyết định mạnh bạo nên dễ chủ quan, thích đầu tư mạo hiểm nên cũng dễ bị mất tiền, có khả năng kiếm tiền nhưng tiêu nhanh. Tính cách, thích ở một mình, khả năng phối hợp kém và luôn tự cho mình là đúng. Dễ bị gan, thận, bài tiết, hệ tiết niệu"
-            },
-            "NQ": {
-                name: "NGŨ QUỶ",
-                intro: "Người có năng lượng này chủ yếu về trí tuệ và tâm linh. Thông minh, đa nghi, phản ứng nhanh và trí tuệ hơn người, nhiều ý tưởng. Thích học hỏi mọi thứ. Luôn tìm kiếm sự thay đổi, không đi theo lối mòn",
-                weak: "Nhược điểm: Dễ ghét người khác, không dễ tin người, nhiều ý đồ xấu, thay đổi thất thường, hay lo lắng, lo xa, bất an, kiếm tiền không minh bạch, kiếm tiền nhanh nhưng tiêu rất nhanh. Sức khỏe: Tim mạch, tuần hoàn máu, máu huyết và miễn dịch"
-            }
-        };
-
-        const QUE_DETAILS = {
-            "Thủy Lôi Truân": { type: "Hung", desc: "Nạn dã. GIAN LAO. Yếu đuối, chưa đủ sức, ngần ngại, do dự, vất vả, phải nhờ sự giúp đỡ. Tiền hung hậu kiết: Trước dữ sau lành" },
-            "Thủy Phong Tỉnh": { type: "Bình Hòa", desc: "Tịnh dã. TRẦM LẶNG. Ở chỗ nào cứ ở yên chỗ đó, xuống sâu, vực thẳm có nước, dưới sâu, cái giếng. Kiền Khôn sất phối: Trời Đất phối hợp lại" },
-            "Thuần Khảm": { type: "Bình Hòa", desc: "Hãm dã. HÃM HIỂM. Hãm vào ở trong, xuyên sâu vào trong, đóng cửa lại, gập ghềnh, trắc trở, bắt buộc, kềm hãm, thắng. Khổ tận cam lai: Tượng hết khổ mới đến sướng" },
-            "Thủy Sơn Kiển": { type: "Hung", desc: "Nạn dã.TRỞ NGẠI. Cản ngăn, chận lại, chậm chạp, què, khó khăn.Bất năng tiến giả: không năng đi" },
-            "Thủy Địa Tỷ": { type: "Cát", desc: "Tư dã. CHỌN LỌC. Thân liền, gạn lọc, mật thiết, tư hữu riêng, trưởng đoàn, trưởng toán, chọn lựa. Khứ xàm nhiệm hiền : Bỏ nịnh dụng trung" },
-            "Sơn Thiên Đại Súc": { type: "Cát", desc: "Tụ dã. TÍCH TỤ. Chứa tụ, súc tích, lắng tụ một chỗ, dự trữ, đựng, để dành. Đồng loại hoan hội : Đồng loại hội họp vui vẻ, cục bộ" },
-            "Sơn Trạch Tốn": { type: "Bình Hòa", desc: "TỔN HẠI. Hao mất, thua thiệt, bớt kém, bớt phần dưới cho phần trên là tổn hại. Phòng nhân ám toán: tượng đề phòng sự ngầm hại, hao tổn" },
-            "Sơn Hỏa Bí": { type: "Cát", desc: "Sức dã. QUANG MINH. Trang sức, sửa sang, trang điểm, thấu suốt, rõ ràng. Quang minh thông đạt: Quang minh, sáng sủa, thấu suốt" },
-            "Sơn Lôi Di": { type: "Cát Hanh", desc: "Dưỡng dã. DUNG DƯỠNG. Chăm lo, tu bổ, càng thêm, ăn uống, bổ dưỡng, bồi dưỡng, ví như trời nuôi muôn vật, thánh nhân nuôi người. Phi long nhập uyên: Rồng vào vực nghỉ ngơi" },
-            "Sơn Phong Cổ": { type: "Hung", desc: "Sự dã. SỰ BIẾN. Có sự không yên trong lòng, làm ngờ vực, khua, đánh, mua chuốc cái hại, đánh trống, làm cho sợ sệt, sửa lại cái lỗi trước đã làm. Âm hại tương liên: Điều hại cùng có liên hệ" },
-            "Sơn Thủy Mông": { type: "Hung", desc: "Muội dã. BẤT MINH. Tối tăm, mờ ám, không minh bạch, che lấp, bao trùm, phủ chụp, ngu dại, ngờ nghệch. Thiên võng tứ trương: Lưới trời giăng bốn mặt" },
-            "Thuần Cấn": { type: "Bình Hòa", desc: "Chỉ dã. NGƯNG NGHỈ. Ngăn giữ, ở, thôi, dừng lại, đậy lại, gói ghém, ngăn cấm, vừa đúng chỗ. Thủ cựu đãi thời: Giữ mức cũ đợi thời" },
-            "Sơn Địa Bác": { type: "Hung", desc: "Lạc dã. TIÊU ĐIỀU. Đẽo gọt, lột cướp đi, không có lợi, rụng rớt, đến rồi lại đi, tản lạc, lạt lẽo nhau, xa lìa nhau, hoang vắng, buồn thảm. Lục thân băng thán: Bà con thân thích xa lìa nhau" },
-            "Địa Thiên Thái": { type: "Cát", desc: "Thông dã. ĐIỀU HÒA. Thông hiểu, am tường, hiểu biết, thông suốt, quen biết, quen thuộc. Thiên địa hòa xướng: Trời đất giao hoà" },
-            "Địa Trạch Lâm": { type: "Bình Hòa", desc: "Đại dã. BAO QUẢN. Việc lớn, người lớn, cha nuôi, vú nuôi, giáo học, nhà sư, kẻ cả, dạy dân, nhà thầu" },
-            "Địa Hỏa Minh Di": { type: "Hung", desc: "Thương dã. HẠI ĐAU. Thương tích, bịnh hoạn, buồn lo, đau lòng, ánh sáng bị thương. Kinh cức mãn đồ: Gai góc đầy đường" },
-            "Địa Lôi Phục": { type: "Bình Hòa", desc: "Phản dã. TÁI HỒI. Lại có, trở về, bên ngoài, phản phục. Sơn ngoại thanh sơn: Tượng ngoài núi lại còn có núi" },
-            "Địa Phong Thăng": { type: "Cát", desc: "Tiến dã. TIẾN THỦ. Thăng tiến, trực chỉ, tiến mau, bay lên, vọt tới trước, bay lên không trung, thăng chức, thăng hà. Phù giao trực thượng: Chòi đạp để ngoi lên trên" },
-            "Địa Thủy Sư": { type: "Cát", desc: "Chúng dã. CHÚNG TRỢ. Đông chúng, vừa làm thầy, vừa làm bạn, học hỏi lẫn nhau, níu nắm nhau qua truông, nâng đỡ. Sĩ chúng ủng tòng: Chúng ủng hộ nhau" },
-            "Địa Sơn Khiêm": { type: "Cát", desc: "Thoái dã. CÁO THOÁI. Khiêm tốn, nhún nhường, khiêm từ, cáo thoái, từ giã, lui vào trong, giữ gìn, nhốt vào trong, bế cửa. Thượng hạ mông lung : Trên dưới hoang mang" },
-            "Thuần Khôn": { type: "Đại Cát", desc: "Nhu thuận dã. NHU THUẬN. Thuận tòng, mềm dẻo, theo đường mà được lợi, hòa theo lẽ, chịu lấy" },
-            "Thuần Càn": { type: "Đại Cát", desc: "Chính yếu dã. CHÍNH YẾU: Cứng mạnh, khô, lớn, khỏe mạnh, đức không nghỉ. Nguyên Hanh Lợi Trinh: Vạn vật có khởi đầu, lớn lên, toại chí, hóa thành Kiện dã" },
-            "Thiên Trạch Lý": { type: "Cát", desc: "Lễ dã. LỘ HÀNH. Nghi lễ, có chừng mực, khuôn phép, dẫm lên, không cho đi sai, có ý chặn đường sái quá, hệ thống, pháp lý. Hổ lang đang đạo: Hổ lang đón đường" },
-            "Thiên Hỏa Đồng Nhân": { type: "Cát", desc: "Thân dã. THÂN THIỆN. Trên dưới cùng lòng, cùng người ưa thích, cùng một bọn người. Hiệp lực đồng tâm: Cùng người hiệp lực" },
-            "Thiên Lôi Vô Vọng": { type: "Hung", desc: "Thiên tai dã. XÂM LẤN. Tai vạ, lỗi bậy bạ, không lề lối, không quy củ, càn đại, chống đối, hứng chịu. Cương tự ngoại lai: Kẻ mạnh từ ngoài đến" },
-            "Thiên Phong Cấu": { type: "Bình Hòa", desc: "Ngộ dã. TƯƠNG NGỘ. Gặp gỡ, cấu kết, liên kết, kết hợp, móc nối, mềm gặp cứng. Phong vân bất trắc: Gặp gỡ thình lình, ít khi" },
-            "Thiên Thủy Tụng": { type: "Hung", desc: "Luận dã. BẤT HÒA. Bàn cãi, kiện tụng, bàn tính, cãi vã, tranh luận, bàn luận. Đại tiểu bất hòa: lớn nhỏ không hòa" },
-            "Thiên Sơn Độn": { type: "Hung", desc: "Thoái dã. ẨN TRÁ. Lui, ẩn khuất, tránh đời, lừa dối, trá hình, có ý trốn tránh, trốn cái mặt đưa thấy cái lưng. Báo ẩn nam sơn: Con báo ẩn ở núi Nam" },
-            "Thiên Địa Bỉ": { type: "Hung", desc: "Tắc dã. GIÁN CÁCH. Bế tắc, không thông, không tương cảm nhau, xui xẻo, dèm pha, chê bai lẫn nhau, mạnh ai nấy theo ý riêng. Thượng hạ tiếm loạn: Trên dưới lôi thôi" },
-            "Trạch Thiên Quải": { type: "Hung", desc: "Quyết dã. DỨT KHOÁT. Dứt hết, biên cương, ranh giới, thành phần, thành khoảnh, quyết định, quyết nghị, cổ phần, thôi, khai lề lối. Ích chi cực tắc quyết: Lợi đã cùng ắt thôi" },
-            "Thuần Đoài": { type: "Cát", desc: "Duyệt dã. HIỆN ĐẸP. Đẹp đẽ, ưa thích, vui hiện trên mặt, không buồn chán, cười nói, khuyết mẻ. Hỉ dật mi tu : Tượng vui hiện trên mặt, khẩu khí" },
-            "Trạch Hỏa Cách": { type: "Cát", desc: "Cải dã. CẢI BIẾN. Bỏ lối cũ, cải cách, hoán cải, cách tuyệt, cánh chim thay lông. Thiên uyên huyền cách: Tượng vực trời xa thẳm" },
-            "Trạch Lôi Tùy": { type: "Bình Hòa", desc: "Thuận dã. DI ĐỘNG. Cùng theo, mặc lòng, không có chí hướng, chỉ chìu theo, đại thể chủ việc di động, thuyên chuyển như chiếc xe. Phản phúc bất định: Loại không ở yên một chỗ" },
-            "Trạch Phong Đại Quá": { type: "Cát", desc: "Họa dã. CẢ QUÁ. Cả quá ắt tai họa, quá mực thường, quá nhiều, giàu cương nghị ở trong. Nộn thảo kinh sương : Tượng cỏ non bị sương tuyết" },
-            "Trạch Thủy Khốn": { type: "Bình Hòa", desc: "Nguy dã, nguy lo. Cùng quẫn, bị người làm ác, lo lắng, cùng khổ, mệt mỏi, nguy cấp, lo hiểm nạn. Thủ kỷ đãi thời: Giữ mình đợi thời" },
-            "Trạch Sơn Hàm": { type: "Cát", desc: "Cảm dã. THỤ CẢM. Cảm xúc, thọ nhận, cảm ứng, nghĩ đến, nghe thấy, xúc động. Nam nữ giao cảm : Nam nữ có tình ý" },
-            "Trạch Địa Tụy": { type: "Cát", desc: "Tụ dã. TRƯNG TẬP. Nhóm họp, biểu tình, dồn đống, quần tụ nhau lại, kéo đến, kéo thành bầy. Long vân tế hội: Rồng mây giao hội" },
-            "Hỏa Thiên Đại Hữu": { type: "Đại Cát", desc: "Khoan dã. CẢ CÓ. Thong dong, dung dưỡng nhiều, độ lượng rộng, có đức dầy, chiếu sáng lớn. Kim ngọc mãn đường: Vàng bạc đầy nhà" },
-            "Hỏa Trạch Khuê": { type: "Hung", desc: "Quai dã. HỖ TRỢ. Trái lìa, lìa xa, hai bên lợi dụng lẫn nhau, cơ biến quai xảo, như cung tên. Hồ giả hổ oai: Con hồ nhờ oai con hổ" },
-            "Thuần Ly": { type: "Cát", desc: "Lệ dã. SÁNG CHÓI. Sáng sủa, trống trải, trống trơn, tỏa ra, bám vào, phụ bám, phô trương ra ngoài. Môn hộ bất ninh: Nhà cửa không yên" },
-            "Hỏa Lôi Phệ Hạp": { type: "Bình Hòa", desc: "Khiết dã. CẮN HỢP. Cẩu hợp, bấu vấu, bấu quào, dày xéo, đay nghiến, phỏng vấn, hỏi han. Ủy mị bất chấn: Yếu đuối không chạy được" },
-            "Hỏa Phong Đỉnh": { type: "Cát", desc: "Định dã. NUNG ĐÚC. Đứng được, cậm đứng, trồng, nung nấu, rèn luyện, vững chắc, ước hẹn. Luyện dược thành đơn: Luyện thuốc thành linh đơn" },
-            "Hỏa Thủy Vị Tế": { type: "Hung", desc: "Thất dã. THẤT CÁCH. Thất bác, mất, thất bại, dở dang, chưa xong, nửa chùng. Ưu trung vọng hỷ: Trong cái lo có cái mừng" },
-            "Hỏa Sơn Lữ": { type: "Bình Hòa", desc: "Khách dã. THỨ YẾU. Đỗ nhờ, khách, ở đậu, tạm trú, kê vào, gá vào, ký ngụ bên ngoài, tính cách lang thang, ít người thân, không chính. Ỷ nhân tác giá: Nhờ người mai mối" },
-            "Hỏa Địa Tấn": { type: "Cát", desc: "Tiến dã. HIỂN HIỆN. Đi hoặc tới, tiến tới gần, theo mực thường, lửa đã hiện trên đất, trưng bày. Long kiến trình tường: Rồng hiện điềm lành" },
-            "Lôi Thiên Đại Tráng": { type: "Cát", desc: "Chí dã. TỰ CƯỜNG. Ý riêng, bụng nghĩ, hướng. Có chí khí vươn lên, hướng thượng, ở trên cao, tự lớn mạnh, tự lập, tự cường, tự quyết, tự xây dựng. Phượng tập đăng sơn: Phượng đậu trên núi" },
-            "Lôi Trạch Quy Muội": { type: "Hung", desc: "Tai dã. XÔN XAO. Tai nạn, rối ren, lôi thôi, nữ chi chung, gái lấy chồng.Rối trí, loạn tâm thần, om sòm, nước mắt cá sấu, xen kẽ, lẫn lộn" },
-            "Lôi Hỏa Phong": { type: "Cát", desc: "Thịnh dã. HÒA MỸ. Thịnh đại, được mùa, nhiều người góp sức. Chí đồng đạo hợp: Cùng đồng tâm hiệp lực" },
-            "Thuần Chấn": { type: "Bình Hòa", desc: "Động dã. ĐỘNG DỤNG. Rung động, sợ hãi do chấn động, phấn phát, nổ vang, chấn khởi, chấn kinh. Trùng trùng chấn kinh: Khắp cùng dấy động" },
-            "Lôi Phong Hằng": { type: "Cát", desc: "Cửu dã. TRƯỜNG CỬU. Lâu dài, chậm chạp, đạo lâu bền như vợ chồng, kéo dài câu chuyện, thâm giao, nghĩa cố tri, xưa, cũ. Trường cửu chi nghĩa: Lâu bền như đạo nghĩa vợ chồng" },
-            "Lôi Thủy Giải": { type: "Cát", desc: "Tán dã. NƠI NƠI. Làm cho tan đi, như làm tan sự nguy hiểm, giải phóng, giải tán, loan truyền, tuyên truyền, phân phát, lưu thông, ban rải, ân xá. Lôi vũ tác giải: Sấm động mưa bay" },
-            "Lôi Sơn Tiểu Quá": { type: "Bình Hòa", desc: "Quá dã. BẤT TÚC. Thiểu lý, thiểu não, hèn mọn, nhỏ nhặt, bẩn thiểu, thiếu cường lực. Thượng hạ truân chuyên: Trên dưới gian nan, vất vả, buồn thảm" },
-            "Lôi Địa Dự": { type: "Cát", desc: "Duyệt dã. THUẬN ĐỘNG. Dự bị, dự phòng, canh chừng, sớm, vui vầy. Thượng hạ duyệt dịch: Trên dưới vui vẻ" },
-            "Phong Thiên Tiểu Súc": { type: "Bình Hòa", desc: "Tắc dã. DỊ ĐỒNG. Lúc bế tắc, không đồng ý nhau, cô quả, súc oán, chứa mội oán giận, có ý trái lại, không hòa hợp, nhỏ nhen. Cầm sắt bất điệu : Tiếng đờn không hòa điệu" },
-            "Phong Trạch Trung Phu": { type: "Cát", desc: "Tín dã. TRUNG THẬT. Tín thật, không ngờ vực, có uy tín cho người tin tưởng, tín ngưỡng, ở trong" },
-            "Phong Hỏa Gia Nhân": { type: "Cát", desc: "Đồng dã. NẨY NỞ. Người nhà, gia đinh, cùng gia đình, đồng chủng, đồng nghiệp, cùng xóm, sinh sôi, khai thác mở mang thêm. Khai hoa kết tử : Trổ bông sinh trái, nẩy mầm" },
-            "Phong Lôi Ích": { type: "Cát", desc: "Ích dã. TIẾN ÍCH. Thêm được lợi, giúp dùm, tiếng dội xa, vượt lên, phóng mình tới. Hồng hộc xung tiêu: Chim hồng, chim hộc bay qua mây mù" },
-            "Thuần Tốn": { type: "Bình Hòa", desc: "Thuận dã. THUẬN NHẬP. Theo lên theo xuống, theo tới theo lui, có sự giấu diếm ở trong. Âm dương thăng giáng: Khí âm dương lên xuống giao hợp" },
-            "Phong Thủy Hoán": { type: "Hung", desc: "Tán dã. LY TÁN. Lan ra tràn lan, tán thất, trốn đi xa, lánh xa, thất nhân tâm, hao hớt. Thủy ngộ phong tắc hoán tán: Nước gặp gió thì phải tan, phải chạy" },
-            "Phong Sơn Tiệm": { type: "Cát", desc: "Tiến dã. TUẦN TỰ. Từ từ, thong thả đến, lần lần, bò tới, chậm chạp, nhai nhỏ nuốt vào. Phúc lộc đồng lâm: Phúc lộc cùng đến" },
-            "Phong Địa Quán": { type: "Bình Hòa", desc: "Quan dã. QUAN SÁT. Xem xét, trông coi, cảnh tượng xem thấy, thanh tra, lướt qua, sơ qua, sơn phết, quét nhà. Vân bình tụ tán: Bèo mây tan hợp" },
-            "Thủy Thiên Nhu": { type: "Cát", desc: "Thuận dã. TƯƠNG HỘI. Chờ đợi vì hiểm đằng trườc, thuận theo, quây quầng, hội tụ, vui hội, cứu xét, chầu về. Quân tử hoan hội: Quân tử vui vẻ hội họp, ăn uống chờ thời" },
-            "Thủy Trạch Tiết": { type: "Cát", desc: "Chỉ dã. GIẢM CHẾ. Ngăn ngừa, tiết độ, kềm chế, giảm bớt, chừng mực, nhiều thì tràn. Trạch thượng hữu thủy: Trên đầm có nước" },
-            "Thủy Hỏa Ký Tế": { type: "Đại Cát", desc: "Hợp dã. HIỆN HỢP. Gặp nhau, cùng nhau, đã xong, việc xong, hiện thực, ích lợi nhỏ. Hanh tiểu giả: Việc nhỏ thì thành" }
-        };
+        let ELEMENT_INFO = {};
+        let STAR_DATA = {};
+        let STAR_COMBINATIONS = {};
+        let STAR_INFO = {};
+        let QUE_DETAILS = {};
 
         const STAR_COLORS = {
             "TY": "#2196f3", "SK": "#4caf50", "DN": "#ffc107", "PV": "#e91e63",
@@ -3219,10 +3105,6 @@
 
         // ======= FETCH DỮ LIỆU =======
         async function loadDataFromAPI() {
-            if (API_URL === "https://script.google.com/macros/s/AKfycbwiI-s8d9TRy37uicjcwiLPPQwR0eFrpYnwMVgXyRVsro-9oTP076YJZXNSzsnA99HA/exec") {
-                alert("Bạn chưa cấu hình link API_URL của Google Apps Script trong file HTML!");
-                return;
-            }
 
             const overlay = document.getElementById('loadingOverlay');
             overlay.classList.add('active');
@@ -3234,17 +3116,27 @@
 
                 const rawData = await res.json();
 
-                if (!Array.isArray(rawData)) {
-                    throw new Error(rawData.error || "Dữ liệu trả về không hợp lệ (không phải mảng)");
+                let simsArray = [];
+                if (Array.isArray(rawData)) {
+                    simsArray = rawData;
+                } else {
+                    simsArray = rawData.sims || [];
+                    // CẬP NHẬT DỮ LIỆU LUẬN GIẢI TỪ GOOGLE SHEET
+                    if (rawData.elements) ELEMENT_INFO = rawData.elements;
+                    if (rawData.starInfo) STAR_INFO = rawData.starInfo;
+                    if (rawData.combinations) STAR_COMBINATIONS = rawData.combinations;
+                    if (rawData.queDetails) QUE_DETAILS = rawData.queDetails;
+                    if (rawData.starData) STAR_DATA = rawData.starData;
                 }
 
-                FULL_DATA = rawData.map((item, index) => {
+                FULL_DATA = simsArray.map((item, index) => {
                     try {
+                        // Ánh xạ linh hoạt: Tìm tên cột tiếng Việt hoặc tên viết tắt n, sr, g, s
                         return {
-                            n: String(item.n || ""),
-                            sr: String(item.sr || ""),
-                            s: String(item.s || ""),
-                            g: Number(item.g || 0),
+                            n: String(item.n || item["mạng"] || ""),
+                            sr: String(item.sr || item["số"] || ""),
+                            s: String(item.s || item["số chấm"] || ""),
+                            g: Number(String(item.g || item["giá"] || 0).replace(/[^0-9]/g, '')),
                             vp0: item.vp0,
                             vp1: item.vp1,
                             vp2h: item.vp2h,
@@ -3272,7 +3164,7 @@
                             d: Number(item.d || 0),
                             a: Number(item.a || 0),
                             ys: Number(item.ys || 0),
-                            cHt: item.cHt,
+                            cHt: item.cht || item.cHt,
                             m: String(item.m || "").trim(),
                             qn: String(item.qn || "").trim(),
                             dh: String(item.dh || "")
@@ -3282,13 +3174,34 @@
                     }
                 }).filter(x => x !== null);
 
+                console.log("✅ Dữ liệu nạp thành công:", FULL_DATA.length, "SIM.");
+                console.log("📂 Dữ liệu luận giải (Tìm thấy):", {
+                    "Mệnh (ELEMENT_INFO)": Object.keys(ELEMENT_INFO).length,
+                    "Sao (STAR_INFO)": Object.keys(STAR_INFO).length,
+                    "Tổ hợp (STAR_COMBINATIONS)": Object.keys(STAR_COMBINATIONS).length,
+                    "Quẻ (QUE_DETAILS)": Object.keys(QUE_DETAILS).length
+                });
+
                 document.getElementById('stTotal').innerText = FULL_DATA.length.toLocaleString('vi-VN');
                 applyFilters();
 
             } catch (error) {
+                console.error("Lỗi parse dữ liệu API:", error);
                 alert("Lỗi tải dữ liệu: " + error.message);
             } finally {
                 overlay.classList.remove('active');
+            }
+        }
+
+        // HÀM HIỆN MODAL LUẬN GIẢI (ROBUST)
+        function toggleCombModal(show) {
+            const modal = document.getElementById('combinationModal');
+            if (!modal) return;
+            if (show) modal.classList.add('active');
+            else {
+                modal.classList.remove('active');
+                const titleEl = document.getElementById('combTitle');
+                if (titleEl) titleEl.style.color = '';
             }
         }
 
@@ -3673,11 +3586,15 @@
                     content = `<b>Sao ${STAR_NAME_MAP[stars[0]]}</b>${info?.intro || ""}<hr><span class="label">Nhược điểm:</span> ${info?.weak || "N/A"}`;
                 }
             } else if (type === 'que') {
-                const q = QUE_DETAILS[value];
-                if (q) {
-                    content = `<b>Quẻ ${value}</b><span class="tag-que type-${q.type.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/\s/g, "")}" style="margin: 0 0 8px 0">${q.type}</span><br>${q.desc}`;
+                const q = QUE_DETAILS[value] || {};
+                const qType = q.type || "Bình Hòa";
+                const qDesc = q.desc || "";
+
+                if (Object.keys(q).length > 0) {
+                    const safeType = (qType || "").toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/\s/g, "");
+                    content = `<b>Quẻ ${value}</b><span class="tag-que type-${safeType}" style="margin: 0 0 8px 0">${qType}</span><br>${qDesc}`;
                 } else {
-                    content = `<b>Quẻ ${value}</b>Chưa có mô tả chi tiết cho quẻ này.`;
+                    content = `<b>Quẻ ${value}</b>Chưa có mô tả chi tiết cho quẻ này trong Sheet.`;
                 }
             }
 
@@ -3970,6 +3887,7 @@
             // Reset searches
             if (document.getElementById('mainSearch')) document.getElementById('mainSearch').value = "";
             if (document.getElementById('searchSim')) document.getElementById('searchSim').value = "";
+            if (document.getElementById('excludeString')) document.getElementById('excludeString').value = "";
 
             // Reset header dropdowns
             if (document.getElementById('headerNet')) document.getElementById('headerNet').value = "";
@@ -3985,6 +3903,8 @@
 
             starComboFilter = null;
             excluded = [];
+            lastSearchedQuery = "";
+            syncSearchButtonState();
 
             updateUI(true);
             const dd = document.getElementById('activeFiltersDropdown');
@@ -4045,8 +3965,15 @@
             const hKC = document.getElementById('headerKeCuoi')?.value || "";
             const hC = document.getElementById('headerCuoi')?.value || "";
 
+            const exStrVal = document.getElementById('excludeString')?.value || "";
+            const manualExcludes = exStrVal.split(',').map(s => s.trim()).filter(s => s !== "");
+
             filteredData = FULL_DATA.filter(d => {
-                // == LỌC CÁT TINH NHANH (TỔ HỢP 2 CUỐI) ==
+                const srStr = String(d.sr);
+                // == FILTER: SỐ LOẠI TRỪ (CHIPS & TEXTBOX) ==
+                if (excluded.length && excluded.some(n => srStr.includes(String(n)))) return false;
+                if (manualExcludes.length && manualExcludes.some(n => srStr.includes(n))) return false;
+
                 // == LỌC CÁT TINH CHI TIẾT (HEADER & TAG) ==
                 const energy = getEnergyProgression(d.sr);
                 const eKC = energy.length >= 2 ? energy[energy.length - 2].type : (energy.length === 1 ? energy[0].type : "");
@@ -4060,12 +3987,6 @@
                 if (starComboFilter) {
                     let combo = energy.length >= 2 ? `${energy[energy.length - 2].type},${energy[energy.length - 1].type}` : (energy.length === 1 ? energy[0].type : "");
                     if (combo !== starComboFilter) return false;
-                }
-
-                // == FILTER: SỐ LOẠI TRỪ ==
-                if (excluded.length) {
-                    const srStr = String(d.sr);
-                    if (excluded.some(n => srStr.includes(String(n)))) return false;
                 }
 
 
@@ -4148,15 +4069,24 @@
 
                 // == FILTER: ĐỊNH DẠNG SỐ / CÁT TINH (*) ==
                 if (simQuery) {
-                    let targetField = d.sr; // Mặc định Tìm Số (Mode 1)
-                    if (sMode === "2") targetField = d.t2; // Chế độ 2: Tìm t2
-                    if (sMode === "3") targetField = d.t3; // Chế độ 3: Tìm t3
+                    let targetField = d.sr ? String(d.sr) : ""; 
+                    if (sMode === "2") targetField = d.t2 ? String(d.t2) : "";
+                    if (sMode === "3") targetField = d.t3 ? String(d.t3) : "";
 
                     if (!checkPatterns(simQuery, p => {
                         let pattern = p.trim();
-                        // Chỉ bỏ số 0 ở đầu nếu đang tìm Số (Mode 1)
-                        if (sMode === "1" && pattern.startsWith('0')) pattern = pattern.substring(1);
-                        return matchWildcard(pattern, String(targetField));
+                        // Chế độ 1: Tìm Số
+                        if (sMode === "1") {
+                            if (pattern.startsWith('0')) pattern = pattern.substring(1);
+                            return matchWildcard(pattern, targetField);
+                        } else {
+                            // Chế độ 2 & 3: Tìm Sao
+                            // Nếu người dùng không dùng *, tự hiểu là tìm kiếm "Chứa" (Contains)
+                            if (!pattern.includes('*')) {
+                                return targetField.toLowerCase().includes(pattern.toLowerCase());
+                            }
+                            return matchWildcard(pattern, targetField);
+                        }
                     })) return false;
                 }
 
@@ -4284,8 +4214,13 @@
                 }
             }
 
-            const q = QUE_DETAILS[d.queName] || { type: "Bình Hòa", desc: d.queDesc };
-            document.getElementById('d-que-name').innerHTML = `${d.queName} <span style="font-size: 13px; color: var(--primary); margin-left: 8px;">(Động hào: ${d.dh || 'N/A'})</span> <span class="tag-que type-${q.type.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/\s/g, "")}">${q.type}</span>`;
+            const q = QUE_DETAILS[d.queName] || {};
+            const qType = q.type || "Bình Hòa";
+            const qDesc = q.desc || d.queDesc || "";
+
+            const safeTypeClass = (qType || "").toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/\s/g, "");
+
+            document.getElementById('d-que-name').innerHTML = `${d.queName} <span style="font-size: 13px; color: var(--primary); margin-left: 8px;">(Động hào: ${d.dh || 'N/A'})</span> <span class="tag-que type-${safeTypeClass}">${qType}</span>`;
 
             // Hiển thị trạng thái Hung Tinh Cuối (cHt)
             const chtEl = document.getElementById('d-cht-status');
@@ -4299,7 +4234,7 @@
             }
 
             renderHexagram(d.queName);
-            document.getElementById('d-que-desc').innerText = q.desc;
+            document.getElementById('d-que-desc').innerText = qDesc || "Đang cập nhật nội dung quẻ...";
 
             // DRAW CHARTS
             try {
@@ -4337,13 +4272,13 @@
                 chart.getDatasetMeta(0).data.forEach((element, i) => {
                     const value = data.datasets[0].data[i];
                     if (value === 0) return;
-                    
+
                     const label = data.labels[i].includes('(') ? data.labels[i].split('(')[1].replace(')', '') : data.labels[i].split(' ')[0];
                     const percent = ((value / total) * 100).toFixed(0) + "%";
                     const displayText = label + " " + percent;
-                    
+
                     const { x, y } = element.tooltipPosition();
-                    
+
                     ctx.fillStyle = '#fff';
                     ctx.shadowColor = 'rgba(0,0,0,0.5)';
                     ctx.shadowBlur = 4;
@@ -4576,16 +4511,16 @@
                         ctx.save();
                         ctx.font = `bold ${fontSize}px Inter`;
                         ctx.textAlign = 'center';
-                        
+
                         chart.data.datasets[1].data.forEach((value, i) => {
                             const starType = energyData[i].type;
                             const xPos = x.getPixelForValue(i);
                             const yPos = y.getPixelForValue(value);
                             const yBase = y.getPixelForValue(0);
-                            
+
                             // Tính toán vị trí nhãn (giữa cột)
                             let labelY = (yPos + yBase) / 2 + (fontSize / 2);
-                            
+
                             // Nếu cột quá thấp (< 25px), đẩy nhãn lên trên đầu cột
                             if (Math.abs(yBase - yPos) < 25) {
                                 ctx.fillStyle = '#334155';
@@ -4595,7 +4530,7 @@
                                 ctx.shadowColor = 'rgba(0,0,0,0.3)';
                                 ctx.shadowBlur = 2;
                             }
-                            
+
                             ctx.fillText(starType, xPos, labelY);
                         });
                         ctx.restore();
@@ -4604,17 +4539,7 @@
             });
         }
 
-        function toggleCombModal(isShow) {
-            const modal = document.getElementById('combinationModal');
-            if (isShow) {
-                modal.classList.add('active');
-            } else {
-                modal.classList.remove('active');
-                // Reset title color
-                const titleEl = document.getElementById('combTitle');
-                if (titleEl) titleEl.style.color = '';
-            }
-        }
+        // toggleCombModal đã được định nghĩa ở trên (dòng 3210)
 
         function copyDetail() {
             const num = document.getElementById('d-num').innerText.replace(/\./g, '');
@@ -4658,15 +4583,15 @@
         function setSort(type) {
             currentSort = type;
 
-            // Update UI
-            document.querySelectorAll('.sort-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById('sort-' + type).classList.add('active');
+            // Đồng bộ dropdown
+            const sel = document.getElementById('headerSort');
+            if (sel) sel.value = type;
 
             // Logic Sort
             if (type === 'asc') {
-                filteredData.sort((a, b) => parseInt(a.g || 0) - parseInt(b.g || 0));
+                filteredData.sort((a, b) => Number(a.g || 0) - Number(b.g || 0));
             } else if (type === 'desc') {
-                filteredData.sort((a, b) => parseInt(b.g || 0) - parseInt(a.g || 0));
+                filteredData.sort((a, b) => Number(b.g || 0) - Number(a.g || 0));
             } else {
                 // Mặc định (Trở về đúng thứ tự ban đầu của bộ lọc)
                 applyFilters();
@@ -4674,7 +4599,6 @@
             }
 
             renderInitial();
-            toggleModal(false); // Đóng bộ lọc sau khi chọn sắp xếp
             syncQuickFilters();
         }
 
