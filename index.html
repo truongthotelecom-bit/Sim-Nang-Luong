@@ -2805,6 +2805,14 @@
                                 <input type="number" id="max_c_pv" placeholder="Max" onchange="updateUI()">
                             </div>
                         </div>
+                        <div class="tech-filter-item" style="border: 1px dashed var(--primary); border-radius: 8px; padding: 4px; background: rgba(211, 47, 47, 0.05);">
+                            <label style="color: var(--primary); font-weight: 800;">Tổng các cặp (C+H+P)</label>
+                            <div class="tech-filter-pair">
+                                <input type="number" id="min_c_total" placeholder="Min" onchange="updateUI()">
+                                <span>-</span>
+                                <input type="number" id="max_c_total" placeholder="Max" onchange="updateUI()">
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Nhóm 2: Lọc Tỉ lệ % MỚI -->
@@ -3754,11 +3762,12 @@
             });
 
             // 10. Thng s? k? thu?t (Min/Max)
-            const techFields = ['c_cat', 'c_hung', 'c_pv', 'ty', 'sk', 'dn', 'pb', 'ln', 'tl', 'hp', 'th'];
+            const techFields = ['c_cat', 'c_hung', 'c_pv', 'c_total', 'ty', 'sk', 'dn', 'pb', 'ln', 'tl', 'hp', 'th'];
             const techNameMap = {
-                c_cat: 'Ct liên ti?p', c_hung: 'Hung liên ti?p', c_pv: 'PV liên ti?p',
-                ty: 'Thiên Y', sk: 'Sinh Khí', dn: 'Diên Niên', pb: 'Ph?c V?',
-                ln: 'L?c Sát', tl: 'Tuy?t M?nh', hp: 'H?a H?i', th: 'th'
+                c_cat: 'Cát liên tiếp', c_hung: 'Hung liên tiếp', c_pv: 'PV liên tiếp',
+                c_total: 'Tổng các cặp',
+                ty: 'Thiên Y', sk: 'Sinh Khí', dn: 'Diên Niên', pb: 'Phục Vị',
+                ln: 'Lục Sát', tl: 'Tuyệt Mệnh', hp: 'Họa Hại', th: 'Ngũ Quỷ'
             };
             techFields.forEach(f => {
                 const min = document.getElementById(`min_${f}`)?.value;
@@ -3937,7 +3946,7 @@
             const yyCbs = Array.from(document.querySelectorAll('.am-duong-cb:checked')).map(cb => parseInt(cb.value));
 
             // Technical Filters (Min/Max)
-            const techFields = ['c_cat', 'c_hung', 'c_pv', 'ty', 'sk', 'dn', 'pb', 'ln', 'tl', 'hp', 'th'];
+            const techFields = ['c_cat', 'c_hung', 'c_pv', 'c_total', 'ty', 'sk', 'dn', 'pb', 'ln', 'tl', 'hp', 'th'];
             const techValues = {};
             techFields.forEach(f => {
                 const min = document.getElementById(`min_${f}`)?.value;
@@ -4012,7 +4021,12 @@
 
                 // == FILTER: THÔNG SỐ KỸ THUẬT (MIN/MAX) ==
                 for (let f of techFields) {
-                    const val = parseFloat(d[f] || 0);
+                    let val = 0;
+                    if (f === 'c_total') {
+                        val = parseFloat(d.c_cat || 0) + parseFloat(d.c_hung || 0) + parseFloat(d.c_pv || 0);
+                    } else {
+                        val = parseFloat(d[f] || 0);
+                    }
                     if (val < techValues[f].min || val > techValues[f].max) return false;
                 }
 
