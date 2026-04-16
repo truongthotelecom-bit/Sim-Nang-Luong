@@ -3373,9 +3373,11 @@
 
             const stCountTag = document.getElementById('stCount');
             if (stCountTag) {
-                stCountTag.innerText = currentRenderCount.toLocaleString('vi-VN');
+                // Đổi hiển thị từ "số đang vẽ" sang "tổng số khớp bộ lọc" theo yêu cầu
+                stCountTag.innerText = filteredData.length.toLocaleString('vi-VN');
             }
         }
+
 
         const observer = new IntersectionObserver((entries) => {
             if (entries[0].isIntersecting) {
@@ -4010,14 +4012,18 @@
             syncQuickFilters();
             renderFilterChips();
 
-            // Cập nhật số lượng tổng
+            // Cập nhật số lượng tổng trong kho (stTotal)
             if (document.getElementById('stTotal')) {
-                document.getElementById('stTotal').innerText = filteredData.length.toLocaleString('vi-VN');
+                document.getElementById('stTotal').innerText = FULL_DATA.length.toLocaleString('vi-VN');
             }
-            // Reset label đếm hiện tại (Đang xem 0 / Total)
+            
+            // Cập nhật số lượng khớp bộ lọc (stCount)
             const stCountTag = document.getElementById('stCount');
-            if (stCountTag) stCountTag.innerText = "0";
+            if (stCountTag) {
+                stCountTag.innerText = filteredData.length.toLocaleString('vi-VN');
+            }
         }
+
 
         function removeSingleFilter(type, value) {
             if (type === 'main') document.getElementById('mainSearch').value = "";
@@ -4318,12 +4324,14 @@
             if (isSelectionMode) {
                 fab.querySelector('span').innerText = "Hủy chọn";
                 fab.style.background = "#e53e3e";
+                updateCounter(); // Đồng bộ số lượng ngay khi mở
             } else {
                 fab.querySelector('span').innerText = "Chọn SIM";
                 fab.style.background = "#1a202c";
-                toggleSelectAll(false); // Reset when exit
+                selectAllFiltered(false); // Sửa lỗi ReferenceError tại đây
             }
         }
+
 
         function toggleSimSelect(cb) {
             if (cb.checked) selectedSims.add(cb.value);
@@ -4821,20 +4829,16 @@
             if (selectedSims.size === 0) return;
 
             let results = [];
-
             selectedSims.forEach(srVal => {
-                // Tìm chi tiết SIM trong data gốc thông qua sr
                 const obj = FULL_DATA.find(d => String(d.sr) === String(srVal));
                 if (!obj) {
-                    results.push(srVal); // Fallback
+                    results.push(srVal);
                     return;
                 }
-
-                const numFmt = obj.s || obj.sr; // Số đẹp có chấm
+                const numFmt = obj.s || obj.sr;
                 const price = formatPriceDynamic(parseInt(obj.g || 0));
                 const menh = (obj.m && obj.m.trim() !== "") ? ("Mệnh " + obj.m) : "";
 
-                // Tính nhóm Cát Tinh
                 const vTY = parseInt(obj.ty || 0);
                 const vSK = parseInt(obj.sk || 0);
                 const vDN = parseInt(obj.dn || 0);
@@ -4844,11 +4848,9 @@
                 const pDN = 100 - pTY - pSK;
                 const ctFmt = `TY:${pTY}% SK:${pSK}% DN:${pDN}%`;
 
-                if (formatType === 1) {
-                    results.push(`${numFmt}`);
-                } else if (formatType === 2) {
-                    results.push(`${numFmt} - ${price}`);
-                } else if (formatType === 3) {
+                if (formatType === 1) results.push(`${numFmt}`);
+                else if (formatType === 2) results.push(`${numFmt} - ${price}`);
+                else if (formatType === 3) {
                     const tail = menh ? ` - ${menh}` : '';
                     results.push(`${numFmt} - ${price}${tail}`);
                 } else if (formatType === 4) {
@@ -4858,10 +4860,32 @@
             });
 
             const textToCopy = results.join('\n');
-            navigator.clipboard.writeText(textToCopy).then(() => {
+            
+            // Hàm xử lý copy hiện đại + dự phòng (Robust Copy)
+            const doCopy = (text) => {
+                if (navigator.clipboard && window.isSecureContext) {
+                    return navigator.clipboard.writeText(text);
+                } else {
+                    // Fallback using textarea
+                    const textArea = document.createElement("textarea");
+                    textArea.value = text;
+                    textArea.style.position = "fixed";
+                    textArea.style.left = "-9999px";
+                    textArea.style.top = "0";
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    return new Promise((res, rej) => {
+                        document.execCommand('copy') ? res() : rej();
+                        textArea.remove();
+                    });
+                }
+            };
+
+            doCopy(textToCopy).then(() => {
                 alert(`Đã copy ${selectedSims.size} số (Kèm thông tin) lưu vào bộ nhớ tạm!`);
                 toggleCopyModal(false);
-                toggleSelectionMode(); // Thoát chế độ chọn
+                toggleSelectionMode(); 
                 selectedSims.clear();
                 updateCounter();
             }).catch(err => {
@@ -4869,6 +4893,7 @@
                 console.error(err);
             });
         }
+
 
         function init() {
             const exG = document.getElementById('exGrid');
