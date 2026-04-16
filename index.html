@@ -2749,8 +2749,19 @@
             </div>
 
             <div class="modal-body">
+                <!-- ĐẦU SỐ (MỚI) -->
+                <h3 style="margin-top: 0;">Đầu Số</h3>
+                <div class="chip-group">
+                    <label class="chip-label"><input type="checkbox" class="prefix-cb" value="09" onchange="updateUI()"><span class="chip-text">Đầu 09</span></label>
+                    <label class="chip-label"><input type="checkbox" class="prefix-cb" value="08" onchange="updateUI()"><span class="chip-text">Đầu 08</span></label>
+                    <label class="chip-label"><input type="checkbox" class="prefix-cb" value="07" onchange="updateUI()"><span class="chip-text">Đầu 07</span></label>
+                    <label class="chip-label"><input type="checkbox" class="prefix-cb" value="05" onchange="updateUI()"><span class="chip-text">Đầu 05</span></label>
+                    <label class="chip-label"><input type="checkbox" class="prefix-cb" value="03" onchange="updateUI()"><span class="chip-text">Đầu 03</span></label>
+                </div>
+
                 <!-- NHÀ MẠNG -->
-                <h3 style="margin-top: 0;">Nhà Mạng</h3>
+                <h3 style="margin-top: 20px;">Nhà Mạng</h3>
+
                 <div class="chip-group">
                     <label class="chip-label"><input type="checkbox" class="net-cb" value="Viettel" onchange="updateUI()"><span class="chip-text">Viettel</span></label>
                     <label class="chip-label"><input type="checkbox" class="net-cb" value="Mobi" onchange="updateUI()"><span class="chip-text">Mobifone</span></label>
@@ -3878,7 +3889,13 @@
                 chips.push({ type: 'net', label: net, value: net });
             });
 
+            // 2. Đầu số
+            document.querySelectorAll('.prefix-cb:checked').forEach(cb => {
+                chips.push({ type: 'prefix', label: `Đầu số: ${cb.value}`, value: cb.value });
+            });
+
             // 3. Mệnh
+
             document.querySelectorAll('.menh-cb:checked').forEach(cb => {
                 chips.push({ type: 'menh', label: `Mệnh: ${cb.value}`, value: cb.value });
             });
@@ -4027,7 +4044,11 @@
 
         function removeSingleFilter(type, value) {
             if (type === 'main') document.getElementById('mainSearch').value = "";
+            if (type === 'prefix') {
+                document.querySelectorAll('.prefix-cb').forEach(cb => { if (cb.value === value) cb.checked = false; });
+            }
             if (type === 'net_h') document.getElementById('headerNet').value = "";
+
             if (type === 'net') {
                 document.querySelectorAll('.net-cb').forEach(cb => { if (cb.value === value) cb.checked = false; });
             }
@@ -4120,7 +4141,11 @@
             // Tránh hung tinh
             const hungCbs = Array.from(document.querySelectorAll('.hung-cb:checked')).map(cb => cb.value);
 
+            // Đầu số (MỚI)
+            const prefixCbs = Array.from(document.querySelectorAll('.prefix-cb:checked')).map(cb => cb.value);
+
             // Mệnh, Nhà Mạng, Âm Dương
+
             const menhCbs = Array.from(document.querySelectorAll('.menh-cb:checked')).map(cb => cleanMenh(cb.value));
             const netCbs = Array.from(document.querySelectorAll('.net-cb:checked')).map(cb => cleanVN(cb.value));
             const yyCbs = Array.from(document.querySelectorAll('.am-duong-cb:checked')).map(cb => parseInt(cb.value));
@@ -4163,7 +4188,19 @@
                 if (excluded.length && excluded.some(n => srStr.includes(String(n)))) return false;
                 if (manualExcludes.length && manualExcludes.some(n => srStr.includes(n))) return false;
 
+                // == FILTER: ĐẦU SỐ (MỚI - ĐÃ SỬA LOGIC KHỚP 09 VÀ 9) ==
+                if (prefixCbs.length > 0) {
+                    const matchPrefix = prefixCbs.some(pref => {
+                        // Trường hợp 09* hoặc 9* (nếu pref là 09)
+                        const altPref = pref.startsWith('0') ? pref.substring(1) : pref;
+                        return srStr.startsWith(pref) || srStr.startsWith(altPref);
+                    });
+                    if (!matchPrefix) return false;
+                }
+
+
                 // == LỌC CÁT TINH CHI TIẾT (HEADER & TAG) ==
+
                 const energy = getEnergyProgression(d.sr);
                 const eKC = energy.length >= 2 ? energy[energy.length - 2].type : (energy.length === 1 ? energy[0].type : "");
                 const eC = energy.length >= 1 ? energy[energy.length - 1].type : "";
