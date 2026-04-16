@@ -667,8 +667,53 @@
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
 
+        /* PRICE FILTER DROPDOWN MENU */
+        .price-filter-menu {
+            display: none;
+            position: absolute;
+            top: 55px;
+            left: 150px; /* Sẽ được điều chỉnh bằng JS nếu cần */
+            background: white;
+            min-width: 280px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+            z-index: 10001;
+            padding: 20px;
+            animation: menuFadeIn 0.2s ease-out;
+            border: 1px solid var(--border);
+        }
+
+        .price-filter-menu.active {
+            display: block;
+        }
+
+        .price-menu-title {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--primary);
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            display: block;
+            border-bottom: 1px solid #f1f5f9;
+            padding-bottom: 5px;
+        }
+
+        .price-menu-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .price-menu-custom {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed var(--border);
+        }
+
         /* TOAST NOTIFICATION */
         #toast {
+
             position: fixed;
             bottom: 30px;
             left: 50%;
@@ -2430,6 +2475,48 @@
                 <option value="desc">Giá cao ↓</option>
             </select>
 
+            <!-- NÚT MỞ MENU GIÁ -->
+            <button class="quick-select" id="priceFilterBtn" onclick="togglePriceMenu()" style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                <span>Khoảng giá</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <path d="M6 9l6 6 6-6"></path>
+                </svg>
+            </button>
+
+            <!-- MENU LỌC GIÁ DROP DOWN -->
+            <div id="priceFilterMenu" class="price-filter-menu">
+                <span class="price-menu-title">Chọn Khoảng Giá</span>
+                <div class="price-menu-grid">
+                    <label class="chip-label">
+                        <input type="checkbox" class="price-cb" value="Dưới 1tr" onchange="updateUI()">
+                        <span class="chip-text" style="font-size: 12px; padding: 10px 5px;">Dưới 1Tr</span>
+                    </label>
+                    <label class="chip-label">
+                        <input type="checkbox" class="price-cb" value="1-5tr" onchange="updateUI()">
+                        <span class="chip-text" style="font-size: 12px; padding: 10px 5px;">1 - 5Tr</span>
+                    </label>
+                    <label class="chip-label">
+                        <input type="checkbox" class="price-cb" value="5-10tr" onchange="updateUI()">
+                        <span class="chip-text" style="font-size: 12px; padding: 10px 5px;">5 - 10Tr</span>
+                    </label>
+                    <label class="chip-label">
+                        <input type="checkbox" class="price-cb" value="Trên 10tr" onchange="updateUI()">
+                        <span class="chip-text" style="font-size: 12px; padding: 10px 5px;">Trên 10Tr</span>
+                    </label>
+                </div>
+
+                <div class="price-menu-custom">
+                    <span class="price-menu-title" style="color: var(--text-main); font-size: 11px;">Nhập giá tùy chỉnh (VNĐ)</span>
+                    <div class="price-input-row" style="margin-top: 5px; border-top: none; padding-top: 0; grid-template-columns: 1fr 15px 1fr;">
+                        <input type="number" id="hPriceMin" class="input-text price-min-input" placeholder="Min" oninput="syncCustomPrice(this)" style="padding: 10px 5px; text-align: center;">
+                        <div class="price-dash" style="margin: 0; display: flex; align-items: center; justify-content: center;">-</div>
+                        <input type="number" id="hPriceMax" class="input-text price-max-input" placeholder="Max" oninput="syncCustomPrice(this)" style="padding: 10px 5px; text-align: center;">
+                    </div>
+                    <button class="btn-main" onclick="executePriceSearch()" style="margin-top: 15px; padding: 12px; font-size: 13px;">ÁP DỤNG</button>
+                </div>
+            </div>
+
+            <div id="priceMenuOverlay" class="search-mode-overlay" onclick="togglePriceMenu(false)"></div>
             <select class="quick-select" id="headerNet" onchange="updateUI()">
                 <option value="">Tất cả mạng</option>
                 <option value="Viettel">Viettel</option>
@@ -2520,13 +2607,14 @@
                 <div class="price-input-row" style="margin-top:0; border-top:none; padding-top:0;">
                     <div class="price-input-group">
                         <span>Tối thiểu</span>
-                        <input type="number" id="priceMin" class="input-text" placeholder="Min" onchange="updateUI()">
+                        <input type="number" id="sidePriceMin" class="input-text price-min-input" placeholder="Min" oninput="syncCustomPrice(this)" onchange="updateUI()">
                     </div>
                     <div class="price-dash" style="margin-top:15px;">-</div>
                     <div class="price-input-group">
                         <span>Tối đa</span>
-                        <input type="number" id="priceMax" class="input-text" placeholder="Max" onchange="updateUI()">
+                        <input type="number" id="sidePriceMax" class="input-text price-max-input" placeholder="Max" oninput="syncCustomPrice(this)" onchange="updateUI()">
                     </div>
+
                 </div>
                 <p style="font-size: 10px; color: var(--text-muted); margin-top: 10px; font-style: italic;">
                     (Nhập số tiền chính xác để lọc)
@@ -2661,6 +2749,54 @@
             </div>
 
             <div class="modal-body">
+                <!-- NHÀ MẠNG -->
+                <h3 style="margin-top: 0;">Nhà Mạng</h3>
+                <div class="chip-group">
+                    <label class="chip-label"><input type="checkbox" class="net-cb" value="Viettel" onchange="updateUI()"><span class="chip-text">Viettel</span></label>
+                    <label class="chip-label"><input type="checkbox" class="net-cb" value="Mobi" onchange="updateUI()"><span class="chip-text">Mobifone</span></label>
+                    <label class="chip-label"><input type="checkbox" class="net-cb" value="Vina" onchange="updateUI()"><span class="chip-text">Vinaphone</span></label>
+                    <label class="chip-label"><input type="checkbox" class="net-cb" value="Vietnamobile" onchange="updateUI()"><span class="chip-text">Vietnamobile</span></label>
+                    <label class="chip-label"><input type="checkbox" class="net-cb" value="Itel" onchange="updateUI()"><span class="chip-text">Itel</span></label>
+                    <label class="chip-label"><input type="checkbox" class="net-cb" value="Wintel" onchange="updateUI()"><span class="chip-text">Wintel</span></label>
+                </div>
+
+                <!-- KHOẢNG GIÁ PHỔ BIẾN -->
+                <h3>Khoảng Giá Phổ Biến</h3>
+                <div class="chip-group">
+                    <label class="chip-label">
+                        <input type="checkbox" class="price-cb" value="Dưới 1tr" onchange="updateUI()">
+                        <span class="chip-text">Dưới 1 triệu</span>
+                    </label>
+                    <label class="chip-label">
+                        <input type="checkbox" class="price-cb" value="1-5tr" onchange="updateUI()">
+                        <span class="chip-text">1 - 5 triệu</span>
+                    </label>
+                    <label class="chip-label">
+                        <input type="checkbox" class="price-cb" value="5-10tr" onchange="updateUI()">
+                        <span class="chip-text">5 - 10 triệu</span>
+                    </label>
+                    <label class="chip-label">
+                        <input type="checkbox" class="price-cb" value="Trên 10tr" onchange="updateUI()">
+                        <span class="chip-text">Trên 10 triệu</span>
+                    </label>
+                </div>
+
+                <!-- KHOẢNG GIÁ TÙY CHỈNH (MỚI THÊM) -->
+                <h4>Khoảng Giá Tùy Chỉnh (Min - Max)</h4>
+                <div class="price-input-row" style="margin-top: 5px; border-top: none; padding-top: 0; grid-template-columns: 1fr 20px 1fr; background: #f8fafc; padding: 15px; border-radius: 12px; border: 1px solid var(--border);">
+                    <div class="price-input-group">
+                        <span style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Từ (VNĐ)</span>
+                        <input type="number" id="modalPriceMin" class="input-text price-min-input" placeholder="Ví dụ: 500000" oninput="syncCustomPrice(this)" onchange="updateUI()">
+                    </div>
+                    <div class="price-dash" style="margin-top: 20px; font-weight: bold; color: var(--text-muted); text-align: center;">-</div>
+                    <div class="price-input-group">
+                        <span style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Đến (VNĐ)</span>
+                        <input type="number" id="modalPriceMax" class="input-text price-max-input" placeholder="Ví dụ: 5000000" oninput="syncCustomPrice(this)" onchange="updateUI()">
+                    </div>
+                </div>
+
+
+
 
                 <!-- MỆNH -->
                 <h3>Ngũ Hành (Mệnh)</h3>
@@ -3482,8 +3618,22 @@
 
 
         function syncQuickFilters() {
-            // 1. Đồng bộ Nhà mạng & Tính toán số lượng từng mạng
+            // 1. Đồng bộ Checkbox cùng loại (Giá, Mạng) giữa Modal và Sidebar/Header
+            const priceCbs = document.querySelectorAll('.price-cb');
+            const checkedPrices = Array.from(priceCbs).filter(cb => cb.checked).map(cb => cb.value);
+            priceCbs.forEach(cb => {
+                if (checkedPrices.includes(cb.value)) cb.checked = true;
+            });
+
+            const netCbs = document.querySelectorAll('.net-cb');
+            const checkedNets = Array.from(netCbs).filter(cb => cb.checked).map(cb => cb.value);
+            netCbs.forEach(cb => {
+                if (checkedNets.includes(cb.value)) cb.checked = true;
+            });
+
+            // 1. Đồng bộ Nhà mạng & Tính toán số lượng từng mạng (Tiếp tục logic cũ)
             const netChecked = Array.from(document.querySelectorAll('.net-cb:checked')).map(cb => cb.value.toLowerCase().trim());
+
 
             // Đếm số lượng SIM cho từng mạng dựa trên FULL_DATA
             const netCounts = {};
@@ -3717,9 +3867,13 @@
 
             // 2. Nhà mạng
             const hNet = document.getElementById('headerNet')?.value;
-            if (hNet) chips.push({ type: 'net_h', label: hNet, value: hNet });
+            const uniqueNets = new Set();
+            if (hNet) uniqueNets.add(hNet.trim());
             document.querySelectorAll('.net-cb:checked').forEach(cb => {
-                chips.push({ type: 'net', label: cb.value, value: cb.value });
+                uniqueNets.add(cb.value.trim());
+            });
+            uniqueNets.forEach(net => {
+                chips.push({ type: 'net', label: net, value: net });
             });
 
             // 3. Mệnh
@@ -3733,9 +3887,22 @@
             });
 
             // 5. Khoảng giá
+            // Checkboxes
+            const uniquePriceCbs = new Set();
             document.querySelectorAll('.price-cb:checked').forEach(cb => {
-                chips.push({ type: 'priceCb', label: `Giá: ${cb.value}`, value: cb.value });
+                if (!uniquePriceCbs.has(cb.value)) {
+                    uniquePriceCbs.add(cb.value);
+                    chips.push({ type: 'priceCb', label: `Giá: ${cb.value}`, value: cb.value });
+                }
             });
+            // Custom Inputs (Min/Max)
+            const pMinVal = document.querySelector('.price-min-input')?.value;
+            const pMaxVal = document.querySelector('.price-max-input')?.value;
+            if (pMinVal || pMaxVal) {
+                const label = `Giá: ${pMinVal || 0} - ${pMaxVal || '∞'}`;
+                chips.push({ type: 'priceCustom', label: label });
+            }
+
 
             // 6. Âm Dương
             document.querySelectorAll('.am-duong-cb:checked').forEach(cb => {
@@ -3867,7 +4034,11 @@
             if (type === 'priceCb') {
                 document.querySelectorAll('.price-cb').forEach(cb => { if (cb.value === value) cb.checked = false; });
             }
+            if (type === 'priceCustom') {
+                document.querySelectorAll('.price-min-input, .price-max-input').forEach(i => i.value = "");
+            }
             if (type === 'yy') {
+
                 document.querySelectorAll('.am-duong-cb').forEach(cb => { if (cb.value === value) cb.checked = false; });
             }
             if (type === 'kc') document.getElementById('headerKeCuoi').value = "";
@@ -3908,7 +4079,8 @@
             document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
 
             // Reset các ô nhập số kỹ thuật, giá, tỉ lệ...
-            document.querySelectorAll('.points-grid input, .price-range input, .percent-grid input, .tech-filter-grid input').forEach(i => i.value = "");
+            document.querySelectorAll('.points-grid input, .price-range input, .percent-grid input, .tech-filter-grid input, .price-min-input, .price-max-input').forEach(i => i.value = "");
+
 
             starComboFilter = null;
             excluded = [];
@@ -3929,10 +4101,12 @@
 
             // Khoảng giá
             const priceCbs = Array.from(document.querySelectorAll('.price-cb:checked')).map(cb => cb.value);
-            const inputMin = document.getElementById('priceMin') ? document.getElementById('priceMin').value : '';
-            const inputMax = document.getElementById('priceMax') ? document.getElementById('priceMax').value : '';
+            // Lấy giá trị từ các ô nhập (đã được đồng bộ qua class)
+            const inputMin = document.querySelector('.price-min-input')?.value || '';
+            const inputMax = document.querySelector('.price-max-input')?.value || '';
             const pMin = inputMin !== '' ? parseInt(inputMin) : 0;
             const pMax = inputMax !== '' ? parseInt(inputMax) : Infinity;
+
 
             // Quẻ Dịch - Matching log: chuẩn hóa mạnh hơn để khớp tuyệt đối
             const queCbs = Array.from(document.querySelectorAll('.q-cb:checked')).map(cb => cleanVN(cb.value));
@@ -4003,7 +4177,7 @@
                 // == FILTER: GIÁ TIỀN ==
                 const simPrice = parseInt(d.g || 0);
 
-                // Checkbox giá
+                // Checkbox giá (bao gồm cả modal và header)
                 if (priceCbs.length > 0) {
                     let matchPriceCb = false;
                     for (let p of priceCbs) {
@@ -4011,13 +4185,15 @@
                         if (p === "1-5tr" && simPrice >= 1000000 && simPrice <= 5000000) matchPriceCb = true;
                         if (p === "5-10tr" && simPrice > 5000000 && simPrice <= 10000000) matchPriceCb = true;
                         if (p === "Trên 10tr" && simPrice > 10000000) matchPriceCb = true;
-                        if (p === "Khác") matchPriceCb = true;
+                        // Nếu chọn "Khác", nó sẽ được xử lý bởi phần pMin/pMax bên dưới
+                        if (p === "Khác") matchPriceCb = true; 
                     }
                     if (!matchPriceCb) return false;
                 }
 
-                // Min/Max giá
+                // Min/Max giá (Nếu không nhập gì thì pMin=0, pMax=Infinity)
                 if (simPrice < pMin || simPrice > pMax) return false;
+
 
                 // == FILTER: THÔNG SỐ KỸ THUẬT (MIN/MAX) ==
                 for (let f of techFields) {
@@ -4054,13 +4230,21 @@
                 if (p3v8 < pctValues['pct_3v8'].min || p3v8 > pctValues['pct_3v8'].max) return false;
 
                 // == FILTER: NHÀ MẠNG ==
+                // Ưu tiên OR logic: Nếu khớp bất kỳ mạng nào trong checkbox HOẶC header select
                 if (hNet || netCbs.length > 0) {
                     const simNet = cleanVN(d.n || "");
                     const matchH = hNet ? simNet.includes(cleanVN(hNet)) : false;
                     const matchCb = netCbs.length > 0 ? netCbs.some(net => simNet.includes(net)) : false;
-                    if (hNet && !matchH) return false; // Nếu chọn headerNet thì phải khớp
-                    if (netCbs.length > 0 && !matchCb) return false; // Nếu chọn checkbox thì phải khớp (OR logic trong checkbox)
+                    
+                    // Nếu dùng cả 2, ta coi là thỏa mãn nếu khớp MỘT TRONG HAI (OR) hoặc đồng bộ
+                    if (hNet && netCbs.length > 0) {
+                         if (!matchH && !matchCb) return false;
+                    } else {
+                         if (hNet && !matchH) return false;
+                         if (netCbs.length > 0 && !matchCb) return false;
+                    }
                 }
+
 
                 // == FILTER: MỆNH ==
                 if (menhCbs.length > 0) {
@@ -4931,8 +5115,48 @@
             }, 2500);
         }
 
+        function togglePriceMenu(forceClose = null) {
+            const menu = document.getElementById('priceFilterMenu');
+            const overlay = document.getElementById('priceMenuOverlay');
+            const btn = document.getElementById('priceFilterBtn');
+            if (!menu || !overlay) return;
+
+            const isShow = forceClose !== null ? forceClose : !menu.classList.contains('active');
+
+            if (isShow) {
+                // Định vị menu bên dưới nút bấm
+                const rect = btn.getBoundingClientRect();
+                menu.style.left = Math.min(rect.left, window.innerWidth - 300) + 'px';
+                menu.style.top = (rect.bottom + 5) + 'px';
+                
+                menu.classList.add('active');
+                overlay.classList.add('active');
+            } else {
+                menu.classList.remove('active');
+                overlay.classList.remove('active');
+            }
+        }
+
+        function syncCustomPrice(el) {
+            const val = el.value;
+            const isMin = el.classList.contains('price-min-input');
+            const targetClass = isMin ? '.price-min-input' : '.price-max-input';
+            
+            // Cập nhật tất cả các ô nhập cùng loại
+            document.querySelectorAll(targetClass).forEach(input => {
+                if (input !== el) input.value = val;
+            });
+        }
+
+
+        function executePriceSearch() {
+            togglePriceMenu(false);
+            updateUI();
+        }
+
         // Initialize things
         window.onload = function () {
+
             init();
             observer.observe(document.getElementById('loadMoreTrigger'));
             loadDataFromAPI();
