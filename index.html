@@ -2918,6 +2918,17 @@
                 </div>
                 <div class="que-scroll chip-group" id="queBox"></div>
 
+                <!-- ĐỘNG HÀO -->
+                <h3 style="margin-top: 20px;">Lọc theo Động Hào</h3>
+                <div class="chip-group">
+                    <label class="chip-label"><input type="checkbox" class="dong-hao-cb" value="1" onchange="updateUI()"><span class="chip-text">Hào 1</span></label>
+                    <label class="chip-label"><input type="checkbox" class="dong-hao-cb" value="2" onchange="updateUI()"><span class="chip-text">Hào 2</span></label>
+                    <label class="chip-label"><input type="checkbox" class="dong-hao-cb" value="3" onchange="updateUI()"><span class="chip-text">Hào 3</span></label>
+                    <label class="chip-label"><input type="checkbox" class="dong-hao-cb" value="4" onchange="updateUI()"><span class="chip-text">Hào 4</span></label>
+                    <label class="chip-label"><input type="checkbox" class="dong-hao-cb" value="5" onchange="updateUI()"><span class="chip-text">Hào 5</span></label>
+                    <label class="chip-label"><input type="checkbox" class="dong-hao-cb" value="6" onchange="updateUI()"><span class="chip-text">Hào 6</span></label>
+                </div>
+
                 <!-- THÔNG SỐ KỸ THUẬT CHUYÊN SÂU (CHIA 3 NHÓM) -->
                 <div style="margin-top: 25px; border-top: 1px dashed var(--border); padding-top: 20px;">
                     <h3 style="margin-bottom: 5px;">Thông số kỹ thuật Nâng cao</h3>
@@ -3522,6 +3533,7 @@
                     <div class="tag-row">Mệnh: <span class="tag-menh ${menhClass}" data-type="menh" data-clean="${cleanMenhVal}" data-orig="${d.m}" onmouseenter="showTagTooltip(event, 'menh', '${d.m}')" onmouseleave="hideTagTooltip()">${d.m}</span></div>
                     <div class="tag-row">Cát Tinh: <span class="tag-cat-tinh" data-type="stars" data-clean="${last2Keys}" data-orig="${last2Stars}" onmouseenter="showTagTooltip(event, 'stars', '${last2Keys}')" onmouseleave="hideTagTooltip()">${last2Stars}</span></div>
                     <div class="tag-row">Quẻ: <span class="tag-que" data-type="que" data-clean="${cleanQueVal}" data-orig="${d.qn || ''}" onmouseenter="showTagTooltip(event, 'que', '${d.qn}')" onmouseleave="hideTagTooltip()">${d.qn || ''}</span></div>
+                    <div class="tag-row">Động: <span class="tag-que tag-dong-hao" data-type="donghao" data-clean="${d.dh || ''}" style="color: #ea580c; background: #ffedd5; cursor: pointer;">Hào ${d.dh || '?'}</span></div>
                 </div>
                 <div class="card-row-ratio">
                     <span>TY: <b>${pTY}%</b></span>
@@ -3818,7 +3830,7 @@
 
         // Event delegation cho các thẻ tag trên SIM (Mệnh, Quẻ, Cát Tinh)
         document.addEventListener('click', function (e) {
-            const tag = e.target.closest('.tag-menh, .tag-que, .tag-cat-tinh');
+            const tag = e.target.closest('.tag-menh, .tag-que, .tag-cat-tinh, .tag-dong-hao');
             if (tag) {
                 e.stopPropagation();
                 e.preventDefault();
@@ -3839,6 +3851,10 @@
                         });
                     } else if (type === 'stars') {
                         starComboFilter = cleanVal;
+                    } else if (type === 'donghao') {
+                        document.querySelectorAll('.dong-hao-cb').forEach(cb => {
+                            cb.checked = (cb.value === cleanVal);
+                        });
                     }
 
                     updateUI();
@@ -3903,6 +3919,11 @@
             // 4. Quẻ
             document.querySelectorAll('.q-cb:checked').forEach(cb => {
                 chips.push({ type: 'que', label: `Quẻ: ${cb.value}`, value: cb.value });
+            });
+
+            // 4b. Động Hào
+            document.querySelectorAll('.dong-hao-cb:checked').forEach(cb => {
+                chips.push({ type: 'donghao', label: `Động Hào: ${cb.value}`, value: cb.value });
             });
 
             // 5. Khoảng giá
@@ -4058,6 +4079,9 @@
             if (type === 'que') {
                 document.querySelectorAll('.q-cb').forEach(cb => { if (cleanVN(cb.value) === cleanVN(value)) cb.checked = false; });
             }
+            if (type === 'donghao') {
+                document.querySelectorAll('.dong-hao-cb').forEach(cb => { if (cb.value === value) cb.checked = false; });
+            }
             if (type === 'priceCb') {
                 document.querySelectorAll('.price-cb').forEach(cb => { if (cb.value === value) cb.checked = false; });
             }
@@ -4149,6 +4173,7 @@
             const menhCbs = Array.from(document.querySelectorAll('.menh-cb:checked')).map(cb => cleanMenh(cb.value));
             const netCbs = Array.from(document.querySelectorAll('.net-cb:checked')).map(cb => cleanVN(cb.value));
             const yyCbs = Array.from(document.querySelectorAll('.am-duong-cb:checked')).map(cb => parseInt(cb.value));
+            const dongHaoCbs = Array.from(document.querySelectorAll('.dong-hao-cb:checked')).map(cb => String(cb.value));
 
             // Technical Filters (Min/Max)
             const techFields = ['c_cat', 'c_hung', 'c_pv', 'c_total', 'ty', 'sk', 'dn', 'pb', 'ln', 'tl', 'hp', 'th'];
@@ -4288,6 +4313,11 @@
                     }
                 }
 
+
+                // == FILTER: ĐỘNG HÀO ==
+                if (dongHaoCbs.length > 0) {
+                    if (!dongHaoCbs.includes(String(d.dh))) return false;
+                }
 
                 // == FILTER: MỆNH ==
                 if (menhCbs.length > 0) {
