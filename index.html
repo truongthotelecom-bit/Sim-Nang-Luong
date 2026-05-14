@@ -2918,6 +2918,14 @@
                 </div>
                 <div class="que-scroll chip-group" id="queBox"></div>
 
+                <!-- QUẺ TỐT / XẤU -->
+                <h3 style="margin-top: 20px;">Lọc theo Loại Quẻ</h3>
+                <div class="chip-group">
+                    <label class="chip-label"><input type="checkbox" class="que-type-cb" value="Cát" onchange="updateUI()"><span class="chip-text" style="color: #16a34a; font-weight: bold;">Quẻ Cát (Tốt)</span></label>
+                    <label class="chip-label"><input type="checkbox" class="que-type-cb" value="Hung" onchange="updateUI()"><span class="chip-text" style="color: #dc2626; font-weight: bold;">Quẻ Hung (Xấu)</span></label>
+                    <label class="chip-label"><input type="checkbox" class="que-type-cb" value="Bình Hòa" onchange="updateUI()"><span class="chip-text">Bình Hòa</span></label>
+                </div>
+
                 <!-- ĐỘNG HÀO -->
                 <h3 style="margin-top: 20px;">Lọc theo Động Hào</h3>
                 <div class="chip-group">
@@ -3512,6 +3520,12 @@
             const cleanMenhVal = cleanMenh(d.m);
             const cleanQueVal = cleanVN(d.qn);
 
+            const qInfo = QUE_DETAILS[d.qn] || {};
+            const qType = qInfo.type || "Bình Hòa";
+            let qColor = "#475569", qBg = "#f1f5f9";
+            if (qType.includes("Cát")) { qColor = "#16a34a"; qBg = "#dcfce7"; }
+            else if (qType.includes("Hung")) { qColor = "#dc2626"; qBg = "#fee2e2"; }
+
             // Đóng gói data-* attribute để phục vụ popup nhanh
             const dAttrs = `data-num="${d.s}" data-sr="${d.sr}" data-price="${priceFmt}" data-telco="${d.n}" ` +
                 `data-menh="${d.m}" data-yy-am="${d.a}" data-yy-duong="${d.d}" data-yy-status="${yyText}" ` +
@@ -3532,7 +3546,7 @@
                 <div class="card-row-bottom">
                     <div class="tag-row">Mệnh: <span class="tag-menh ${menhClass}" data-type="menh" data-clean="${cleanMenhVal}" data-orig="${d.m}" onmouseenter="showTagTooltip(event, 'menh', '${d.m}')" onmouseleave="hideTagTooltip()">${d.m}</span></div>
                     <div class="tag-row">Cát Tinh: <span class="tag-cat-tinh" data-type="stars" data-clean="${last2Keys}" data-orig="${last2Stars}" onmouseenter="showTagTooltip(event, 'stars', '${last2Keys}')" onmouseleave="hideTagTooltip()">${last2Stars}</span></div>
-                    <div class="tag-row">Quẻ: <span class="tag-que" data-type="que" data-clean="${cleanQueVal}" data-orig="${d.qn || ''}" onmouseenter="showTagTooltip(event, 'que', '${d.qn}')" onmouseleave="hideTagTooltip()">${d.qn || ''}</span></div>
+                    <div class="tag-row">Quẻ: <span class="tag-que" data-type="que" data-clean="${cleanQueVal}" data-orig="${d.qn || ''}" onmouseenter="showTagTooltip(event, 'que', '${d.qn}')" onmouseleave="hideTagTooltip()">${d.qn || ''}</span> <span class="tag-que" style="color: ${qColor}; background: ${qBg}; pointer-events: none;">${qType}</span></div>
                     <div class="tag-row">Động: <span class="tag-que tag-dong-hao" data-type="donghao" data-clean="${d.dh || ''}" style="color: #ea580c; background: #ffedd5; cursor: pointer;">Hào ${d.dh || '?'}</span></div>
                 </div>
                 <div class="card-row-ratio">
@@ -3926,6 +3940,12 @@
                 chips.push({ type: 'donghao', label: `Động Hào: ${cb.value}`, value: cb.value });
             });
 
+            // 4c. Quẻ Tốt / Xấu
+            document.querySelectorAll('.que-type-cb:checked').forEach(cb => {
+                const lbl = cb.value === 'Cát' ? 'Quẻ Cát' : (cb.value === 'Hung' ? 'Quẻ Hung' : 'Bình Hòa');
+                chips.push({ type: 'quetype', label: lbl, value: cb.value });
+            });
+
             // 5. Khoảng giá
             // Checkboxes
             const uniquePriceCbs = new Set();
@@ -4082,6 +4102,9 @@
             if (type === 'donghao') {
                 document.querySelectorAll('.dong-hao-cb').forEach(cb => { if (cb.value === value) cb.checked = false; });
             }
+            if (type === 'quetype') {
+                document.querySelectorAll('.que-type-cb').forEach(cb => { if (cb.value === value) cb.checked = false; });
+            }
             if (type === 'priceCb') {
                 document.querySelectorAll('.price-cb').forEach(cb => { if (cb.value === value) cb.checked = false; });
             }
@@ -4174,6 +4197,7 @@
             const netCbs = Array.from(document.querySelectorAll('.net-cb:checked')).map(cb => cleanVN(cb.value));
             const yyCbs = Array.from(document.querySelectorAll('.am-duong-cb:checked')).map(cb => parseInt(cb.value));
             const dongHaoCbs = Array.from(document.querySelectorAll('.dong-hao-cb:checked')).map(cb => String(cb.value));
+            const queTypeCbs = Array.from(document.querySelectorAll('.que-type-cb:checked')).map(cb => cb.value);
 
             // Technical Filters (Min/Max)
             const techFields = ['c_cat', 'c_hung', 'c_pv', 'c_total', 'ty', 'sk', 'dn', 'pb', 'ln', 'tl', 'hp', 'th'];
@@ -4317,6 +4341,19 @@
                 // == FILTER: ĐỘNG HÀO ==
                 if (dongHaoCbs.length > 0) {
                     if (!dongHaoCbs.includes(String(d.dh))) return false;
+                }
+
+                // == FILTER: LOẠI QUẺ (Tốt/Xấu) ==
+                if (queTypeCbs.length > 0) {
+                    const qInfo = QUE_DETAILS[d.qn] || {};
+                    const qType = qInfo.type || "Bình Hòa";
+                    
+                    let match = false;
+                    if (queTypeCbs.includes("Cát") && qType.includes("Cát")) match = true;
+                    if (queTypeCbs.includes("Hung") && qType.includes("Hung")) match = true;
+                    if (queTypeCbs.includes("Bình Hòa") && (!qType.includes("Cát") && !qType.includes("Hung"))) match = true;
+                    
+                    if (!match) return false;
                 }
 
                 // == FILTER: MỆNH ==
